@@ -1,0 +1,710 @@
+{
+  "project": "FieldOps",
+  "branchName": "ralph/field-management-app",
+  "description": "Field Management PWA - Offline-first task management for field service crews with photo uploads, GPS tracking, and admin configuration",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Database schema setup",
+      "description": "As a developer, I need the Supabase database schema created so all features have data storage.",
+      "acceptanceCriteria": [
+        "Create users table with: id, email, role (admin/field_user), created_at, updated_at",
+        "Create divisions table with: id, name, color, icon, created_at",
+        "Create statuses table with: id, name, color, order, is_complete, is_default, created_at",
+        "Create tasks table with: id, title, description, status_id, division_id, location_lat, location_lng, address, due_date, assigned_user_id, custom_fields (JSONB), created_at, updated_at, deleted_at",
+        "Create comments table with: id, task_id, user_id, content, created_at",
+        "Create photos table with: id, task_id, user_id, storage_path, timestamp, gps_lat, gps_lng, created_at",
+        "Create files table with: id, task_id, user_id, storage_path, file_name, file_size, created_at",
+        "Create custom_field_definitions table with: id, name, field_type, options (JSONB), required, order, created_at",
+        "Create task_templates table with: id, name, default_title, default_description, default_division_id, default_custom_fields (JSONB), created_at",
+        "Create branding table with: id, logo_url, primary_color, accent_color, app_name, created_at",
+        "All foreign key relationships properly defined",
+        "npm run typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Supabase RLS policies",
+      "description": "As a developer, I need Row Level Security policies so users can only access appropriate data.",
+      "acceptanceCriteria": [
+        "Admins can read/write all tables",
+        "Field users can read all tasks, divisions, statuses, custom_field_definitions, templates, branding",
+        "Field users can create/update task status, comments, photos, files",
+        "Field users can only read their own user profile",
+        "Users can only read data from their own organization (if multi-tenant)",
+        "RLS enabled on all tables",
+        "npm run typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "User authentication with Supabase Auth",
+      "description": "As a user, I want to log in securely so that I can access my company's tasks.",
+      "acceptanceCriteria": [
+        "Login page with email/password form",
+        "Supabase Auth integration for authentication",
+        "Remember me checkbox keeps user logged in for 30 days",
+        "Session token stored securely for offline access",
+        "Role-based redirect: Admin → /admin/dashboard, Field User → /tasks",
+        "Logout functionality clears session",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "PWA manifest and service worker setup",
+      "description": "As a user, I want to install the app on my device so it feels native.",
+      "acceptanceCriteria": [
+        "Web App Manifest with name, icons (192px, 512px), theme_color, background_color",
+        "display: standalone in manifest",
+        "Service worker registered on app load",
+        "App shell (HTML, CSS, JS) cached for offline access",
+        "Works on iOS Safari, Android Chrome, Desktop Chrome/Edge",
+        "npm run typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Admin - Create divisions/flags",
+      "description": "As an admin, I want to create divisions or flags so tasks can be categorized.",
+      "acceptanceCriteria": [
+        "Admin page at /admin/divisions",
+        "Form to create division with: name (required), color (color picker), icon (optional dropdown)",
+        "List of existing divisions with edit and delete buttons",
+        "Edit modal pre-fills current values",
+        "Delete shows confirmation dialog",
+        "Changes saved to Supabase",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Admin - Create custom statuses",
+      "description": "As an admin, I want to define custom task statuses so workflows match my business.",
+      "acceptanceCriteria": [
+        "Admin page at /admin/statuses",
+        "Form to create status with: name (required), color (color picker), order (number)",
+        "Checkbox to mark status as 'complete' (affects reporting)",
+        "Checkbox to mark as default status for new tasks",
+        "List of statuses sortable via drag-and-drop to reorder",
+        "Edit and delete functionality",
+        "Changes saved to Supabase",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Admin - Task management table view",
+      "description": "As an admin, I want to view all tasks in a table so I can manage work.",
+      "acceptanceCriteria": [
+        "Admin page at /admin/tasks",
+        "Table showing: title, status, division, assigned user, due date, created date",
+        "Columns are sortable (click header)",
+        "Filter dropdowns for: status, division, assigned user",
+        "Search input filters by title or description",
+        "Pagination with 25 items per page",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-008",
+      "title": "Admin - Create and edit tasks",
+      "description": "As an admin, I want to create and edit tasks so field users have work assigned.",
+      "acceptanceCriteria": [
+        "Create task button opens modal form",
+        "Form fields: title, description (textarea), status (dropdown), division (dropdown), due date (date picker), assigned user (dropdown)",
+        "Location fields: address (text), latitude/longitude (number inputs)",
+        "Save creates task in Supabase",
+        "Edit button on table row opens same modal with pre-filled values",
+        "Delete button shows confirmation, performs soft delete (sets deleted_at)",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 8,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-009",
+      "title": "View task list (field user)",
+      "description": "As a field user, I want to see all tasks so I can plan my work.",
+      "acceptanceCriteria": [
+        "Task list page at /tasks",
+        "Card-based layout (not table)",
+        "Each card shows: title, status badge (colored), division badge, location, due date, assigned user avatar/name",
+        "Cards are minimum 72px height with high-contrast text",
+        "Filter buttons for status (All, To Do, In Progress, Complete)",
+        "Filter dropdown for division",
+        "Tasks fetched from Supabase on load",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 9,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-010",
+      "title": "View task detail (field user)",
+      "description": "As a field user, I want to view task details so I know what work is required.",
+      "acceptanceCriteria": [
+        "Task detail page at /tasks/[id]",
+        "Shows: title, description, status, division, due date, assigned user, location/address",
+        "Map preview showing job location (static image from map tile service)",
+        "Get Directions button opens native maps app (Google Maps/Apple Maps link)",
+        "Large 'Update Status' button always visible at bottom",
+        "Custom fields section displays any JSONB custom field values",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-011",
+      "title": "Update task status (field user)",
+      "description": "As a field user, I want to update a task's status so the office knows my progress.",
+      "acceptanceCriteria": [
+        "Status update UI shows large buttons for each status (fetched from statuses table)",
+        "Buttons are minimum 64px tall, single-tap selection",
+        "Current status is visually highlighted",
+        "Selecting new status updates task in Supabase",
+        "Optimistic UI: status updates immediately before server confirms",
+        "Success toast notification after save",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 11,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-012",
+      "title": "Photo upload - camera and gallery",
+      "description": "As a field user, I want to capture and upload photos for task documentation.",
+      "acceptanceCriteria": [
+        "Photo upload section on task detail page",
+        "Large 'Take Photo' button (min 64px tall) opens device camera",
+        "Gallery picker button for selecting existing photos",
+        "Support multiple photos per upload (batch select)",
+        "Photos displayed as thumbnails after selection",
+        "Upload button sends photos to Supabase Storage",
+        "Upload progress indicator shown during upload",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 12,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-013",
+      "title": "Photo processing - compression and watermark",
+      "description": "As a field user, I want photos compressed and watermarked automatically.",
+      "acceptanceCriteria": [
+        "Photos resized client-side to max 1920px on longest edge",
+        "JPEG quality set to 80%",
+        "Watermark added to bottom corner: timestamp in format 'YYYY-MM-DD HH:mm'",
+        "Watermark includes GPS coordinates if available: 'lat, lng'",
+        "Watermark is semi-transparent white text with dark shadow for readability",
+        "Processing happens before upload",
+        "npm run typecheck passes"
+      ],
+      "priority": 13,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-014",
+      "title": "Photo metadata and GPS capture",
+      "description": "As a field user, I want photos tagged with location and timestamp metadata.",
+      "acceptanceCriteria": [
+        "Request Geolocation API permission when uploading photos",
+        "If permission granted, capture current GPS coordinates",
+        "Store in photos table: gps_lat, gps_lng, timestamp, uploader user_id",
+        "If GPS unavailable, proceed without coordinates (not required)",
+        "Photo record linked to task_id",
+        "npm run typecheck passes"
+      ],
+      "priority": 14,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-015",
+      "title": "View task photos",
+      "description": "As a field user, I want to view photos attached to a task.",
+      "acceptanceCriteria": [
+        "Photos section on task detail page shows thumbnails grid",
+        "Clicking thumbnail opens full-size image in lightbox/modal",
+        "Lightbox shows metadata: timestamp, GPS coordinates, uploader name",
+        "Navigation arrows to browse multiple photos",
+        "Close button to dismiss lightbox",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 15,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-016",
+      "title": "File upload",
+      "description": "As a field user, I want to attach files to tasks for documentation.",
+      "acceptanceCriteria": [
+        "File upload section on task detail page",
+        "File picker button supporting: PDF, DOC, DOCX, XLS, XLSX, images",
+        "Max file size validation: 25MB per file, show error if exceeded",
+        "Upload progress indicator during upload",
+        "Files stored in Supabase Storage",
+        "File record created with: file_name, file_size, storage_path, task_id, user_id",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 16,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-017",
+      "title": "View and download task files",
+      "description": "As a field user, I want to view files attached to a task and download them.",
+      "acceptanceCriteria": [
+        "Files section on task detail page lists all attached files",
+        "Each file shows: file name, file size formatted (KB/MB), upload date",
+        "Click on file opens in new tab (for viewable types) or downloads",
+        "Download button explicitly downloads file",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 17,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-018",
+      "title": "Add comments to task",
+      "description": "As a field user, I want to add comments to tasks to communicate with the office.",
+      "acceptanceCriteria": [
+        "Comment input section on task detail page",
+        "Large text input field (min height 64px) keyboard-friendly",
+        "Submit button posts comment to Supabase",
+        "Comment record includes: content, user_id, task_id, created_at",
+        "New comment appears in list immediately after submit",
+        "Toast notification confirms comment added",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 18,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-019",
+      "title": "View comments on task",
+      "description": "As a field user, I want to read comments on a task for context.",
+      "acceptanceCriteria": [
+        "Comments section on task detail page shows all comments",
+        "Comments sorted newest-first",
+        "Each comment shows: author name/avatar, content, relative timestamp ('2 hours ago')",
+        "Clear visual distinction between different users (avatar or color)",
+        "Empty state message when no comments exist",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 19,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-020",
+      "title": "Voice-to-text for comments",
+      "description": "As a field user, I want to dictate comments to avoid typing with gloves.",
+      "acceptanceCriteria": [
+        "Microphone button next to comment input",
+        "Click starts browser Speech Recognition API",
+        "Visual indicator shows recording is active",
+        "Transcribed text appears in comment input field",
+        "User can edit before submitting",
+        "Graceful fallback if speech API unavailable (hide button)",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 20,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-021",
+      "title": "Offline - IndexedDB setup with Dexie",
+      "description": "As a developer, I need IndexedDB storage for offline data caching.",
+      "acceptanceCriteria": [
+        "Dexie.js installed and configured",
+        "Database schema mirrors Supabase tables: tasks, divisions, statuses, comments, photos, files, custom_field_definitions",
+        "Sync timestamp tracked per table",
+        "Helper functions: saveToLocal, getFromLocal, clearLocal",
+        "npm run typecheck passes"
+      ],
+      "priority": 21,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-022",
+      "title": "Offline - Cache task data for offline viewing",
+      "description": "As a field user, I want task data cached so I can view tasks offline.",
+      "acceptanceCriteria": [
+        "On initial load, all tasks synced to IndexedDB",
+        "On subsequent loads, check IndexedDB first, then fetch updates from server",
+        "Task list page reads from IndexedDB when offline",
+        "Task detail page reads from IndexedDB when offline",
+        "Visual indicator (banner or icon) when app is offline",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 22,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-023",
+      "title": "Offline - Queue mutations for later sync",
+      "description": "As a field user, I want my changes saved locally when offline.",
+      "acceptanceCriteria": [
+        "Pending mutations table in IndexedDB: id, type (status/comment/photo/file), payload, created_at, status (pending/syncing/failed)",
+        "Status updates queued when offline",
+        "Comments queued when offline",
+        "Photos queued in IndexedDB when offline (blob stored locally)",
+        "Files queued when offline",
+        "Queue count displayed in UI ('3 pending changes')",
+        "npm run typecheck passes"
+      ],
+      "priority": 23,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-024",
+      "title": "Offline - Background sync when online",
+      "description": "As a field user, I want pending changes to sync automatically when I'm back online.",
+      "acceptanceCriteria": [
+        "Background Sync API registered for pending mutations",
+        "When online, process queue in order (FIFO)",
+        "Each mutation sent to Supabase",
+        "On success, remove from queue and update local cache",
+        "On failure, keep in queue and mark as failed",
+        "Sync status indicator: 'Synced', 'Syncing...', 'X pending'",
+        "npm run typecheck passes"
+      ],
+      "priority": 24,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-025",
+      "title": "Offline - Manual sync and pull-to-refresh",
+      "description": "As a field user, I want to manually trigger sync and refresh data.",
+      "acceptanceCriteria": [
+        "Manual 'Sync Now' button in header or profile",
+        "Pull-to-refresh gesture on task list syncs with server",
+        "Refresh fetches latest tasks, statuses, divisions from server",
+        "Updates local IndexedDB cache",
+        "Shows loading indicator during sync",
+        "Toast notification on sync complete or error",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 25,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-026",
+      "title": "Offline - Conflict detection",
+      "description": "As a field user, I want conflicts flagged so I can resolve them.",
+      "acceptanceCriteria": [
+        "Compare updated_at timestamps on sync",
+        "If server record updated after local change queued, flag as conflict",
+        "Non-conflicting fields auto-merge silently",
+        "Conflicting fields show UI: 'Your change' vs 'Server change'",
+        "User can choose which version to keep",
+        "After resolution, mark mutation as resolved",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 26,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-027",
+      "title": "Admin - Custom fields configuration",
+      "description": "As an admin, I want to add custom fields to tasks for industry-specific data.",
+      "acceptanceCriteria": [
+        "Admin page at /admin/custom-fields",
+        "Form to create field: name, type (text/number/date/dropdown/checkbox), required toggle",
+        "Dropdown type shows additional input for comma-separated options",
+        "List of fields with drag-and-drop reordering",
+        "Edit and delete functionality",
+        "Changes saved to custom_field_definitions table",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 27,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-028",
+      "title": "Custom fields on task forms",
+      "description": "As an admin, I want custom fields to appear on task create/edit forms.",
+      "acceptanceCriteria": [
+        "Task create/edit form fetches custom_field_definitions",
+        "Renders appropriate input for each type: text input, number input, date picker, dropdown, checkbox",
+        "Required fields show validation error if empty",
+        "Values saved to tasks.custom_fields JSONB column",
+        "Values displayed on task detail view",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 28,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-029",
+      "title": "Admin - User management",
+      "description": "As an admin, I want to manage users so I can control access.",
+      "acceptanceCriteria": [
+        "Admin page at /admin/users",
+        "Table showing: email, role, last active date, status (active/deactivated)",
+        "Invite user button: form with email and role dropdown (Admin/Field User)",
+        "Invite sends email via Supabase Auth",
+        "Edit user role via dropdown",
+        "Deactivate button revokes access but preserves history",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 29,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-030",
+      "title": "Admin - Branding and white-label",
+      "description": "As an admin, I want to customize branding so the app reflects my company.",
+      "acceptanceCriteria": [
+        "Admin page at /admin/branding",
+        "Logo upload: accepts image, stores in Supabase Storage, displays in header",
+        "Primary color picker: applies to buttons, headers",
+        "Accent color picker: applies to status badges, highlights",
+        "App name input: shown in PWA install and header",
+        "Preview section shows how colors/logo will look",
+        "Changes saved to branding table",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 30,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-031",
+      "title": "Apply branding throughout app",
+      "description": "As a user, I want to see company branding applied to the app.",
+      "acceptanceCriteria": [
+        "Fetch branding settings on app load",
+        "Logo displayed in header/navigation",
+        "Primary color applied to buttons, header background",
+        "Accent color applied to status badges, links, highlights",
+        "App name shown in header and PWA title",
+        "Branding cached for offline use",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 31,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-032",
+      "title": "Admin - Task templates",
+      "description": "As an admin, I want to create task templates for common job types.",
+      "acceptanceCriteria": [
+        "Admin page at /admin/templates",
+        "Form to create template: name, default title, default description, default division, default custom field values",
+        "List of templates with edit and delete",
+        "Templates saved to task_templates table",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 32,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-033",
+      "title": "Create task from template",
+      "description": "As an admin, I want to create tasks from templates quickly.",
+      "acceptanceCriteria": [
+        "Task create form has 'Create from Template' dropdown",
+        "Selecting template pre-fills: title, description, division, custom fields",
+        "User can override any pre-filled values",
+        "Still need to set: status, due date, assigned user, location",
+        "Save creates task with template defaults merged with overrides",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 33,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-034",
+      "title": "Admin - Media gallery",
+      "description": "As an admin, I want to view all uploaded photos and files.",
+      "acceptanceCriteria": [
+        "Admin page at /admin/media",
+        "Gallery grid view of all photos across tasks",
+        "Filter dropdowns: by task, by user, by division, by date range",
+        "Click photo opens full-size with metadata (timestamp, GPS, uploader, task link)",
+        "Download individual photos",
+        "Bulk selection checkbox on each photo",
+        "Download selected button creates zip",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 34,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-035",
+      "title": "Admin - Bulk task actions",
+      "description": "As an admin, I want to perform bulk actions on multiple tasks.",
+      "acceptanceCriteria": [
+        "Checkbox on each task row in admin table",
+        "Select all checkbox in header",
+        "Shift+Click selects range of tasks",
+        "Bulk action dropdown appears when tasks selected",
+        "Bulk actions: Assign to user, Change status, Delete",
+        "Confirmation dialog before destructive actions",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 35,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-036",
+      "title": "Admin - Export data to CSV",
+      "description": "As an admin, I want to export task data for reporting.",
+      "acceptanceCriteria": [
+        "Export to CSV button on admin tasks page",
+        "Exports visible/filtered tasks (respects current filters)",
+        "CSV includes: ID, title, status, division, assigned user, due date, created date, location",
+        "Downloads file with timestamp in filename",
+        "npm run typecheck passes"
+      ],
+      "priority": 36,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-037",
+      "title": "Responsive layout - Mobile first",
+      "description": "As a field user on mobile, I want large touch targets usable with gloves.",
+      "acceptanceCriteria": [
+        "All tap targets minimum 48x48px, primary actions 64px",
+        "No hover-dependent interactions",
+        "Bottom navigation bar with max 4 items: Tasks, Upload, Sync, Profile",
+        "Font size minimum 16px for body text",
+        "High contrast mode support (prefers-contrast media query)",
+        "Works in landscape and portrait orientations",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 37,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-038",
+      "title": "Admin dashboard - Desktop layout",
+      "description": "As an admin on desktop, I want denser information display.",
+      "acceptanceCriteria": [
+        "Side navigation with expanded labels (collapsible)",
+        "Navigation sections: Dashboard, Tasks, Media, Configuration (sub-items)",
+        "Dashboard shows summary stats: tasks by status counts, recent uploads",
+        "Keyboard shortcuts: n=new task, /=search, ?=help",
+        "Multi-column layout adapts to screen width",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 38,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-039",
+      "title": "PWA install prompt and splash screen",
+      "description": "As a user, I want to be prompted to install the app.",
+      "acceptanceCriteria": [
+        "beforeinstallprompt event captured",
+        "Install banner shown after 2nd visit or after meaningful action",
+        "Install button triggers native install prompt",
+        "Splash screen shows company logo (from branding) on app launch",
+        "Splash screen matches theme colors from branding",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 39,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-040",
+      "title": "Dark mode support",
+      "description": "As a field user, I want dark mode for outdoor readability.",
+      "acceptanceCriteria": [
+        "Detect prefers-color-scheme media query",
+        "Dark mode styles for all screens",
+        "Toggle in profile/settings to override system preference",
+        "Preference persisted in localStorage",
+        "Colors maintain sufficient contrast in both modes",
+        "npm run typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 40,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}
