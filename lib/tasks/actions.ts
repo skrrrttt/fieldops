@@ -206,6 +206,7 @@ export interface CreateTaskData {
   location_lat?: number | null;
   location_lng?: number | null;
   custom_fields?: Record<string, unknown> | null;
+  assigned_field_ids?: string[] | null;
 }
 
 /**
@@ -227,6 +228,7 @@ export async function createTask(data: CreateTaskData): Promise<ActionResult<Tas
       location_lat: data.location_lat || null,
       location_lng: data.location_lng || null,
       custom_fields: data.custom_fields || null,
+      assigned_field_ids: data.assigned_field_ids || [],
     } as never)
     .select()
     .single();
@@ -251,6 +253,7 @@ export interface UpdateTaskData {
   location_lat?: number | null;
   location_lng?: number | null;
   custom_fields?: Record<string, unknown> | null;
+  assigned_field_ids?: string[] | null;
 }
 
 /**
@@ -273,6 +276,7 @@ export async function updateTask(data: UpdateTaskData): Promise<ActionResult<Tas
   if (data.location_lat !== undefined) updateData.location_lat = data.location_lat;
   if (data.location_lng !== undefined) updateData.location_lng = data.location_lng;
   if (data.custom_fields !== undefined) updateData.custom_fields = data.custom_fields;
+  if (data.assigned_field_ids !== undefined) updateData.assigned_field_ids = data.assigned_field_ids;
 
   const { data: task, error } = await supabase
     .from('tasks')

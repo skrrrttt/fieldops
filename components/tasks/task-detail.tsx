@@ -161,14 +161,18 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
       />
       <FileList key={`filelist-${refreshKey}`} files={files} />
 
-      {/* 6. Custom Fields Section - Editable for field users */}
-      {customFields.length > 0 && (
-        <CustomFieldEdit
-          taskId={task.id}
-          customFields={customFields}
-          initialValues={(task.custom_fields as Record<string, unknown>) || {}}
-        />
-      )}
+      {/* 6. Custom Fields Section - Only show fields assigned to this task */}
+      {(() => {
+        const assignedFieldIds = (task as { assigned_field_ids?: string[] | null }).assigned_field_ids || [];
+        const assignedFields = customFields.filter(f => assignedFieldIds.includes(f.id));
+        return assignedFields.length > 0 ? (
+          <CustomFieldEdit
+            taskId={task.id}
+            customFields={assignedFields}
+            initialValues={(task.custom_fields as Record<string, unknown>) || {}}
+          />
+        ) : null;
+      })()}
 
       {/* 7. Additional Details - Due Date, Assigned User */}
       {(task.due_date || task.assigned_user) && (
