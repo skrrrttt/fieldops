@@ -414,3 +414,48 @@ export async function bulkDeleteTasks(
 
   return { success: true, data: { deleted: count || taskIds.length } };
 }
+
+/**
+ * Update a task's custom fields (for field users to fill in custom data)
+ */
+export async function updateTaskCustomFields(
+  taskId: string,
+  customFields: Record<string, unknown>
+): Promise<ActionResult<Task>> {
+  const supabase = await createClient();
+
+  // First get the current task to merge custom fields
+  const { data: currentTask, error: fetchError } = await supabase
+    .from('tasks')
+    .select('custom_fields')
+    .eq('id', taskId)
+    .single<{ custom_fields: Record<string, unknown> | null }>();
+
+  if (fetchError) {
+    console.error('Error fetching task:', fetchError);
+    return { success: false, error: fetchError.message };
+  }
+
+  // Merge existing custom fields with new values
+  const mergedCustomFields = {
+    ...((currentTask?.custom_fields as Record<string, unknown>) || {}),
+    ...customFields,
+  };
+
+  const { data: task, error } = await supabase
+    .from('tasks')
+    .update({
+      custom_fields: mergedCustomFields,
+      updated_at: new Date().toISOString(),
+    } as never)
+    .eq('id', taskId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error updating task custom fields:', error);
+    return { success: false, error: error.message };
+  }
+
+  return { success: true, data: task as Task };
+}

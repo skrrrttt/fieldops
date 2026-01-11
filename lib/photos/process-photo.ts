@@ -2,6 +2,7 @@
  * Photo Processing Utility
  *
  * Handles client-side photo processing:
+ * - EXIF orientation handling (critical for iOS)
  * - Resizing to max 1920px on longest edge
  * - JPEG compression at 80% quality
  * - Watermarking with timestamp and GPS coordinates
@@ -30,7 +31,117 @@ const DEFAULT_MAX_SIZE = 1920;
 const DEFAULT_QUALITY = 0.8;
 
 /**
+ * Read EXIF orientation from image file
+ * Returns orientation value 1-8 (1 = normal, others = rotated/flipped)
+ */
+async function getExifOrientation(file: File): Promise<number> {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      const view = new DataView(e.target?.result as ArrayBuffer);
+
+      // Check for JPEG marker
+      if (view.getUint16(0, false) !== 0xFFD8) {
+        resolve(1);
+        return;
+      }
+
+      const length = view.byteLength;
+      let offset = 2;
+
+      while (offset < length) {
+        if (view.getUint16(offset, false) === 0xFFE1) {
+          // Found EXIF marker
+          const exifLength = view.getUint16(offset + 2, false);
+
+          // Check for "Exif" string
+          if (view.getUint32(offset + 4, false) !== 0x45786966) {
+            resolve(1);
+            return;
+          }
+
+          const tiffOffset = offset + 10;
+          const littleEndian = view.getUint16(tiffOffset, false) === 0x4949;
+
+          // Get IFD0 offset
+          const ifdOffset = view.getUint32(tiffOffset + 4, littleEndian);
+          const numEntries = view.getUint16(tiffOffset + ifdOffset, littleEndian);
+
+          // Search for orientation tag (0x0112)
+          for (let i = 0; i < numEntries; i++) {
+            const entryOffset = tiffOffset + ifdOffset + 2 + (i * 12);
+            if (view.getUint16(entryOffset, littleEndian) === 0x0112) {
+              resolve(view.getUint16(entryOffset + 8, littleEndian));
+              return;
+            }
+          }
+
+          resolve(1);
+          return;
+        }
+
+        offset += 2 + view.getUint16(offset + 2, false);
+      }
+
+      resolve(1);
+    };
+
+    reader.onerror = () => resolve(1);
+
+    // Read first 64KB which should contain EXIF data
+    reader.readAsArrayBuffer(file.slice(0, 65536));
+  });
+}
+
+/**
+ * Apply EXIF orientation transformation to canvas context
+ */
+function applyExifOrientation(
+  ctx: CanvasRenderingContext2D,
+  orientation: number,
+  width: number,
+  height: number
+): void {
+  switch (orientation) {
+    case 2: // Horizontal flip
+      ctx.translate(width, 0);
+      ctx.scale(-1, 1);
+      break;
+    case 3: // 180 degree rotation
+      ctx.translate(width, height);
+      ctx.rotate(Math.PI);
+      break;
+    case 4: // Vertical flip
+      ctx.translate(0, height);
+      ctx.scale(1, -1);
+      break;
+    case 5: // 90 CW + horizontal flip
+      ctx.rotate(Math.PI / 2);
+      ctx.scale(1, -1);
+      break;
+    case 6: // 90 CW
+      ctx.rotate(Math.PI / 2);
+      ctx.translate(0, -height);
+      break;
+    case 7: // 90 CCW + horizontal flip
+      ctx.rotate(-Math.PI / 2);
+      ctx.translate(-width, 0);
+      ctx.scale(1, -1);
+      break;
+    case 8: // 90 CCW
+      ctx.rotate(-Math.PI / 2);
+      ctx.translate(-width, 0);
+      break;
+    default:
+      // Orientation 1 or unknown - no transformation needed
+      break;
+  }
+}
+
+/**
  * Process a photo file: resize, compress, and add watermark
+ * Handles EXIF orientation for proper display on all devices (especially iOS)
  */
 export async function processPhoto(
   file: File,
@@ -43,6 +154,9 @@ export async function processPhoto(
     gpsCoordinates = null,
   } = options;
 
+  // Read EXIF orientation before loading image
+  const orientation = await getExifOrientation(file);
+
   return new Promise((resolve, reject) => {
     const img = new Image();
     const objectUrl = URL.createObjectURL(file);
@@ -51,14 +165,19 @@ export async function processPhoto(
       URL.revokeObjectURL(objectUrl);
 
       try {
-        // Calculate new dimensions
+        // For orientations 5-8, the image is rotated 90 degrees, so swap dimensions
+        const isRotated = orientation >= 5 && orientation <= 8;
+        const sourceWidth = isRotated ? img.height : img.width;
+        const sourceHeight = isRotated ? img.width : img.height;
+
+        // Calculate new dimensions based on the oriented dimensions
         const { width, height } = calculateNewDimensions(
-          img.width,
-          img.height,
+          sourceWidth,
+          sourceHeight,
           maxSize
         );
 
-        // Create canvas
+        // Create canvas with the correct dimensions
         const canvas = document.createElement('canvas');
         canvas.width = width;
         canvas.height = height;
@@ -69,8 +188,18 @@ export async function processPhoto(
           return;
         }
 
-        // Draw resized image
-        ctx.drawImage(img, 0, 0, width, height);
+        // Apply EXIF orientation transformation
+        applyExifOrientation(ctx, orientation, width, height);
+
+        // Calculate the draw dimensions (need to swap for rotated images)
+        const drawWidth = isRotated ? height : width;
+        const drawHeight = isRotated ? width : height;
+
+        // Draw resized image with orientation applied
+        ctx.drawImage(img, 0, 0, drawWidth, drawHeight);
+
+        // Reset transformation for watermark
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
 
         // Add watermark
         addWatermark(ctx, width, height, timestamp, gpsCoordinates);
