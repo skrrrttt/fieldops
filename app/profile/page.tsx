@@ -2,6 +2,7 @@ import { requireAuth, signOut } from '@/lib/auth/actions';
 import { DetailHeader } from '@/components/layout/app-header';
 import { MobileBottomNav, MobileBottomNavSpacer } from '@/components/layout/mobile-bottom-nav';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 export default async function ProfilePage() {
   const user = await requireAuth();
@@ -13,13 +14,13 @@ export default async function ProfilePage() {
         <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm p-6 space-y-6">
           {/* User Info */}
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-              <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+            <Avatar className="w-16 h-16 ring-2 ring-blue-500/20 ring-offset-2 ring-offset-white dark:ring-offset-zinc-800">
+              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-2xl font-semibold">
                 {user.email?.charAt(0).toUpperCase() || 'U'}
-              </span>
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-xl font-semibold text-zinc-900 dark:text-white truncate">
                 {user.email}
               </h2>
               <p className="text-base text-zinc-500 dark:text-zinc-400 capitalize">

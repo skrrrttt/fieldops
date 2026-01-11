@@ -14,6 +14,7 @@ import { FileUpload } from '@/components/tasks/file-upload';
 import { FileList } from '@/components/tasks/file-list';
 import { CommentInput } from '@/components/tasks/comment-input';
 import { CommentList } from '@/components/tasks/comment-list';
+import { CustomFieldEdit } from '@/components/tasks/custom-field-edit';
 import { useBranding, getContrastColor } from '@/lib/branding/branding-context';
 
 interface TaskDetailProps {
@@ -86,69 +87,6 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
 
   const directionsUrl = getDirectionsUrl();
   const mapEmbedUrl = getMapPreviewUrl();
-
-  // Render custom fields if they exist
-  const renderCustomFields = () => {
-    if (!task.custom_fields || Object.keys(task.custom_fields).length === 0) {
-      return null;
-    }
-
-    // Get custom fields that have values
-    const fieldsWithValues = customFields.filter(
-      (field) => task.custom_fields?.[field.id] !== undefined && task.custom_fields?.[field.id] !== ''
-    );
-
-    if (fieldsWithValues.length === 0) {
-      return null;
-    }
-
-    return (
-      <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-4">
-        <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4">
-          Additional Information
-        </h2>
-        <div className="space-y-3">
-          {fieldsWithValues.map((field) => {
-            const value = task.custom_fields?.[field.id];
-            return (
-              <div key={field.id}>
-                <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                  {field.name}
-                </dt>
-                <dd className="mt-1 text-base text-zinc-900 dark:text-white">
-                  {formatCustomFieldValue(value, field)}
-                </dd>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-    );
-  };
-
-  const formatCustomFieldValue = (value: unknown, field: CustomFieldDefinition): string => {
-    if (value === null || value === undefined) return '-';
-
-    switch (field.field_type) {
-      case 'checkbox':
-        return value ? 'Yes' : 'No';
-      case 'date':
-        if (typeof value === 'string' && value) {
-          return new Date(value).toLocaleDateString('en-US', {
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric',
-          });
-        }
-        return '-';
-      case 'number':
-        return typeof value === 'number' ? value.toLocaleString() : String(value);
-      case 'text':
-      case 'dropdown':
-      default:
-        return String(value);
-    }
-  };
 
   return (
     <div className="space-y-4">
@@ -355,8 +293,14 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
         </section>
       )}
 
-      {/* Custom Fields Section */}
-      {renderCustomFields()}
+      {/* Custom Fields Section - Editable for field users */}
+      {customFields.length > 0 && (
+        <CustomFieldEdit
+          taskId={task.id}
+          customFields={customFields}
+          initialValues={(task.custom_fields as Record<string, unknown>) || {}}
+        />
+      )}
 
       {/* Photo Upload Section */}
       <PhotoUpload
