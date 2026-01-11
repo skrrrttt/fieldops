@@ -22,8 +22,8 @@
         "npm run typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Created SQL migration with all 10 tables and TypeScript types"
     },
     {
       "id": "US-002",
@@ -39,8 +39,8 @@
         "npm run typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Created RLS policies for all tables with is_admin() helper function. Admins have full access, field users can read shared data and create their own content."
     },
     {
       "id": "US-003",
@@ -57,8 +57,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Login page at /login, Supabase Auth integration, remember me checkbox, role-based redirects (admin→/admin/dashboard, field_user→/tasks), logout button clears session. Middleware protects routes and handles auth."
     },
     {
       "id": "US-004",
@@ -73,8 +73,8 @@
         "npm run typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: PWA manifest with name/icons/theme colors, service worker for app shell caching, registration on app load via client component, Apple Web App meta tags for iOS Safari."
     },
     {
       "id": "US-005",
@@ -91,8 +91,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Admin page at /admin/divisions with form to create divisions (name, color picker, icon dropdown), list of existing divisions with edit/delete buttons, inline edit form with pre-filled values, delete confirmation dialog modal. Server actions in lib/divisions/actions.ts handle CRUD operations with Supabase."
     },
     {
       "id": "US-006",
@@ -110,8 +110,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Admin page at /admin/statuses with form to create statuses (name, color picker, order, is_complete checkbox, is_default checkbox). List of existing statuses with drag-and-drop reordering via HTML5 drag events. Edit/delete buttons with inline edit form and delete confirmation modal. Server actions in lib/statuses/actions.ts handle CRUD operations with Supabase. Only one status can be marked as default at a time."
     },
     {
       "id": "US-007",
@@ -128,8 +128,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Admin page at /admin/tasks with sortable table (title, status, division, assigned user, due date, created date), filter dropdowns for status/division/assigned user, search input for title/description, pagination with 25 items per page. Server actions in lib/tasks/actions.ts for data fetching with joins to related tables."
     },
     {
       "id": "US-008",
@@ -146,8 +146,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 8,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Create Task button opens modal form with all fields (title, description, status dropdown, division dropdown, due date picker, assigned user dropdown, address, lat/lng). Edit button on each row opens same modal pre-filled. Delete button in modal shows inline confirmation and performs soft delete (sets deleted_at). Server actions in lib/tasks/actions.ts for createTask, updateTask, deleteTask. getDefaultStatus() used to pre-select default status for new tasks."
     },
     {
       "id": "US-009",
@@ -165,8 +165,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 9,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Task list page at /tasks with card-based layout. Each card shows title, status badge (colored), division badge, location, due date, assigned user avatar/name. Cards are minimum 72px height with high-contrast text. Filter buttons for status (All, To Do, In Progress, Complete) and dropdown for division. Tasks fetched from Supabase on load."
     },
     {
       "id": "US-010",
@@ -183,8 +183,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 10,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Task detail page at /tasks/[id] showing title, description, status badge, division badge, due date, assigned user, location/address with map preview (OpenStreetMap embed), Get Directions button (Google Maps link), Update Status button fixed at bottom, and custom fields section. Server component with client TaskDetail component."
     },
     {
       "id": "US-011",
@@ -201,8 +201,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 11,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Status update page at /tasks/[id]/status with large touch-friendly buttons (min 64px tall), visual highlighting of current status with ring and scale effect, optimistic UI updates, success/error toast notifications with slide-up animation. Server action updateTaskStatus in lib/tasks/actions.ts. Auto-redirect back to task detail after successful update."
     },
     {
       "id": "US-012",
@@ -220,8 +220,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 12,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Photo upload section on task detail page with Take Photo button (64px tall, opens camera with capture='environment'), Gallery button for batch selecting existing photos. Selected photos display as thumbnails in 3-column grid with remove button. Upload button sends photos to Supabase Storage with circular progress indicator. Server actions in lib/photos/actions.ts for CRUD operations."
     },
     {
       "id": "US-013",
@@ -237,8 +237,8 @@
         "npm run typecheck passes"
       ],
       "priority": 13,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Client-side photo processing with Canvas API. Resizes to max 1920px on longest edge, JPEG quality 80%, watermark with timestamp (YYYY-MM-DD HH:mm) and GPS coordinates in bottom right corner. Semi-transparent white text with dark shadow for readability. Processing happens before upload. Uses Geolocation API to capture GPS."
     },
     {
       "id": "US-014",
@@ -253,8 +253,8 @@
         "npm run typecheck passes"
       ],
       "priority": 14,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Verified: GPS coordinates requested via Geolocation API when photos selected (lib/photos/process-photo.ts:236). Coordinates captured and stored in photos table via createPhotoRecord (lib/photos/actions.ts:66-67). Timestamp and user_id also stored. If GPS unavailable, proceeds gracefully with null coordinates. Photo records linked to task_id."
     },
     {
       "id": "US-015",
@@ -270,8 +270,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 15,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: PhotoGallery component with thumbnail grid (3-5 columns responsive), full-size lightbox modal with metadata display (timestamp, GPS coordinates with map link, uploader name/avatar), navigation arrows and keyboard navigation (left/right arrows, Escape to close), close button."
     },
     {
       "id": "US-016",
@@ -288,8 +288,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 16,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: FileUpload component with file picker (PDF, DOC/DOCX, XLS/XLSX, images), 25MB size validation with error display, circular progress indicator during upload, files stored in Supabase Storage 'files' bucket, file records created via createFileRecord server action in lib/files/actions.ts."
     },
     {
       "id": "US-017",
@@ -304,8 +304,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 17,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: FileList component with file name, formatted size (KB/MB), relative upload date, and uploader email. Clicking file opens in new tab for viewable types (PDF, images) or downloads. Explicit download button on each file. Files fetched server-side and passed to TaskDetail component."
     },
     {
       "id": "US-018",
@@ -322,8 +322,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 18,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: CommentInput component with large 64px textarea, server actions in lib/comments/actions.ts for CRUD, toast notifications for success/error, new comments appear immediately in list (newest-first), relative timestamps. Comments section integrated into task detail page."
     },
     {
       "id": "US-019",
@@ -339,8 +339,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 19,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: CommentList component with distinct user avatar colors (8 color palette based on user ID hash), empty state message with chat bubble icon when no comments, comments sorted newest-first with relative timestamps, larger 40px avatars for better visibility."
     },
     {
       "id": "US-020",
@@ -357,8 +357,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 20,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Microphone button in comment input using Web Speech Recognition API. Visual indicator with red pulsing dot when recording, textarea border turns red. Transcribed text appends to existing content. Button hidden gracefully if speech API unavailable. User can edit text before submitting."
     },
     {
       "id": "US-021",
@@ -372,8 +372,8 @@
         "npm run typecheck passes"
       ],
       "priority": 21,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Dexie.js installed and configured with database schema mirroring Supabase tables (tasks, divisions, statuses, comments, photos, files, custom_field_definitions). Sync timestamp tracked per table via sync_meta table. Helper functions: saveToLocal, getFromLocal, clearLocal, plus bulk operations and task-specific helpers."
     },
     {
       "id": "US-022",
@@ -389,8 +389,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 22,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: useOfflineSync hook syncs tasks/statuses/divisions to IndexedDB on load. useTaskOffline hook syncs individual task with related photos/files/comments. useOnlineStatus hook tracks online/offline status. OfflineIndicator component shows banner when offline or using cached data. TaskListOfflineWrapper and TaskDetailOfflineWrapper handle offline-first data loading."
     },
     {
       "id": "US-023",
@@ -406,8 +406,8 @@
         "npm run typecheck passes"
       ],
       "priority": 23,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Added pending_mutations table to Dexie schema (v2) with typed mutation payloads. Created mutation-queue.ts with queueStatusMutation, queueCommentMutation, queuePhotoMutation, queueFileMutation helpers. Updated status-update-ui.tsx, comment-input.tsx, photo-upload.tsx, file-upload.tsx to queue mutations when offline. Photos/files store blobs locally in IndexedDB. Updated offline-indicator.tsx to show pending changes count. Created pending-changes-indicator.tsx for standalone queue display."
     },
     {
       "id": "US-024",
@@ -423,8 +423,8 @@
         "npm run typecheck passes"
       ],
       "priority": 24,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Created sync-processor.ts with processAllMutations() for FIFO queue processing. Each mutation type (status/comment/photo/file) sent to Supabase with proper error handling. On success, mutation removed from queue and local cache updated. On failure, marked as failed with error message. Updated service worker (sw.js) with Background Sync API support - listens for 'sync' events and notifies clients. Created useBackgroundSync hook for auto-sync when online and listening for SW messages. Created SyncStatusIndicator component with three variants (default, header, badge) showing Synced/Syncing.../X pending/X failed states."
     },
     {
       "id": "US-025",
@@ -441,8 +441,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 25,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: SyncNowButton component (icon/header/default variants), PullToRefresh wrapper with touch gestures, SyncToast component with auto-dismiss. TaskListOfflineWrapper integrates all components with Sync Now button row, pull-to-refresh gesture, last synced timestamp display, loading indicators, and toast notifications on success/error. Uses router.refresh() to fetch fresh data from server and syncs to IndexedDB."
     },
     {
       "id": "US-026",
@@ -459,8 +459,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 26,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Conflict detection in sync-processor.ts compares updated_at timestamps and previous_status_id to detect conflicts. ConflictInfo type stores local_value, server_value, and timestamps. ConflictResolution component shows 'Your Change' vs 'Server Version' with blue/green cards. User clicks 'Keep My Change' (force_overwrite) or 'Use Server Version' (discard mutation). SyncStatusIndicator shows conflict count and Resolve button. ConflictModal provides popup for conflict resolution."
     },
     {
       "id": "US-027",
@@ -477,8 +477,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 27,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Admin page at /admin/custom-fields with form to create custom fields (name, type dropdown with text/number/date/dropdown/checkbox options, required toggle). Dropdown type shows comma-separated options input. List of fields with drag-and-drop reordering via HTML5 drag events. Edit/delete functionality with inline edit form and delete confirmation modal. Server actions in lib/custom-fields/actions.ts for CRUD operations with Supabase."
     },
     {
       "id": "US-028",
@@ -494,8 +494,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 28,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Task create/edit form fetches custom_field_definitions and renders appropriate inputs (text, number, date, dropdown, checkbox). Required fields show validation errors. Values saved to tasks.custom_fields JSONB column. Task detail view displays custom field values with proper labels from definitions. Typecheck passes."
     },
     {
       "id": "US-029",
@@ -512,8 +512,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 29,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Admin page at /admin/users with table showing email, role, last active date, status. Invite user modal with email and role dropdown (Admin/Field User). Sends invite via Supabase Auth admin.inviteUserByEmail(). Inline edit for user role via dropdown. Deactivate button with confirmation revokes access but preserves history (is_active flag). Reactivate button for deactivated users. Added is_active and last_active_at fields to users table via migration 003."
     },
     {
       "id": "US-030",
@@ -531,8 +531,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 30,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Admin page at /admin/branding with logo upload (Supabase Storage 'branding' bucket), primary/accent color pickers with hex input, app name input, live preview section showing header/buttons/badges/links/task card previews with selected colors and logo. Changes saved to branding table via saveBranding server action. Typecheck passes."
     },
     {
       "id": "US-031",
@@ -549,8 +549,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 31,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: BrandingProvider context fetches branding on app load and caches in localStorage. AppHeader component displays logo/initial and app name from branding. Primary color applied to Get Directions button, assigned user avatars. Accent color applied to Update Status button. Dynamic manifest at /manifest.json uses branding app name and theme color. Theme color meta tag updated dynamically. All pages updated to use branded headers. Typecheck passes."
     },
     {
       "id": "US-032",
@@ -565,8 +565,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 32,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Admin page at /admin/templates with form to create templates (name, default title, default description, default division dropdown, default custom field values). List of existing templates with edit/delete buttons, delete confirmation modal. Server actions in lib/templates/actions.ts for CRUD operations. TemplateForm supports all custom field types (text, number, date, dropdown, checkbox). Typecheck passes."
     },
     {
       "id": "US-033",
@@ -582,8 +582,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 33,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Added 'Create from Template' dropdown to task create form. Selecting a template pre-fills title, description, division, and custom fields. User can override any pre-filled values. Status, due date, assigned user, and location fields must still be set manually. Template defaults merge with overrides on save. Typecheck passes."
     },
     {
       "id": "US-034",
@@ -601,8 +601,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 34,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Admin page at /admin/media with gallery grid view of all photos. Filter dropdowns for task, user, division, and date range. Full-size lightbox with metadata (timestamp, GPS with map link, uploader info, task link with division badge). Individual photo download in lightbox. Bulk selection checkboxes on each photo with Select All option. Download Selected creates zip using JSZip library. Typecheck passes."
     },
     {
       "id": "US-035",
@@ -619,8 +619,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 35,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Checkbox on each task row with visual highlight for selected rows. Select all checkbox in header with indeterminate state support. Shift+click range selection. Bulk action bar appears when tasks selected with actions: Assign to User (with unassign option), Change Status, Delete. Delete action shows confirmation dialog. Server actions bulkAssignTasks, bulkChangeStatus, bulkDeleteTasks in lib/tasks/actions.ts. Typecheck passes."
     },
     {
       "id": "US-036",
@@ -634,8 +634,8 @@
         "npm run typecheck passes"
       ],
       "priority": 36,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Export to CSV button added to admin tasks page header. Exports visible/filtered tasks with proper CSV escaping for commas, quotes, and newlines. CSV includes all required columns. Filename includes ISO timestamp (tasks-export-YYYY-MM-DDTHH-MM-SS.csv). Typecheck passes."
     },
     {
       "id": "US-037",
@@ -652,8 +652,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 37,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Mobile bottom navigation with 4 items (Tasks, Upload, Sync, Profile). All tap targets updated to minimum 48x48px using touch-target CSS class, primary actions 64px with touch-target-primary. Hover interactions replaced with active states. Body font minimum 16px. High contrast mode via @media (prefers-contrast: more). Safe area insets for notched devices. Landscape orientation support. Created profile page for field users. Typecheck passes."
     },
     {
       "id": "US-038",
@@ -669,8 +669,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 38,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: AdminSidebar with collapsible state and expandable sections (Dashboard, Tasks, Media, Configuration with sub-items). AdminLayout wrapper with multi-column responsive design. DashboardContent shows tasks by status counts with progress bars, total/completed/pending/overdue task counts, recent uploads gallery, user stats. Keyboard shortcuts: n=new task, /=search, ?=help modal. Mobile sidebar overlay with hamburger menu. Typecheck passes."
     },
     {
       "id": "US-039",
@@ -686,8 +686,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 39,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: PWA install prompt captures beforeinstallprompt event, shows install banner after 2nd visit or meaningful action (like status update). Install button triggers native browser install prompt. PWASplashScreen shows company logo/initial with branding colors when app launches in standalone mode. Manifest updated with branding-based background_color for native splash. Typecheck passes."
     },
     {
       "id": "US-040",
@@ -703,8 +703,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 40,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: ThemeProvider context detects prefers-color-scheme media query and supports system/light/dark modes. ThemeToggle component in profile/settings page allows override. Preference persisted in localStorage (fieldops_theme_preference key). Class-based dark mode via Tailwind v4 @custom-variant directive. Existing components already had dark: class prefixes for sufficient contrast. Typecheck passes."
     }
   ]
 }

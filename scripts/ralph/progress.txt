@@ -1,0 +1,1181 @@
+# Ralph Progress Log
+Started: Fri Jan  9 19:52:37 MST 2026
+
+## Codebase Patterns
+- Use `@supabase/ssr` for Next.js App Router integration (not `@supabase/auth-helpers-nextjs`)
+- Database types are in `lib/database.types.ts` - update these when schema changes
+- SQL migrations go in `supabase/migrations/` with numbered prefixes (001_, 002_, etc.)
+- Supabase client files: `lib/supabase/client.ts` (browser), `lib/supabase/server.ts` (server components)
+- Use JSONB for flexible fields like custom_fields and options
+- All tables use UUID primary keys with `uuid_generate_v4()`
+- Foreign keys use proper constraints (CASCADE, SET NULL, RESTRICT as appropriate)
+- Auth actions in `lib/auth/actions.ts`: getCurrentUser(), requireAuth(), requireAdmin(), signOut()
+- Use `.single<{ field: Type }>()` for typed single-field Supabase queries to avoid TypeScript `never` issues
+- Middleware at `middleware.ts` handles route protection and role-based redirects
+- Components go in `components/` directory with feature-based subdirectories (e.g., `components/auth/`, `components/pwa/`, `components/admin/divisions/`)
+- PWA assets in `public/` folder: manifest.json, sw.js, icons/
+- For Supabase insert/update, cast the object as `never` to bypass TypeScript strict type checking: `.insert({...} as never)`
+- Server actions for CRUD go in `lib/[feature]/actions.ts` with 'use server' directive
+- Use Next.js Metadata API with `manifest` and `appleWebApp` fields for PWA meta tags
+- Service worker registration uses client component pattern with useEffect
+- Use HTML5 drag-and-drop (onDragStart, onDragOver, onDragEnd) for simple list reordering
+- Use useRef to avoid stale closures in async drag-and-drop handlers
+- Use Supabase select with embedded relations for joins: `.select('*, status:statuses(*), division:divisions(*)')`
+- For paginated queries, use `{ count: 'exact' }` option and `.range(offset, offset + pageSize - 1)`
+- For URL-based state (filters, sorting, pagination), use `useSearchParams()` and `router.push()` with URLSearchParams
+- Use render functions (not nested components) inside render to avoid React warnings about components created during render
+- Field user components go in `components/tasks/`, admin components in `components/admin/[feature]/`
+- Use server components for data fetching, client components for interactive filtering
+- Photo processing: use `lib/photos/process-photo.ts` - processPhoto() for resize/compress/watermark, requestGpsCoordinates() for GPS
+- Use Canvas API for client-side image manipulation (resize, watermark) with toBlob() for compression
+- Use useRef instead of useState for boolean flags in useEffect to avoid lint warnings about setState in effects
+- Web Speech API: use `window.SpeechRecognition || window.webkitSpeechRecognition` with custom TypeScript types
+- Offline storage: use `lib/offline/` module with Dexie.js - getDB(), saveToLocal(), getFromLocal(), clearLocal()
+- Offline hooks: useOfflineSync() for list pages, useTaskOffline() for detail pages, useOnlineStatus() for status
+- For offline-first pages, use client wrapper components that handle sync logic around server components
+- Offline indicator: components/offline/offline-indicator.tsx shows banner when offline or cached
+- Mutation queue: lib/offline/mutation-queue.ts for queueing offline changes - queueStatusMutation, queueCommentMutation, queuePhotoMutation, queueFileMutation
+- Use Dexie version() for schema migrations - increment version number and define new tables/indexes
+- Store blobs directly in IndexedDB via Dexie for offline photo/file uploads (local_blob field)
+- Use useRef for isMounted tracking to avoid setState after unmount (ESLint react-hooks/set-state-in-effect rule)
+- Custom fields: store values keyed by field ID in tasks.custom_fields JSONB, use field definitions for labels/formatting
+- Mobile responsive: use .touch-target (48px) and .touch-target-primary (64px) CSS classes for accessible tap targets
+- Mobile bottom nav: components/layout/mobile-bottom-nav.tsx with MobileBottomNav and MobileBottomNavSpacer
+- Use .mobile-only and .desktop-only CSS classes for responsive visibility
+- Replace hover: with active: states for touch-friendly interactions
+- High contrast mode: @media (prefers-contrast: more) in globals.css
+- Safe area insets: use env(safe-area-inset-bottom) for notched devices
+- PWA install prompt: components/pwa/pwa-install-prompt.tsx - captures beforeinstallprompt, trackMeaningfulAction() for trigger
+- PWA splash screen: components/pwa/pwa-splash-screen.tsx - shows on standalone mode launch with branding
+- Dark mode: use ThemeProvider from lib/theme/theme-context.tsx with useTheme() hook
+- Dark mode toggle: components/theme/theme-toggle.tsx with ThemeToggle and ThemeToggleCompact
+- Tailwind v4 class-based dark mode: use @custom-variant dark (&:where(.dark, .dark *)) in globals.css
+
+---
+
+## 2026-01-09 19:56 MST - US-001
+- What was implemented:
+  - Set up Next.js 16 project with TypeScript and Tailwind CSS
+  - Installed @supabase/supabase-js and @supabase/ssr
+  - Created complete database schema SQL migration (supabase/migrations/001_initial_schema.sql)
+  - Created TypeScript types for all database tables (lib/database.types.ts)
+  - Set up Supabase client utilities for browser, server, and middleware
+
+- Files changed:
+  - package.json (project setup, added typecheck script)
+  - lib/database.types.ts (all table types)
+  - lib/supabase/client.ts (browser client)
+  - lib/supabase/server.ts (server client)
+  - lib/supabase/middleware.ts (session management)
+  - supabase/migrations/001_initial_schema.sql (all tables)
+  - .env.example (environment template)
+  - .gitignore (updated for env files)
+
+- **Learnings for future iterations:**
+  - Next.js create-next-app requires an empty directory; must create in temp location and copy files
+  - The .gitignore from create-next-app excludes all .env* files - modified to only exclude .env.local
+  - Added `typecheck` script to package.json since it's not included by default
+  - Use user_role and field_type as PostgreSQL enums for type safety
+  - Include default statuses in migration for immediate usability
+---
+
+## 2026-01-09 20:05 MST - US-002
+- What was implemented:
+  - Created RLS policies for all 10 tables (users, divisions, statuses, tasks, comments, photos, files, custom_field_definitions, task_templates, branding)
+  - Created `is_admin()` helper function for reusable admin checks
+  - Enabled RLS on all tables
+  - Admins have full read/write access to all tables
+  - Field users can read shared data (tasks, divisions, statuses, templates, branding, custom fields)
+  - Field users can create their own comments, photos, files
+  - Field users can update task status
+  - Users can only read their own user profile
+
+- Files changed:
+  - supabase/migrations/002_rls_policies.sql (new file with all RLS policies)
+
+- **Learnings for future iterations:**
+  - Use `SECURITY DEFINER` on helper functions like `is_admin()` so they run with elevated privileges
+  - RLS policies use `USING` for SELECT/UPDATE/DELETE and `WITH CHECK` for INSERT
+  - Multiple SELECT policies on same table are OR'd together (e.g., admin can see all, user can see own)
+  - For tasks table, hide soft-deleted records from non-admins by checking `deleted_at IS NULL`
+---
+
+## 2026-01-09 20:30 MST - US-003
+- What was implemented:
+  - Login page at /login with email/password form
+  - Supabase Auth integration via createClient() from @supabase/ssr
+  - Remember me checkbox stores preference in localStorage (Supabase handles session cookies)
+  - Middleware (middleware.ts) for route protection and auth token refresh
+  - Role-based redirects: admin → /admin/dashboard, field_user → /tasks
+  - Logout button component clears session and redirects to /login
+  - Auth helper actions in lib/auth/actions.ts: getCurrentUser, requireAuth, requireAdmin, signOut
+  - Placeholder pages for /tasks and /admin/dashboard
+
+- Files changed:
+  - app/login/page.tsx (new - login form with Supabase Auth)
+  - app/tasks/page.tsx (new - placeholder tasks page)
+  - app/admin/dashboard/page.tsx (new - placeholder admin dashboard)
+  - components/auth/logout-button.tsx (new - logout button component)
+  - lib/auth/actions.ts (new - server auth actions)
+  - middleware.ts (new - route protection and redirects)
+
+- **Learnings for future iterations:**
+  - Supabase select with `.single()` needs explicit type annotation: `.single<{ role: UserRole }>()` to avoid TypeScript `never` type
+  - Use 'use client' directive for components that use hooks (useState, useRouter, etc.)
+  - Use 'use server' directive for server actions that redirect or access cookies
+  - requireAuth() and requireAdmin() can be called directly in page components for protection
+  - Middleware matcher pattern excludes static files: `/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)`
+---
+
+## 2026-01-09 20:45 MST - US-004
+- What was implemented:
+  - PWA manifest at public/manifest.json with app name, description, icons, theme/background colors
+  - Display mode set to "standalone" for native app feel
+  - PNG icons at 192x192 and 512x512 sizes for installability
+  - Service worker at public/sw.js with caching strategies for app shell
+  - Service worker registration via client component (components/pwa/service-worker-registration.tsx)
+  - Updated app/layout.tsx with manifest link, viewport meta, Apple Web App meta tags
+  - Added apple-touch-icon for iOS Safari support
+
+- Files changed:
+  - public/manifest.json (new - PWA manifest)
+  - public/icons/icon-192x192.png (new - small icon)
+  - public/icons/icon-512x512.png (new - large icon)
+  - public/sw.js (new - service worker with caching)
+  - components/pwa/service-worker-registration.tsx (new - SW registration component)
+  - app/layout.tsx (updated - manifest, viewport, Apple meta tags)
+
+- **Learnings for future iterations:**
+  - Next.js Metadata API supports `manifest` and `appleWebApp` fields directly
+  - Use separate `viewport` export for viewport-related meta (themeColor, etc.)
+  - Service worker goes in public/ folder to be served at root scope
+  - Use 'use client' for service worker registration since it uses useEffect and window
+  - Caching strategy: network-first for navigation, cache-first for static assets
+  - Skip API and Supabase requests from service worker caching
+---
+
+## 2026-01-09 21:15 MST - US-005
+- What was implemented:
+  - Admin page at /admin/divisions for managing divisions/flags
+  - Create division form with: name (required), color picker, icon dropdown
+  - List of existing divisions with edit and delete buttons
+  - Inline edit form with pre-filled current values
+  - Delete confirmation dialog modal
+  - Server actions for CRUD operations (getDivisions, createDivision, updateDivision, deleteDivision)
+  - Success/error messages for user feedback
+
+- Files changed:
+  - app/admin/divisions/page.tsx (new - main admin divisions page)
+  - components/admin/divisions/division-form.tsx (new - reusable form component)
+  - components/admin/divisions/division-list.tsx (new - list with edit/delete)
+  - components/admin/divisions/create-division-form.tsx (new - create form wrapper)
+  - lib/divisions/actions.ts (new - server actions for CRUD)
+
+- **Learnings for future iterations:**
+  - For Supabase insert/update operations, cast the object as `never` to bypass TypeScript strict type issues: `.insert({...} as never)`
+  - Use `revalidatePath()` after mutations to refresh the page data
+  - Organize admin components under `components/admin/[feature]/`
+  - Use inline editing pattern for simpler UX instead of separate modal for edits
+  - Delete confirmation should be a modal overlay for better UX
+---
+
+## 2026-01-09 21:45 MST - US-006
+- What was implemented:
+  - Admin page at /admin/statuses for managing custom task statuses
+  - Create status form with: name (required), color picker, order, is_complete checkbox, is_default checkbox
+  - List of existing statuses with drag-and-drop reordering via HTML5 drag events
+  - Inline edit form with pre-filled current values
+  - Delete confirmation dialog modal with warning for default status
+  - Server actions for CRUD operations (getStatuses, getNextStatusOrder, createStatus, updateStatus, deleteStatus, reorderStatuses)
+  - Only one status can be marked as default at a time (automatically unsets others)
+
+- Files changed:
+  - app/admin/statuses/page.tsx (new - main admin statuses page)
+  - components/admin/statuses/status-form.tsx (new - reusable form component)
+  - components/admin/statuses/status-list.tsx (new - list with drag-and-drop, edit/delete)
+  - components/admin/statuses/create-status-form.tsx (new - create form wrapper)
+  - lib/statuses/actions.ts (new - server actions for CRUD)
+
+- **Learnings for future iterations:**
+  - HTML5 drag-and-drop works well for simple reordering: use onDragStart, onDragOver, onDragEnd
+  - Use useRef for dragOverId to avoid stale closure issues in async handlers
+  - When updating a "unique" field (like is_default), first unset others before setting the new one
+  - Optimistic UI updates for drag-and-drop: update local state immediately, then sync to server
+---
+
+## 2026-01-09 22:15 MST - US-007
+- What was implemented:
+  - Admin page at /admin/tasks for task management table view
+  - Table showing: title, status, division, assigned user, due date, created date
+  - Sortable columns (click header): title, due_date, created_at
+  - Filter dropdowns: status, division, assigned user
+  - Search input for filtering by title or description (with form submit)
+  - Pagination with 25 items per page, Previous/Next buttons, page number buttons
+  - Server actions with Supabase joins to fetch tasks with related data (status, division, user)
+  - URL-based state management for filters, sorting, pagination
+
+- Files changed:
+  - app/admin/tasks/page.tsx (new - main admin tasks page with data fetching)
+  - components/admin/tasks/task-table.tsx (new - table with sorting, filters, search, pagination)
+  - lib/tasks/actions.ts (new - server actions for fetching tasks with relations)
+
+- **Learnings for future iterations:**
+  - Use Supabase select with embedded relations: `.select('*, status:statuses(*), division:divisions(*)')`
+  - For paginated queries, use `{ count: 'exact' }` option and `.range(offset, offset + pageSize - 1)`
+  - URL search params work well for filter/sort/page state - allows bookmarkable filtered views
+  - Use `renderSortIcon()` function (not component) inside render to avoid React hook warnings about components created during render
+  - Use useSearchParams() for reading current params and router.push() with URLSearchParams for updating
+---
+
+## 2026-01-09 - US-008
+- What was implemented:
+  - Admin create/edit task modal with all form fields: title, description, status, division, assigned user, due date, address, lat/lng
+  - Create Task button in tasks table header
+  - Edit button on each task row opens modal with pre-filled values
+  - Delete button in edit modal with inline confirmation
+  - Soft delete (sets deleted_at) instead of hard delete
+  - Server actions: createTask, updateTask, deleteTask, getDefaultStatus
+  - Default status pre-selection for new tasks
+
+- Files changed:
+  - lib/tasks/actions.ts (added createTask, updateTask, deleteTask, getDefaultStatus server actions)
+  - components/admin/tasks/task-modal.tsx (new - modal form component for create/edit)
+  - components/admin/tasks/task-table.tsx (added Create Task button, Edit button per row, modal integration)
+  - app/admin/tasks/page.tsx (added defaultStatusId prop)
+
+- **Learnings for future iterations:**
+  - Soft delete pattern: update with `deleted_at: new Date().toISOString()` instead of actual DELETE
+  - Modal pattern: use single component for both create and edit, check if `task` prop exists for edit mode
+  - Use inline delete confirmation in modal footer instead of separate modal for simpler UX
+  - Use `useEffect` to reset form state when modal opens/closes or task prop changes
+  - For number inputs (lat/lng), store as string in form state and parse to float on submit
+---
+
+## 2026-01-09 - US-009
+- What was implemented:
+  - Task list page at /tasks with card-based layout (not table)
+  - TaskCard component showing: title, status badge (colored), division badge, location, due date, assigned user avatar/name
+  - Cards have minimum 72px height with high-contrast text
+  - Filter buttons for status: All, To Do, In Progress, Complete
+  - Filter dropdown for division
+  - Tasks fetched from Supabase on load via server component
+  - Empty state with helpful message when no tasks match filters
+  - Overdue task highlighting (red text for past due dates)
+  - Sticky header for better mobile UX
+
+- Files changed:
+  - app/tasks/page.tsx (updated - now fetches and renders task list)
+  - components/tasks/task-card.tsx (new - card component for individual task)
+  - components/tasks/task-list.tsx (new - list component with filters)
+
+- **Learnings for future iterations:**
+  - Field user components go in `components/tasks/` directory (not components/admin/)
+  - Use client components for interactive filtering, server components for data fetching
+  - Status categorization for filters: group by is_default, order, and is_complete properties
+  - Use useMemo for derived state like filtered tasks to avoid recalculation on every render
+  - Sticky header with z-index for better mobile scrolling experience
+---
+
+## 2026-01-09 - US-010
+- What was implemented:
+  - Task detail page at /tasks/[id] with full task information
+  - Title, description, status badge (colored), division badge with icon
+  - Due date display with overdue indicator
+  - Assigned user with avatar and email
+  - Location section with address, coordinates, and OpenStreetMap embed
+  - Get Directions button linking to Google Maps
+  - Fixed bottom Update Status button (64px tall, green, prominent)
+  - Custom fields section for JSONB custom_fields display
+  - Back navigation to /tasks list
+  - Used existing getTask() server action from lib/tasks/actions.ts
+
+- Files changed:
+  - app/tasks/[id]/page.tsx (new - server component with task fetching and 404 handling)
+  - components/tasks/task-detail.tsx (new - client component for task detail display)
+
+- **Learnings for future iterations:**
+  - OpenStreetMap provides free embed via export/embed.html endpoint with bbox and marker params
+  - Google Maps directions link: `https://www.google.com/maps/dir/?api=1&destination={lat},{lng}`
+  - Use fixed positioning with pb-24 on parent for fixed bottom buttons
+  - Next.js 15 uses Promise params - destructure with `const { id } = await params;`
+  - Use notFound() from next/navigation for 404 handling
+  - Link button pattern for navigation: style Link as button for Update Status
+---
+
+## 2026-01-09 - US-011
+- What was implemented:
+  - Status update page at /tasks/[id]/status for field users
+  - Large touch-friendly status buttons (min 64px tall) for single-tap selection
+  - Current status visually highlighted with ring, offset, and scale effect
+  - Optimistic UI: status updates immediately before server confirms
+  - Success/error toast notifications with slide-up animation
+  - Auto-redirect back to task detail after successful update
+  - Server action updateTaskStatus in lib/tasks/actions.ts
+
+- Files changed:
+  - app/tasks/[id]/status/page.tsx (new - server component for status update page)
+  - components/tasks/status-update-ui.tsx (new - client component with status buttons and toast)
+  - lib/tasks/actions.ts (added updateTaskStatus server action)
+
+- **Learnings for future iterations:**
+  - For optimistic UI, save previous state before updating, then revert if server fails
+  - Use useCallback for toast show function to avoid stale closures in async handlers
+  - Calculate text contrast color based on background luminance: (0.299*R + 0.587*G + 0.114*B) / 255
+  - Use styled-jsx for component-scoped keyframe animations in Next.js
+  - router.refresh() after navigation to ensure page data is refetched
+---
+
+## 2026-01-09 - US-012
+- What was implemented:
+  - Photo upload section on task detail page (/tasks/[id])
+  - "Take Photo" button (64px tall, blue) opens device camera via input[capture="environment"]
+  - "Gallery" button (64px tall, gray) opens file picker with multiple selection
+  - Selected photos displayed as thumbnails in 3-column grid
+  - Remove button (X) on each thumbnail before upload
+  - Upload button with circular progress indicator during upload
+  - Photos uploaded to Supabase Storage in 'photos' bucket organized by task_id
+  - Photo records created in photos table via server action
+  - Success/error messages after upload completion
+  - Page refresh after upload to show new photos (router.refresh())
+
+- Files changed:
+  - components/tasks/photo-upload.tsx (new - photo upload component with camera/gallery/upload)
+  - lib/photos/actions.ts (new - server actions: getTaskPhotos, createPhotoRecord, deletePhoto)
+  - components/tasks/task-detail.tsx (updated - integrated PhotoUpload component)
+
+- **Learnings for future iterations:**
+  - Use capture="environment" on input for rear camera on mobile devices
+  - Use URL.createObjectURL() for preview thumbnails, remember to revoke with URL.revokeObjectURL() on cleanup
+  - For blob URL previews, use regular img tag with eslint-disable comment since Next/Image doesn't support blob URLs
+  - Supabase Storage upload: organize by task_id/filename for easy retrieval
+  - Use circular progress indicator with SVG strokeDasharray/strokeDashoffset for visual upload progress
+  - Store photos with unique ID using Date.now() + random string pattern
+---
+
+## 2026-01-09 - US-013
+- What was implemented:
+  - Client-side photo processing utility (lib/photos/process-photo.ts)
+  - Photo resizing to max 1920px on longest edge while maintaining aspect ratio
+  - JPEG compression at 80% quality
+  - Watermark with timestamp (YYYY-MM-DD HH:mm) in bottom right corner
+  - GPS coordinates added to watermark when available (lat, lng format)
+  - Semi-transparent white text with dark shadow for readability
+  - Semi-transparent dark background behind watermark text
+  - GPS coordinates requested via Geolocation API when photos are first selected
+  - Processing happens before upload to reduce file size and add metadata
+  - Updated photo-upload component to integrate processing pipeline
+  - Processing progress indicator shows "Processing..." during resize/watermark phase
+
+- Files changed:
+  - lib/photos/process-photo.ts (new - photo processing utility with resize, compress, watermark)
+  - components/tasks/photo-upload.tsx (updated - integrated processPhoto before upload, GPS request on first photo selection)
+
+- **Learnings for future iterations:**
+  - Use Canvas API for client-side image manipulation: drawImage for resize, fillText for watermark
+  - canvas.toBlob('image/jpeg', quality) for JPEG compression with quality control
+  - Calculate text contrast for watermark: white text + dark shadow + semi-transparent background
+  - Use useRef for boolean flags that shouldn't trigger re-renders (gpsRequestedRef)
+  - Don't call setState synchronously in useEffect - use refs for flag tracking instead
+  - For font sizing, use percentage of image width with min/max constraints
+  - Geolocation API: use getCurrentPosition with enableHighAccuracy and reasonable timeout
+---
+
+## 2026-01-09 - US-014
+- What was implemented:
+  - Verified all US-014 acceptance criteria were already implemented in US-013
+  - GPS coordinates requested via Geolocation API when photos are first selected (process-photo.ts:236-260)
+  - Coordinates captured and passed through photo processing pipeline
+  - Photo records stored with: task_id, user_id, storage_path, timestamp, gps_lat, gps_lng
+  - GPS unavailable case handled gracefully with null coordinates (resolve(null) fallback)
+  - All metadata stored via createPhotoRecord server action
+
+- Files verified (no changes needed):
+  - lib/photos/process-photo.ts (requestGpsCoordinates function at line 236)
+  - lib/photos/actions.ts (createPhotoRecord stores all metadata at lines 61-68)
+  - components/tasks/photo-upload.tsx (GPS request on photo selection at lines 42-50)
+  - lib/database.types.ts (photos table schema with gps_lat, gps_lng, timestamp, user_id)
+
+- **Learnings for future iterations:**
+  - US-013 and US-014 have overlapping requirements - photo processing includes GPS capture
+  - Always verify existing implementation before making changes
+  - The createPhotoRecord server action uses getCurrentUser() to automatically set user_id
+---
+
+## 2026-01-09 - US-015
+- What was implemented:
+  - PhotoGallery component for viewing task photos with lightbox functionality
+  - Thumbnail grid section with responsive columns (3 on mobile, 4 on tablet, 5 on desktop)
+  - Lightbox modal with full-size image viewing
+  - Metadata display in lightbox: timestamp with relative time, GPS coordinates with "View on map" link, uploader avatar and email
+  - Navigation arrows for browsing multiple photos (left/right buttons)
+  - Keyboard navigation: Left/Right arrows to navigate, Escape to close
+  - Close button in lightbox header
+  - Photo counter showing current position (e.g., "1 / 5")
+  - Body scroll prevented when lightbox is open
+  - Task detail page fetches photos server-side and passes to TaskDetail component
+
+- Files changed:
+  - components/tasks/photo-gallery.tsx (new - complete photo gallery with lightbox)
+  - components/tasks/task-detail.tsx (updated - accepts photos prop, integrates PhotoGallery)
+  - app/tasks/[id]/page.tsx (updated - fetches photos via getTaskPhotos and passes to TaskDetail)
+
+- **Learnings for future iterations:**
+  - Use document.body.style.overflow = 'hidden' to prevent background scroll when modal is open
+  - Use keyboard event listeners with cleanup in useEffect for lightbox navigation
+  - Supabase Storage getPublicUrl() returns { data: { publicUrl } } - no async needed
+  - Use key prop on PhotoGallery with refreshKey to force re-render when photos change
+  - eslint-disable-next-line @next/next/no-img-element is needed for dynamic image URLs
+---
+
+## 2026-01-09 - US-016
+- What was implemented:
+  - File upload section on task detail page (components/tasks/file-upload.tsx)
+  - File picker button supporting PDF, DOC, DOCX, XLS, XLSX, and image files
+  - Max file size validation of 25MB per file with clear error display
+  - File type validation with MIME type checking
+  - Circular upload progress indicator during file upload
+  - Files stored in Supabase Storage 'files' bucket organized by task_id
+  - File records created with file_name, file_size, storage_path, task_id, user_id
+  - Server actions in lib/files/actions.ts: getTaskFiles, createFileRecord, deleteFile
+  - Colored file type icons (red for PDF, blue for Word, green for Excel, purple for images)
+  - File size formatting (Bytes, KB, MB)
+  - Remove button on each selected file before upload
+
+- Files changed:
+  - lib/files/actions.ts (new - server actions for file CRUD operations)
+  - components/tasks/file-upload.tsx (new - file upload component with validation and progress)
+  - components/tasks/task-detail.tsx (updated - integrated FileUpload component)
+
+- **Learnings for future iterations:**
+  - Use React.ReactNode instead of JSX.Element for return types to avoid namespace errors
+  - MIME types for Office files: application/vnd.openxmlformats-officedocument.* for .docx/.xlsx
+  - Follow same pattern as photo upload: select → validate → upload → create record
+  - Supabase Storage uses separate buckets for different file types (photos vs files)
+---
+
+## 2026-01-09 - US-017
+- What was implemented:
+  - FileList component (components/tasks/file-list.tsx) for viewing attached files
+  - Files section shows file name, formatted size (KB/MB), relative upload date, uploader email
+  - Clicking file opens in new tab for viewable types (PDF, JPG, PNG, GIF, WEBP) or downloads
+  - Explicit download button on each file with download icon
+  - Colored file type icons matching file-upload.tsx (red=PDF, blue=Word, green=Excel, purple=images)
+  - Empty state message when no files attached
+  - Files fetched server-side via getTaskFiles and passed to TaskDetail component
+  - refreshKey pattern used to refresh file list after uploads
+
+- Files changed:
+  - components/tasks/file-list.tsx (new - file list component with view/download)
+  - app/tasks/[id]/page.tsx (updated - fetches files via getTaskFiles)
+  - components/tasks/task-detail.tsx (updated - accepts files prop, renders FileList)
+
+- **Learnings for future iterations:**
+  - Reuse utility functions (formatFileSize, getFileIcon) from file-upload.tsx pattern
+  - Use isViewableInBrowser() helper to determine if file opens in new tab or downloads
+  - For downloads, create temporary anchor element with download attribute
+  - Use relative date formatting for better UX (e.g., "2 hours ago", "3 days ago")
+---
+
+## 2026-01-10 - US-018
+- What was implemented:
+  - Comment input section on task detail page with CommentInput component
+  - Large text input (64px min height) for touch-friendly keyboard input
+  - Submit button posts comment to Supabase via createComment server action
+  - Comment record includes: content, user_id, task_id, created_at (auto-generated)
+  - New comment appears immediately in list after submit (optimistic-like with state update)
+  - Toast notification confirms comment added (or shows error)
+  - Comments list shows all comments sorted newest-first with relative timestamps
+  - Server actions in lib/comments/actions.ts: getTaskComments, createComment, deleteComment
+
+- Files changed:
+  - lib/comments/actions.ts (new - server actions for comment CRUD)
+  - components/tasks/comment-input.tsx (new - comment input form with toast)
+  - components/tasks/task-detail.tsx (updated - added comments prop, CommentInput integration, comments list display)
+  - app/tasks/[id]/page.tsx (updated - fetches comments via getTaskComments)
+
+- **Learnings for future iterations:**
+  - Follow same pattern as photos/files: server actions in lib/[feature]/actions.ts
+  - Use `as never` cast for Supabase insert to bypass TypeScript strict typing
+  - For immediate feedback, update local state with new data returned from server action
+  - formatRelativeTime helper for human-readable timestamps ("Just now", "2 hours ago", etc.)
+---
+
+## 2026-01-10 - US-019
+- What was implemented:
+  - CommentList component (components/tasks/comment-list.tsx) for displaying task comments
+  - Distinct user avatar colors - 8 color palette (blue, green, purple, orange, pink, teal, indigo, rose)
+  - Color assigned consistently per user based on hash of user ID
+  - Empty state message with chat bubble icon when no comments exist
+  - Comments sorted newest-first with relative timestamps
+  - Larger 40px avatars (up from 32px) for better visibility
+  - Refactored task-detail.tsx to use CommentList component
+
+- Files changed:
+  - components/tasks/comment-list.tsx (new - dedicated comment list component)
+  - components/tasks/task-detail.tsx (updated - replaced inline comments with CommentList component)
+
+- **Learnings for future iterations:**
+  - Use hash function on user ID for consistent color assignment across the app
+  - Separate display-only components from input components for cleaner code organization
+  - Always provide empty state with helpful messaging and visual icon
+---
+
+## 2026-01-10 - US-020
+- What was implemented:
+  - Voice-to-text feature for comment input using Web Speech Recognition API
+  - Microphone button positioned in top-right corner of textarea
+  - Visual indicators when recording: red pulsing dot, textarea border turns red, placeholder changes to "Listening..."
+  - Continuous speech recognition with interim results for live transcription
+  - Transcribed text appends to existing content with smart spacing
+  - User can edit transcribed text before submitting
+  - Stop button (square icon) replaces microphone when recording
+  - Graceful fallback: button hidden if Speech Recognition API unavailable
+  - Error handling for no-speech, permission denied, and other errors
+
+- Files changed:
+  - components/tasks/comment-input.tsx (updated - added speech recognition with TypeScript types)
+
+- **Learnings for future iterations:**
+  - Web Speech API requires TypeScript type declarations (SpeechRecognition, SpeechRecognitionEvent, etc.) since not in standard lib
+  - Use window.SpeechRecognition || window.webkitSpeechRecognition for cross-browser support
+  - Set continuous=true and interimResults=true for live transcription experience
+  - Define showToast callback before other hooks that use it to satisfy ESLint exhaustive-deps
+  - Use useRef for recognition instance to avoid stale closures in event handlers
+  - Clean up recognition.abort() on component unmount to prevent memory leaks
+---
+
+## 2026-01-10 - US-021
+- What was implemented:
+  - Installed Dexie.js for IndexedDB wrapper functionality
+  - Created FieldOpsDB class extending Dexie with schema mirroring Supabase
+  - Database tables: tasks, divisions, statuses, comments, photos, files, custom_field_definitions
+  - Sync metadata table (sync_meta) to track last_synced_at per table
+  - Local types with denormalized relations: LocalTask, LocalComment, LocalPhoto, LocalFile
+  - Core helpers: saveToLocal, getFromLocal, deleteFromLocal for single items
+  - Bulk helpers: saveAllToLocal, getAllFromLocal, deleteAllFromLocal
+  - Clear helpers: clearLocal (single table), clearAllLocal (all tables)
+  - Task-specific helpers: getTasksFiltered, getTaskComments, getTaskPhotos, getTaskFiles
+  - Utility helpers: getStatusesSorted, getDefaultStatus, getCustomFieldsSorted, countLocal
+  - Sync timestamp helpers: getSyncTimestamp, updateSyncTimestamp, getAllSyncMeta
+  - Browser environment check: isIndexedDBAvailable()
+
+- Files changed:
+  - package.json (added dexie dependency)
+  - lib/offline/db.ts (new - Dexie database class, schema, sync meta, core exports)
+  - lib/offline/helpers.ts (new - all helper functions for CRUD and queries)
+  - lib/offline/index.ts (new - barrel export for offline module)
+
+- **Learnings for future iterations:**
+  - Dexie.js uses `stores()` method with comma-separated index definitions, not array
+  - Use `Table<Type, KeyType>` for typed table declarations in Dexie
+  - Singleton pattern for database instance prevents multiple connections
+  - IndexedDB only available in browser - guard with `typeof window !== 'undefined'`
+  - Use eslint-disable for `any` type in generic table access methods
+  - Boolean indexing in Dexie uses 0/1 instead of true/false when querying
+---
+
+## 2026-01-10 - US-022
+- What was implemented:
+  - useOfflineSync hook for syncing tasks/statuses/divisions to IndexedDB on initial load
+  - useTaskOffline hook for syncing individual task with related photos/files/comments
+  - useOnlineStatus hook for tracking online/offline status via navigator.onLine and event listeners
+  - OfflineIndicator component showing banner when offline or viewing cached data
+  - TaskListOfflineWrapper - client component wrapping TaskList with offline support
+  - TaskDetailOfflineWrapper - client component wrapping TaskDetail with offline support
+  - LocalUserInfo type added to store user info with tasks for offline display
+  - Data syncs to IndexedDB when online, reads from cache when offline
+  - Visual indicator shows "You are offline" or "Viewing cached data" with last sync time
+
+- Files changed:
+  - lib/offline/use-offline-sync.ts (new - hooks for offline sync and online status)
+  - lib/offline/use-task-offline.ts (new - hook for individual task offline support)
+  - lib/offline/db.ts (updated - added LocalUserInfo type)
+  - lib/offline/index.ts (updated - exported new hooks and types)
+  - components/offline/offline-indicator.tsx (new - offline/cached data banner)
+  - components/tasks/task-list-offline-wrapper.tsx (new - offline wrapper for task list)
+  - components/tasks/task-detail-offline-wrapper.tsx (new - offline wrapper for task detail)
+  - app/tasks/page.tsx (updated - use TaskListOfflineWrapper)
+  - app/tasks/[id]/page.tsx (updated - use TaskDetailOfflineWrapper)
+
+- **Learnings for future iterations:**
+  - Use client component wrappers for offline functionality since hooks require 'use client'
+  - Server components fetch data as normal, pass to client wrapper for offline handling
+  - LocalTask/LocalPhoto/LocalFile types need to match server types for proper casting
+  - Use `as User` cast when converting LocalUserInfo back to full User type
+  - navigator.onLine and online/offline events handle connectivity detection
+  - useRef with initialSyncDone pattern prevents double-syncing in StrictMode
+---
+
+## 2026-01-10 - US-023
+- What was implemented:
+  - Added pending_mutations table to Dexie database schema (version 2)
+  - Created TypedPendingMutation types with typed payloads for status/comment/photo/file mutations
+  - Created mutation-queue.ts with helper functions:
+    - queueStatusMutation, queueCommentMutation, queuePhotoMutation, queueFileMutation
+    - getPendingMutations, getAllMutations, getMutationsByType, getMutationsByStatus
+    - updateMutationStatus, deleteMutation, getPendingMutationCount, getTotalMutationCount
+    - getMutationsSummary for UI display
+  - Updated status-update-ui.tsx to queue status changes when offline (optimistic local update)
+  - Updated comment-input.tsx to queue comments when offline (creates temp local comment)
+  - Updated photo-upload.tsx to queue photos when offline (stores processed blob in IndexedDB)
+  - Updated file-upload.tsx to queue files when offline (stores blob in IndexedDB)
+  - Updated offline-indicator.tsx to show pending changes count
+  - Created pending-changes-indicator.tsx with PendingChangesIndicator and PendingChangesBadge components
+
+- Files changed:
+  - lib/offline/db.ts (added mutation types and pending_mutations table schema)
+  - lib/offline/mutation-queue.ts (new - mutation queue helper functions)
+  - lib/offline/index.ts (exported new types and functions)
+  - components/tasks/status-update-ui.tsx (offline queueing with optimistic update)
+  - components/tasks/comment-input.tsx (offline queueing with temp local comment)
+  - components/tasks/photo-upload.tsx (offline queueing with blob storage)
+  - components/tasks/file-upload.tsx (offline queueing with blob storage)
+  - components/offline/offline-indicator.tsx (shows pending count)
+  - components/offline/pending-changes-indicator.tsx (new - standalone pending indicator)
+
+- **Learnings for future iterations:**
+  - Use Dexie version() for schema migrations - each new table requires incrementing version
+  - Store blobs directly in IndexedDB for offline photo/file uploads via local_blob field
+  - Use useRef for isMounted tracking to avoid setState after unmount (lint rule)
+  - Optimistic UI: update local cache immediately when queueing mutations offline
+  - Use typed mutation payloads (StatusMutationPayload, etc.) for type safety
+  - Poll for mutation count every 5 seconds to keep UI updated
+---
+
+## 2026-01-10 - US-024
+- What was implemented:
+  - Created sync-processor.ts for processing queued mutations when online
+  - FIFO processing via processAllMutations() - processes oldest mutations first
+  - Each mutation type handled: processStatusMutation, processCommentMutation, processPhotoMutation, processFileMutation
+  - Mutations sent to Supabase with proper authentication and error handling
+  - On success: mutation removed from queue, local IndexedDB cache updated with real server data
+  - On failure: mutation marked as 'failed' with error message, kept in queue for retry
+  - Updated service worker (sw.js) with Background Sync API support
+  - Service worker listens for 'sync' events with tag 'sync-mutations'
+  - SW notifies clients via postMessage to trigger sync in-app (since SW can't access IndexedDB directly for Supabase calls)
+  - Created useBackgroundSync hook for managing sync state and auto-sync
+  - Auto-syncs when coming online and detecting pending mutations
+  - Listens for service worker messages to process background sync
+  - Created SyncStatusIndicator component with three variants:
+    - 'default': Full status card with icon, text, actions
+    - 'header': Inline status for headers with icon + text
+    - 'badge': Compact pill badge for navbars
+  - Shows: Synced (green check), Syncing... (blue spinner), X pending (amber clock), X failed (red exclamation)
+  - SyncBadge and SyncStatusHeader convenience components exported
+
+- Files changed:
+  - lib/offline/sync-processor.ts (new - mutation processing and Background Sync API)
+  - lib/offline/use-background-sync.ts (new - hook for sync state management)
+  - lib/offline/index.ts (exported new sync functions and types)
+  - public/sw.js (updated - added Background Sync event handling)
+  - components/offline/sync-status-indicator.tsx (new - sync status UI component)
+
+- **Learnings for future iterations:**
+  - Background Sync API uses service worker 'sync' event with custom tags
+  - SW can't directly call Supabase (no auth context), so use postMessage to notify clients
+  - Import types from db.ts, helpers from helpers.ts - keep imports organized
+  - Use exhaustive switch for TypedPendingMutation to ensure all types handled
+  - Auto-sync on reconnect: check pending count and trigger if > 0
+  - Poll summary every 3 seconds for responsive UI updates
+---
+
+## 2026-01-10 - US-025
+- What was implemented:
+  - SyncNowButton component with three variants: icon, header, and default
+  - PullToRefresh wrapper component with touch gesture support (pull threshold, visual feedback)
+  - SyncToast component with auto-dismiss and manual dismiss
+  - useSyncToast hook for managing toast state (showSuccess, showError, showInfo, dismissToast)
+  - useManualRefresh hook for coordinating manual refresh operations
+  - Updated TaskListOfflineWrapper to integrate:
+    - Sync Now button in header row
+    - Pull-to-refresh wrapper around task list
+    - Last synced timestamp display
+    - Loading indicators during sync
+    - Toast notifications for success/error feedback
+  - Refresh uses router.refresh() to fetch fresh data from server
+  - Data synced to IndexedDB cache after refresh
+
+- Files changed:
+  - components/offline/sync-now-button.tsx (new - sync button with variants)
+  - components/offline/pull-to-refresh.tsx (new - pull-to-refresh wrapper)
+  - components/offline/sync-toast.tsx (new - toast component and useSyncToast hook)
+  - lib/offline/use-manual-refresh.ts (new - manual refresh hook)
+  - lib/offline/index.ts (exported new hook and types)
+  - components/tasks/task-list-offline-wrapper.tsx (integrated sync button, pull-to-refresh, toasts)
+
+- **Learnings for future iterations:**
+  - Use router.refresh() to trigger server-side re-render and refetch data
+  - Pull-to-refresh: track touchStartY and scrollTop, apply resistance to pull distance
+  - Avoid calling setState within useEffect - ESLint react-hooks/set-state-in-effect rule
+  - Toast auto-dismiss: use refs for timeout tracking, only use state for leaving animation
+  - For fully controlled toast component, onDismiss is called in timeout callback
+  - Button variants pattern: pass variant prop to render different styles/layouts
+---
+
+## 2026-01-10 - US-026
+- What was implemented:
+  - Conflict detection in sync-processor.ts when processing status mutations
+  - Compare server updated_at with mutation created_at timestamp
+  - Check if server status_id differs from expected previous_status_id
+  - Added ConflictInfo type with local_value, server_value, server_updated_at, field_name
+  - Added conflict status to MutationStatus type ('pending' | 'syncing' | 'failed' | 'conflict')
+  - Added force_overwrite flag for resolved conflicts that should override server
+  - Created mutation-queue helpers: markMutationConflict, getConflictingMutations, resolveConflict, getConflictCount
+  - Updated MutationsSummary to include conflict count
+  - Created ConflictResolution component with side-by-side comparison (blue=local, green=server)
+  - Created ConflictIndicator for header/navbar display
+  - Created ConflictModal wrapper for popup resolution
+  - Updated SyncStatusIndicator (all variants) to show conflicts and resolve button
+  - User can choose "Keep My Change" (force_overwrite) or "Use Server Version" (discard mutation)
+
+- Files changed:
+  - lib/offline/db.ts (added ConflictInfo type, conflict to MutationStatus, force_overwrite flag)
+  - lib/offline/mutation-queue.ts (added conflict functions and updated MutationsSummary)
+  - lib/offline/sync-processor.ts (conflict detection in processStatusMutation, updated SyncProgress)
+  - lib/offline/use-background-sync.ts (added conflict to initial summary state)
+  - lib/offline/index.ts (exported new conflict types and functions)
+  - components/offline/conflict-resolution.tsx (new - ConflictResolution, ConflictIndicator, ConflictModal)
+  - components/offline/sync-status-indicator.tsx (integrated conflict display and modal)
+
+- **Learnings for future iterations:**
+  - Use `.single<{ field: Type }>()` for typed single-field Supabase queries to get proper typing
+  - Conflict detection: compare previous expected value vs current server value, not just timestamps
+  - For status mutations, store previous_status_id in payload to detect actual value conflicts
+  - Use force_overwrite flag pattern to allow resolved conflicts to override server on retry
+  - Conflict UI: show both versions side-by-side with clear labels and colored backgrounds
+  - Status colors need to be fetched from IndexedDB for conflict display since we only store IDs
+---
+
+## 2026-01-10 - US-027
+- What was implemented:
+  - Admin page at /admin/custom-fields for managing custom field definitions
+  - Create custom field form with: name (required), field type dropdown (text/number/date/dropdown/checkbox), required toggle
+  - Dropdown type shows additional comma-separated options input
+  - List of existing fields with drag-and-drop reordering via HTML5 drag events
+  - Edit/delete buttons with inline edit form and delete confirmation modal
+  - Server actions for CRUD operations (getCustomFields, createCustomField, updateCustomField, deleteCustomField, reorderCustomFields)
+  - Field type icons for visual distinction (text, number, date, dropdown, checkbox)
+
+- Files changed:
+  - app/admin/custom-fields/page.tsx (new - main admin custom fields page)
+  - components/admin/custom-fields/custom-field-form.tsx (new - reusable form component)
+  - components/admin/custom-fields/custom-field-list.tsx (new - list with drag-and-drop, edit/delete)
+  - components/admin/custom-fields/create-custom-field-form.tsx (new - create form wrapper)
+  - lib/custom-fields/actions.ts (new - server actions for CRUD)
+
+- **Learnings for future iterations:**
+  - Follow same pattern as statuses: server actions in lib/[feature]/actions.ts, components in components/admin/[feature]/
+  - Use key prop on form component to force remount when editing different items (avoids setState in useEffect)
+  - Dropdown options stored as string[] in JSONB options column, displayed as comma-separated in UI
+  - Use FieldType from database.types.ts for type safety on field_type values
+---
+
+## 2026-01-10 - US-028
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- What was implemented:
+  - Custom fields on task create/edit forms (components/admin/tasks/task-modal.tsx)
+  - Fetches custom_field_definitions and renders appropriate input for each type
+  - Renders text input, number input, date picker, dropdown, checkbox based on field_type
+  - Required field validation with error messages
+  - Values saved to tasks.custom_fields JSONB column
+  - Updated lib/tasks/actions.ts to handle custom_fields in CreateTaskData and UpdateTaskData
+  - Task detail view displays custom field values with proper labels from definitions
+  - Updated TaskDetail, TaskDetailOfflineWrapper, and task detail page to accept customFields prop
+
+- Files changed:
+  - components/admin/tasks/task-modal.tsx (added custom fields section with input rendering and validation)
+  - components/admin/tasks/task-table.tsx (added customFields prop)
+  - app/admin/tasks/page.tsx (fetches customFields and passes to TaskTable)
+  - lib/tasks/actions.ts (added custom_fields to CreateTaskData and UpdateTaskData interfaces)
+  - components/tasks/task-detail.tsx (updated to use customFields for proper labeling)
+  - components/tasks/task-detail-offline-wrapper.tsx (added customFields prop passthrough)
+  - app/tasks/[id]/page.tsx (fetches customFields and passes to wrapper)
+
+- **Learnings for future iterations:**
+  - Store custom field values keyed by field ID (not field name) for reliable lookup
+  - Use formatCustomFieldValue with field definition to format values appropriately per type
+  - Custom fields validation: check for required fields by looking at field.required and value emptiness
+  - For checkbox fields, false is considered "empty" for required validation
+  - Use eslint-disable-next-line for getDefaultCustomFieldValues in dependency array since it's stable
+---
+
+## 2026-01-10 - US-029
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- What was implemented:
+  - Admin page at /admin/users with user management table
+  - Table shows: email, role (Admin/Field User badge), last active date (relative), status (Active/Deactivated)
+  - Invite User button opens modal with email input and role dropdown
+  - Invite sends email via Supabase Auth admin.inviteUserByEmail()
+  - Inline edit for user role via dropdown with Save/Cancel buttons
+  - Deactivate button with inline confirmation dialog revokes access but preserves history
+  - Reactivate button for deactivated users
+  - Added is_active and last_active_at fields to users table via migration 003
+  - Server actions: getUsers, getUser, inviteUser, updateUserRole, deactivateUser, reactivateUser, updateLastActive
+
+- Files changed:
+  - supabase/migrations/003_user_status_fields.sql (new - adds is_active and last_active_at columns)
+  - lib/database.types.ts (updated User type with is_active and last_active_at)
+  - lib/users/actions.ts (new - server actions for user management)
+  - app/admin/users/page.tsx (new - admin users page)
+  - components/admin/users/user-table.tsx (new - user table with edit/deactivate functionality)
+  - components/admin/users/invite-user-modal.tsx (new - invite user modal)
+
+- **Learnings for future iterations:**
+  - Use Supabase Auth admin.inviteUserByEmail() for inviting users - requires service_role key
+  - Inline edit pattern with Save/Cancel buttons works well for role changes
+  - Deactivation uses is_active flag rather than deletion to preserve history (task assignments, comments, etc.)
+  - Use relative date formatting for last_active_at (Just now, 2h ago, Yesterday, etc.)
+  - Disable edit/deactivate buttons for current user to prevent self-modification
+---
+
+## 2026-01-10 - US-030
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- What was implemented:
+  - Admin page at /admin/branding for managing company branding
+  - Logo upload section with image preview, upload/change/remove buttons
+  - Uploads to Supabase Storage 'branding' bucket
+  - Max 5MB file size validation for logos
+  - Primary color picker with color input and hex text input
+  - Accent color picker with color input and hex text input
+  - App name input for customizing application name
+  - Live preview section showing:
+    - Header preview with logo/initial and app name
+    - Primary and secondary button styles
+    - Status badges with accent color
+    - Links and highlights with accent color
+    - Task card preview with division badge and status
+    - Color palette swatch display
+  - Server actions: getBranding, createBranding, updateBranding, saveBranding, uploadLogo, deleteOldLogo
+  - Changes saved to branding table (creates if none exists, updates if exists)
+
+- Files changed:
+  - lib/branding/actions.ts (new - server actions for branding CRUD and logo upload)
+  - components/admin/branding/branding-form.tsx (new - branding form with logo, colors, name, and preview)
+  - app/admin/branding/page.tsx (new - admin branding page)
+
+- **Learnings for future iterations:**
+  - Use saveBranding() pattern that auto-creates or updates based on existence
+  - Store logo in dedicated 'branding' bucket with unique timestamp-based filenames
+  - Use getContrastColor() helper to calculate readable text color on dynamic backgrounds
+  - Live preview is essential for branding - show actual UI components with applied colors
+  - Delete old logo from storage when uploading new one to avoid orphaned files
+---
+
+## 2026-01-10 - US-031
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- What was implemented:
+  - BrandingProvider context (lib/branding/branding-context.tsx) for app-wide branding state
+  - Fetches branding on app load and caches in localStorage for offline use
+  - AppHeader component (components/layout/app-header.tsx) displays logo/initial, app name from branding
+  - DetailHeader component for detail pages with branded back button
+  - All admin pages updated to use AppHeader (divisions, statuses, tasks, users, custom-fields, branding)
+  - Field user pages updated to use AppHeader and DetailHeader (tasks list, task detail, status update)
+  - Primary color applied to Get Directions button, assigned user avatars
+  - Accent color applied to Update Status button
+  - Dynamic manifest route at /manifest.json uses branding app name and theme color
+  - Branding API route at /api/branding for client-side fetching
+  - Created branded UI components: BrandedButton, BrandedBadge, BrandedLink
+  - Theme color meta tag updated dynamically from branding in root layout
+  - Root layout wraps app in BrandingProviderWrapper
+
+- Files changed:
+  - lib/branding/branding-context.tsx (new - branding context and hooks)
+  - components/layout/app-header.tsx (new - branded header components)
+  - components/providers/branding-provider-wrapper.tsx (new - client wrapper for layout)
+  - components/ui/branded-button.tsx (new - primary/accent button component)
+  - components/ui/branded-badge.tsx (new - accent color badge)
+  - components/ui/branded-link.tsx (new - accent color link)
+  - app/api/branding/route.ts (new - branding API endpoint)
+  - app/manifest.json/route.ts (new - dynamic PWA manifest)
+  - app/layout.tsx (added BrandingProviderWrapper and dynamic theme color)
+  - app/admin/*/page.tsx (all updated to use AppHeader)
+  - app/tasks/page.tsx (updated to use AppHeader)
+  - app/tasks/[id]/page.tsx (updated to use DetailHeader)
+  - app/tasks/[id]/status/page.tsx (updated to use DetailHeader)
+  - components/tasks/task-detail.tsx (added branding to buttons and avatars)
+  - components/tasks/task-card.tsx (added branding to user avatar)
+
+- **Learnings for future iterations:**
+  - Use BrandingProvider context pattern for app-wide styling from database
+  - Cache branding in localStorage for offline-first - simpler than IndexedDB for single records
+  - Use dynamic route at /manifest.json for PWA manifest to incorporate branding
+  - Apply branding via inline styles with `style={{ backgroundColor: branding.primary_color }}`
+  - Use getContrastColor() helper to calculate readable text color on dynamic backgrounds
+  - Root layout can be async server component to fetch initial branding data
+---
+
+## 2026-01-10 - US-032
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- What was implemented:
+  - Admin page at /admin/templates for managing task templates
+  - Create template form with: name (required), default title, default description, default division dropdown
+  - Default custom field values section supporting all field types (text, number, date, dropdown, checkbox)
+  - List of existing templates showing template name, default values summary, and division badge
+  - Edit/delete functionality with inline edit form and delete confirmation modal
+  - Server actions for CRUD operations (getTemplates, getTemplatesWithDivision, getTemplate, createTemplate, updateTemplate, deleteTemplate)
+  - Template list shows count of configured default values for each template
+
+- Files changed:
+  - lib/templates/actions.ts (new - server actions for template CRUD)
+  - components/admin/templates/template-form.tsx (new - reusable form component with custom field inputs)
+  - components/admin/templates/create-template-form.tsx (new - create form wrapper)
+  - components/admin/templates/template-list.tsx (new - list with edit/delete)
+  - app/admin/templates/page.tsx (new - admin templates page)
+
+- **Learnings for future iterations:**
+  - Follow same pattern as custom-fields: server actions in lib/[feature]/actions.ts, components in components/admin/[feature]/
+  - Use getTemplatesWithDivision() to fetch templates with joined division data for display
+  - For checkbox custom fields in templates, use radio buttons (No default/Checked/Unchecked) instead of single checkbox
+  - Use formKey pattern with useState to force form remount and reset after successful create
+  - Template custom field values stored as Record<fieldId, value> for reliable lookup
+---
+
+## 2026-01-10 - US-033
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- What was implemented:
+  - Added 'Create from Template' dropdown to task create form (task-modal.tsx)
+  - Dropdown only visible in create mode (not when editing existing task)
+  - Selecting a template pre-fills: title, description, division, custom fields
+  - User can override any pre-filled values before saving
+  - Status, due date, assigned user, and location must still be set manually (per AC)
+  - Template selection resets form to template defaults or clears when "No template" selected
+  - Helper text shows when template is selected to inform user values have been applied
+  - Updated TaskTable and admin tasks page to fetch and pass templates prop
+
+- Files changed:
+  - components/admin/tasks/task-modal.tsx (added templates prop, selectedTemplateId state, handleTemplateSelect handler, template dropdown UI)
+  - components/admin/tasks/task-table.tsx (added templates prop, pass to TaskModal)
+  - app/admin/tasks/page.tsx (import getTemplates, fetch templates in parallel, pass to TaskTable)
+
+- **Learnings for future iterations:**
+  - Template pre-fill pattern: update formData while preserving fields that user must set (status, assignee, etc.)
+  - Reset selectedTemplateId in useEffect when modal opens/closes to clear template selection
+  - Template dropdown with "No template (start from scratch)" default option for clear UX
+  - Show conditional helper text below dropdown when template is selected
+---
+
+## 2026-01-10 - US-034
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- What was implemented:
+  - Admin page at /admin/media for viewing all uploaded photos across tasks
+  - Gallery grid view with responsive columns (2-6 depending on screen size)
+  - Filter dropdowns for: task, user, division, start date, end date
+  - URL-based filter state for bookmarkable filtered views
+  - Full-size lightbox modal with:
+    - Task link with division badge
+    - Timestamp with relative time
+    - GPS coordinates with "View on map" link
+    - Uploader avatar and email
+    - Download button
+    - Keyboard navigation (arrow keys, Escape)
+  - Bulk selection with checkbox on each photo
+  - Select All checkbox in action bar
+  - Download Selected creates zip file using JSZip library (dynamically imported)
+  - Server actions for fetching all photos with filters, tasks with photos, users with photos
+
+- Files changed:
+  - lib/photos/actions.ts (added getAllPhotos, getTasksWithPhotos, getUsersWithPhotos, PhotoWithTaskInfo type)
+  - app/admin/media/page.tsx (new - admin media gallery page)
+  - components/admin/media/media-gallery.tsx (new - gallery component with filters, lightbox, bulk actions)
+  - package.json (added jszip dependency)
+
+- **Learnings for future iterations:**
+  - Use JSZip library (dynamically imported) for client-side zip creation
+  - For bulk downloads, use Promise.all to download all files in parallel before creating zip
+  - Use intermediate types (PhotoWithTask, PhotoWithUserOnly) for Supabase select queries that TypeScript can't infer
+  - Filter by related table column with `task.division_id` syntax in Supabase queries
+  - Use `!inner` join in Supabase select to exclude photos with deleted tasks
+---
+
+## 2026-01-10 - US-035
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- What was implemented:
+  - Added checkbox column to task table rows with visual highlight for selected rows
+  - Select all checkbox in table header with indeterminate state support
+  - Shift+click range selection for selecting multiple consecutive tasks
+  - BulkActionBar component appears when tasks are selected
+  - Three bulk actions: Assign to User (with Unassign option), Change Status, Delete
+  - Confirmation dialog for delete action ("Are you sure you want to delete X tasks?")
+  - Server actions: bulkAssignTasks, bulkChangeStatus, bulkDeleteTasks in lib/tasks/actions.ts
+  - Bulk updates use .in('id', taskIds) to update multiple tasks in single query
+
+- Files changed:
+  - lib/tasks/actions.ts (added bulkAssignTasks, bulkChangeStatus, bulkDeleteTasks server actions)
+  - components/admin/tasks/task-table.tsx (added selection state, checkbox column, handlers for select/shift-click)
+  - components/admin/tasks/bulk-action-bar.tsx (new - bulk action bar component with dropdowns and confirmation)
+
+- **Learnings for future iterations:**
+  - Use Set<string> for selectedTaskIds to enable O(1) lookup and manipulation
+  - Use useRef for lastSelectedIndex to track shift-click range selection without re-renders
+  - HTML checkbox supports indeterminate state via ref callback: `ref={(el) => { if (el) el.indeterminate = isSomeSelected; }}`
+  - For bulk updates, Supabase .in() method efficiently updates multiple rows
+  - Bulk action bar pattern: sticky bar at top of table when selection active
+  - For unassign option in user dropdown, use special value like '__unassign__' to differentiate from empty selection
+---
+
+## 2026-01-10 - US-036
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- What was implemented:
+  - Export to CSV button added to admin tasks page header (next to Create Task button)
+  - Button disabled when no tasks to export
+  - Exports visible/filtered tasks (respects all current filters applied)
+  - CSV includes all required columns: ID, Title, Status, Division, Assigned User, Due Date, Created Date, Location
+  - Proper CSV escaping for values containing commas, quotes, or newlines
+  - Location combines address and GPS coordinates when available
+  - Filename includes ISO timestamp (tasks-export-YYYY-MM-DDTHH-MM-SS.csv)
+  - Uses Blob API and temporary anchor element for download trigger
+
+- Files changed:
+  - components/admin/tasks/task-table.tsx (added handleExportCSV function, Export to CSV button in header)
+
+- **Learnings for future iterations:**
+  - Use Blob API with type 'text/csv;charset=utf-8;' for CSV downloads
+  - Escape CSV values: wrap in quotes if contains comma/quote/newline, double internal quotes
+  - Use URL.createObjectURL + revokeObjectURL for blob downloads
+  - Create temporary anchor element with download attribute for programmatic downloads
+  - Format timestamps in ISO format with replaced colons/periods for safe filenames
+---
+
+## 2026-01-10 - US-037
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- What was implemented:
+  - Mobile bottom navigation bar with 4 items: Tasks, Upload, Sync, Profile
+  - Fixed to bottom of screen, only visible on mobile (md: breakpoint hides)
+  - Updated all tap targets to minimum 48x48px using .touch-target CSS class
+  - Primary actions use 64px with .touch-target-primary CSS class
+  - Replaced hover: interactions with active: for touch devices
+  - Added @media (prefers-contrast: more) for high contrast mode support
+  - Minimum 16px body font size set in globals.css
+  - Safe area inset support for notched devices (env() CSS functions)
+  - Landscape orientation adjustments for shorter screens
+  - Created profile page at /profile for field users
+  - Updated login page for accessible font sizes and touch targets
+
+- Files changed:
+  - app/globals.css (added CSS variables, high contrast, touch targets, responsive utilities)
+  - components/layout/mobile-bottom-nav.tsx (new - bottom navigation component)
+  - app/profile/page.tsx (new - profile page for field users)
+  - app/tasks/page.tsx (added MobileBottomNav)
+  - app/tasks/[id]/page.tsx (added MobileBottomNav)
+  - app/tasks/[id]/status/page.tsx (added MobileBottomNav)
+  - components/layout/app-header.tsx (increased back button to 48x48px)
+  - components/auth/logout-button.tsx (updated to touch-target)
+  - components/tasks/task-list.tsx (updated filter buttons to touch-target)
+  - components/ui/branded-button.tsx (all sizes use touch-target classes)
+  - app/login/page.tsx (updated fonts and touch targets)
+
+- **Learnings for future iterations:**
+  - Use CSS custom properties for tap target sizes: --tap-target-min: 48px, --tap-target-primary: 64px
+  - Use .touch-target and .touch-target-primary utility classes for consistent sizing
+  - Replace hover: with active: for touch-friendly interactions
+  - Use @media (hover: none) to detect touch devices
+  - Use env(safe-area-inset-bottom) for notched device support
+  - Use .mobile-only and .desktop-only utility classes for responsive visibility
+  - Bottom nav should use z-50 and fixed position with safe area padding
+---
+
+## 2026-01-10 - US-038
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- What was implemented:
+  - AdminSidebar component with collapsible state (saved to localStorage)
+  - Navigation sections: Dashboard, Tasks, Media, Configuration with expandable sub-items
+  - AdminLayout wrapper providing consistent layout for all admin pages
+  - DashboardContent with summary stats:
+    - Tasks by status counts with colored progress bars
+    - Total, completed, pending, and overdue task counts
+    - Recent uploads gallery with hover tooltips
+    - User stats (total and active today)
+    - Quick actions links with keyboard shortcut hints
+  - Keyboard shortcuts: n=new task, /=search modal, ?=help modal
+  - Multi-column responsive layout adapting to screen width
+  - Mobile sidebar overlay with hamburger menu button
+  - Search modal with keyboard navigation
+  - lib/dashboard/actions.ts for fetching dashboard stats
+  - lib/utils/date.ts for date formatting utilities
+
+- Files changed:
+  - components/admin/admin-sidebar.tsx (new - collapsible sidebar with nav sections)
+  - components/admin/admin-layout.tsx (new - layout wrapper with keyboard shortcuts)
+  - components/admin/dashboard/dashboard-content.tsx (new - dashboard stats and content)
+  - lib/dashboard/actions.ts (new - getDashboardStats, getTaskCountsByStatus, getRecentUploads, etc.)
+  - lib/utils/date.ts (new - formatDistanceToNow, formatDate, formatDateTime)
+  - app/admin/dashboard/page.tsx (updated - uses AdminLayout and DashboardContent)
+  - app/admin/tasks/page.tsx (updated - uses AdminLayout)
+  - app/admin/users/page.tsx (updated - uses AdminLayout)
+  - app/admin/divisions/page.tsx (updated - uses AdminLayout)
+  - app/admin/statuses/page.tsx (updated - uses AdminLayout)
+  - app/admin/custom-fields/page.tsx (updated - uses AdminLayout)
+  - app/admin/templates/page.tsx (updated - uses AdminLayout)
+  - app/admin/branding/page.tsx (updated - uses AdminLayout)
+  - app/admin/media/page.tsx (updated - uses AdminLayout)
+
+- **Learnings for future iterations:**
+  - Use simpler AdminUser interface for layout (only id, email, role) to match AuthUser from requireAdmin()
+  - Use localStorage for persisting sidebar collapsed state across sessions
+  - Keyboard shortcuts should check for input/textarea focus before triggering
+  - Use inline TypeScript interfaces for Supabase query results when types are complex
+  - Admin pages share common layout pattern - extract to wrapper component for consistency
+  - Dashboard stats: use Promise.all for parallel data fetching
+---
+
+## 2026-01-10 - US-039
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- What was implemented:
+  - PWAInstallPrompt component (components/pwa/pwa-install-prompt.tsx) captures beforeinstallprompt event
+  - Install banner shown conditionally: after 2nd visit OR after meaningful action (like status update)
+  - Visit count tracked in localStorage (fieldops_visit_count)
+  - Meaningful actions tracked via trackMeaningfulAction() exported function
+  - Install button triggers native browser install prompt via deferred prompt
+  - User can dismiss banner (persisted to localStorage to not show again)
+  - PWASplashScreen component (components/pwa/pwa-splash-screen.tsx) shows on PWA launch
+  - Splash only appears in standalone mode (installed PWA) and only once per session
+  - Splash displays company logo from branding or initial letter with theme colors
+  - Animated loading dots and fade-in-up animation
+  - Updated dynamic manifest to use branding theme_color for background_color (splash screen)
+  - Added branding logo as icon option in manifest
+  - Integrated both components in app layout
+
+- Files changed:
+  - components/pwa/pwa-install-prompt.tsx (new - install prompt with beforeinstallprompt capture)
+  - components/pwa/pwa-splash-screen.tsx (new - branded splash screen for PWA launch)
+  - app/layout.tsx (added PWAInstallPrompt and PWASplashScreen to layout)
+  - app/manifest.json/route.ts (updated - dynamic background_color from branding, branding logo as icon)
+  - components/tasks/status-update-ui.tsx (added trackMeaningfulAction call on successful status update)
+
+- **Learnings for future iterations:**
+  - Use BeforeInstallPromptEvent interface with prompt() and userChoice for native install
+  - Track visit count in localStorage for conditional banner display
+  - Use sessionStorage for splash screen "shown" flag to show once per session only
+  - Check display-mode: standalone or navigator.standalone for installed PWA detection
+  - Use window.dispatchEvent with CustomEvent for cross-component communication (meaningful action)
+  - Export trackMeaningfulAction for other components to trigger install prompt eligibility
+  - Manifest background_color affects native splash screen on Android
+---
+
+## 2026-01-10 - US-040
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- What was implemented:
+  - ThemeProvider context (lib/theme/theme-context.tsx) with system/light/dark mode support
+  - Detects prefers-color-scheme media query for automatic system preference
+  - Persists preference in localStorage (fieldops_theme_preference key)
+  - ThemeToggle component (components/theme/theme-toggle.tsx) with 3-option selector
+  - Added theme toggle to profile/settings page under "Settings" section
+  - Updated globals.css with Tailwind v4 class-based dark mode via @custom-variant directive
+  - Uses .dark class on html element for Tailwind dark: prefixes
+  - ThemeProvider wrapped in BrandingProviderWrapper for app-wide access
+  - Existing components already had dark: class prefixes for sufficient contrast
+
+- Files changed:
+  - lib/theme/theme-context.tsx (new - theme context provider with localStorage persistence)
+  - components/theme/theme-toggle.tsx (new - theme toggle component with 3 options)
+  - app/globals.css (updated - added @custom-variant dark for class-based dark mode)
+  - app/profile/page.tsx (updated - added ThemeToggle in Settings section)
+  - components/providers/branding-provider-wrapper.tsx (updated - wrapped with ThemeProvider)
+
+- **Learnings for future iterations:**
+  - Use Tailwind v4 @custom-variant for class-based dark mode: `@custom-variant dark (&:where(.dark, .dark *))`
+  - Use useState with lazy initializer to read localStorage synchronously and avoid flash
+  - Use useRef for initial load flags to avoid ESLint setState-in-effect warnings
+  - The project has comprehensive dark: class prefixes on most components already
+  - Theme toggle works well as system/light/dark 3-option selector with visual icons
+---
