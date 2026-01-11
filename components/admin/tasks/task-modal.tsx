@@ -38,6 +38,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Loader2, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { TaskMediaPanel } from './task-media-panel';
 
 interface TaskModalProps {
   isOpen: boolean;
@@ -634,6 +635,15 @@ export function TaskModal({
                       </div>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {/* Comments, Photos, Files section - only show when editing */}
+              {isEditing && task && (
+                <div className="pt-4">
+                  <Separator className="mb-4" />
+                  <h3 className="text-sm font-medium mb-3">Comments, Photos & Files</h3>
+                  <TaskMediaPanel taskId={task.id} />
                 </div>
               )}
             </div>
