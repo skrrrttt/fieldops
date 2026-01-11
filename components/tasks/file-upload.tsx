@@ -25,7 +25,10 @@ interface UploadProgress {
 // Max file size: 25MB
 const MAX_FILE_SIZE = 25 * 1024 * 1024;
 
-// Accepted file types
+// Accepted file extensions (primary check for iOS compatibility)
+const ACCEPTED_EXTENSIONS_LIST = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'heic', 'heif'];
+
+// Accepted MIME types (secondary check)
 const ACCEPTED_TYPES = [
   'application/pdf',
   'application/msword',
@@ -36,9 +39,23 @@ const ACCEPTED_TYPES = [
   'image/png',
   'image/gif',
   'image/webp',
+  'image/heic',
+  'image/heif',
 ];
 
-const ACCEPTED_EXTENSIONS = '.pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.webp';
+const ACCEPTED_EXTENSIONS = '.pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.webp,.heic,.heif';
+
+// Check if file is valid (handles iOS where file.type may be empty)
+function isValidFileType(file: File): boolean {
+  // Check MIME type first
+  if (file.type && ACCEPTED_TYPES.includes(file.type)) {
+    return true;
+  }
+
+  // Fallback to extension check for iOS Safari where file.type can be empty
+  const ext = file.name.split('.').pop()?.toLowerCase() || '';
+  return ACCEPTED_EXTENSIONS_LIST.includes(ext);
+}
 
 function formatFileSize(bytes: number): string {
   if (bytes === 0) return '0 Bytes';
@@ -75,7 +92,7 @@ function getFileIcon(fileName: string): React.ReactNode {
     );
   }
 
-  if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
+  if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic', 'heif'].includes(ext)) {
     return (
       <svg className="w-8 h-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -112,8 +129,8 @@ export function FileUpload({ taskId, onUploadComplete }: FileUploadProps) {
       const file = files[i];
       const id = `${Date.now()}-${i}-${Math.random().toString(36).substr(2, 9)}`;
 
-      // Check file type
-      if (!ACCEPTED_TYPES.includes(file.type)) {
+      // Check file type (with iOS fallback using extension)
+      if (!isValidFileType(file)) {
         newFiles.push({
           id,
           file,
@@ -318,7 +335,11 @@ export function FileUpload({ taskId, onUploadComplete }: FileUploadProps) {
         accept={ACCEPTED_EXTENSIONS}
         multiple
         className="hidden"
-        onChange={(e) => handleFileSelect(e.target.files)}
+        onChange={(e) => {
+          handleFileSelect(e.target.files);
+          // Reset input to allow selecting the same file again
+          e.target.value = '';
+        }}
       />
 
       {/* File picker button */}
