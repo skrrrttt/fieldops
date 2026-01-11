@@ -8,6 +8,8 @@ export interface AuthUser {
   id: string;
   email: string;
   role: UserRole;
+  display_name: string | null;
+  avatar_url: string | null;
 }
 
 /**
@@ -22,12 +24,12 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
     return null;
   }
 
-  // Get user role from users table
+  // Get user data from users table
   const { data: userData, error: userError } = await supabase
     .from('users')
-    .select('role')
+    .select('role, display_name, avatar_url')
     .eq('id', user.id)
-    .single<{ role: UserRole }>();
+    .single<{ role: UserRole; display_name: string | null; avatar_url: string | null }>();
 
   if (userError || !userData) {
     // User exists in auth but not in users table - default to field_user
@@ -35,6 +37,8 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
       id: user.id,
       email: user.email || '',
       role: 'field_user',
+      display_name: null,
+      avatar_url: null,
     };
   }
 
@@ -42,6 +46,8 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
     id: user.id,
     email: user.email || '',
     role: userData.role,
+    display_name: userData.display_name,
+    avatar_url: userData.avatar_url,
   };
 }
 
