@@ -22,6 +22,7 @@ import {
   ChevronLeft,
   ChevronDown,
   Layers,
+  MessageSquareText,
 } from 'lucide-react';
 
 interface NavItem {
@@ -46,6 +47,11 @@ const navItems: NavItem[] = [
     label: 'Media',
     href: '/admin/media',
     icon: <ImageIcon className="w-5 h-5" />,
+  },
+  {
+    label: 'Responses',
+    href: '/admin/responses',
+    icon: <MessageSquareText className="w-5 h-5" />,
   },
   {
     label: 'Configuration',

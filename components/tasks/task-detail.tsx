@@ -90,7 +90,7 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
 
   return (
     <div className="space-y-4">
-      {/* Title and Status */}
+      {/* 1. Title, Status and Description */}
       <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-4">
         <div className="flex items-start justify-between gap-3 mb-3">
           <h1 className="text-xl font-bold text-zinc-900 dark:text-white">
@@ -117,93 +117,127 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
         )}
       </section>
 
-      {/* Division and Assignment */}
-      <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-4">
-        <div className="space-y-4">
-          {/* Division */}
-          {task.division && (
-            <div>
-              <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-                Division
-              </dt>
-              <dd>
-                <span
-                  className="inline-flex items-center px-2.5 py-1 rounded text-sm font-medium"
-                  style={{
-                    backgroundColor: `${task.division.color}15`,
-                    color: task.division.color,
-                    border: `1px solid ${task.division.color}40`,
-                  }}
+      {/* 2. Division */}
+      {task.division && (
+        <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-4">
+          <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">
+            Division
+          </dt>
+          <dd>
+            <span
+              className="inline-flex items-center px-2.5 py-1 rounded text-sm font-medium"
+              style={{
+                backgroundColor: `${task.division.color}15`,
+                color: task.division.color,
+                border: `1px solid ${task.division.color}40`,
+              }}
+            >
+              {task.division.icon && (
+                <span className="mr-1.5">{task.division.icon}</span>
+              )}
+              {task.division.name}
+            </span>
+          </dd>
+        </section>
+      )}
+
+      {/* 3. Comments Section */}
+      <CommentInput taskId={task.id} onCommentAdded={handleCommentAdded} />
+      <CommentList comments={comments} />
+
+      {/* 4. Photo Upload and Gallery */}
+      <PhotoUpload
+        key={refreshKey}
+        taskId={task.id}
+        onUploadComplete={handlePhotoUploadComplete}
+      />
+      <PhotoGallery key={`gallery-${refreshKey}`} photos={photos} />
+
+      {/* 5. File Upload and List */}
+      <FileUpload
+        key={`files-${refreshKey}`}
+        taskId={task.id}
+        onUploadComplete={handleFileUploadComplete}
+      />
+      <FileList key={`filelist-${refreshKey}`} files={files} />
+
+      {/* 6. Custom Fields Section - Editable for field users */}
+      {customFields.length > 0 && (
+        <CustomFieldEdit
+          taskId={task.id}
+          customFields={customFields}
+          initialValues={(task.custom_fields as Record<string, unknown>) || {}}
+        />
+      )}
+
+      {/* 7. Additional Details - Due Date, Assigned User */}
+      {(task.due_date || task.assigned_user) && (
+        <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-4">
+          <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-3">
+            Details
+          </h2>
+          <div className="space-y-4">
+            {/* Due Date */}
+            {task.due_date && (
+              <div>
+                <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">
+                  Due Date
+                </dt>
+                <dd
+                  className={`text-base font-medium flex items-center gap-2 ${
+                    isOverdue
+                      ? 'text-red-600 dark:text-red-400'
+                      : 'text-zinc-900 dark:text-white'
+                  }`}
                 >
-                  {task.division.icon && (
-                    <span className="mr-1.5">{task.division.icon}</span>
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                  {formatDate(task.due_date)}
+                  {isOverdue && (
+                    <span className="text-sm bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-2 py-0.5 rounded">
+                      Overdue
+                    </span>
                   )}
-                  {task.division.name}
-                </span>
-              </dd>
-            </div>
-          )}
+                </dd>
+              </div>
+            )}
 
-          {/* Due Date */}
-          {task.due_date && (
-            <div>
-              <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-                Due Date
-              </dt>
-              <dd
-                className={`text-base font-medium flex items-center gap-2 ${
-                  isOverdue
-                    ? 'text-red-600 dark:text-red-400'
-                    : 'text-zinc-900 dark:text-white'
-                }`}
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-                {formatDate(task.due_date)}
-                {isOverdue && (
-                  <span className="text-sm bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-2 py-0.5 rounded">
-                    Overdue
-                  </span>
-                )}
-              </dd>
-            </div>
-          )}
+            {/* Assigned User */}
+            {task.assigned_user && (
+              <div>
+                <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">
+                  Assigned To
+                </dt>
+                <dd className="flex items-center gap-2 text-base text-zinc-900 dark:text-white">
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold"
+                    style={{
+                      backgroundColor: `${branding.primary_color}20`,
+                      color: branding.primary_color,
+                    }}
+                  >
+                    {task.assigned_user.email.charAt(0).toUpperCase()}
+                  </div>
+                  <span>{task.assigned_user.email}</span>
+                </dd>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
-          {/* Assigned User */}
-          {task.assigned_user && (
-            <div>
-              <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-                Assigned To
-              </dt>
-              <dd className="flex items-center gap-2 text-base text-zinc-900 dark:text-white">
-                <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold"
-                  style={{
-                    backgroundColor: `${branding.primary_color}20`,
-                    color: branding.primary_color,
-                  }}
-                >
-                  {task.assigned_user.email.charAt(0).toUpperCase()}
-                </div>
-                <span>{task.assigned_user.email}</span>
-              </dd>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Location Section */}
+      {/* 8. Location Section */}
       {(task.address || hasLocation) && (
         <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 overflow-hidden">
           <div className="p-4">
@@ -292,41 +326,6 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
           )}
         </section>
       )}
-
-      {/* Custom Fields Section - Editable for field users */}
-      {customFields.length > 0 && (
-        <CustomFieldEdit
-          taskId={task.id}
-          customFields={customFields}
-          initialValues={(task.custom_fields as Record<string, unknown>) || {}}
-        />
-      )}
-
-      {/* Photo Upload Section */}
-      <PhotoUpload
-        key={refreshKey}
-        taskId={task.id}
-        onUploadComplete={handlePhotoUploadComplete}
-      />
-
-      {/* Photo Gallery Section */}
-      <PhotoGallery key={`gallery-${refreshKey}`} photos={photos} />
-
-      {/* File Upload Section */}
-      <FileUpload
-        key={`files-${refreshKey}`}
-        taskId={task.id}
-        onUploadComplete={handleFileUploadComplete}
-      />
-
-      {/* File List Section */}
-      <FileList key={`filelist-${refreshKey}`} files={files} />
-
-      {/* Comment Input Section */}
-      <CommentInput taskId={task.id} onCommentAdded={handleCommentAdded} />
-
-      {/* Comments List */}
-      <CommentList comments={comments} />
 
       {/* Fixed Update Status Button at Bottom */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-white dark:bg-zinc-800 border-t border-zinc-200 dark:border-zinc-700 shadow-lg">
