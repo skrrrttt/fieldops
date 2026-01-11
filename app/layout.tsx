@@ -31,13 +31,13 @@ const dmMono = DM_Mono({
 // Note: metadata.title and appleWebApp.title are set to defaults here
 // but the dynamic manifest at /manifest.json uses branding settings
 export const metadata: Metadata = {
-  title: "FieldOps",
-  description: "Field Management PWA - Offline-first task management for field service crews",
+  title: "Flux",
+  description: "Flux - Offline-first task management for field service crews",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "FieldOps",
+    title: "Flux",
   },
   formatDetection: {
     telephone: false,
@@ -63,7 +63,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        {/* Apple touch icon is auto-generated from app/apple-icon.tsx */}
         {/* Dynamic theme color from branding */}
         {branding?.primary_color && (
           <meta name="theme-color" content={branding.primary_color} />

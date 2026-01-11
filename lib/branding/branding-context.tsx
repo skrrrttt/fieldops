@@ -24,7 +24,7 @@ export const DEFAULT_BRANDING: Branding = {
   logo_url: null,
   primary_color: '#3b82f6', // Blue
   accent_color: '#10b981', // Green
-  app_name: 'FieldOps',
+  app_name: 'Flux',
   created_at: new Date().toISOString(),
 };
 
@@ -40,7 +40,7 @@ const BrandingContext = createContext<BrandingContextValue | null>(null);
 /**
  * IndexedDB storage for branding cache
  */
-const BRANDING_CACHE_KEY = 'fieldops_branding_cache';
+const BRANDING_CACHE_KEY = 'flux_branding_cache';
 
 async function getCachedBranding(): Promise<Branding | null> {
   if (typeof window === 'undefined') return null;

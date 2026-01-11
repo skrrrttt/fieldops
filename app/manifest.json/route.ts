@@ -9,7 +9,7 @@ import { getBranding } from '@/lib/branding/actions';
 export async function GET() {
   const branding = await getBranding();
 
-  const appName = branding?.app_name || 'FieldOps';
+  const appName = branding?.app_name || 'Flux';
   const themeColor = branding?.primary_color || '#0066cc';
   // Use theme color for splash screen background for consistent branding
   const backgroundColor = themeColor;
@@ -17,13 +17,13 @@ export async function GET() {
   // Build icons array - use branding logo if available for splash screen
   const icons = [
     {
-      src: '/icons/icon-192x192.png',
+      src: '/api/icons/192',
       sizes: '192x192',
       type: 'image/png',
       purpose: 'any maskable',
     },
     {
-      src: '/icons/icon-512x512.png',
+      src: '/api/icons/512',
       sizes: '512x512',
       type: 'image/png',
       purpose: 'any maskable',
@@ -43,7 +43,7 @@ export async function GET() {
   const manifest = {
     name: appName,
     short_name: appName,
-    description: 'Field Management PWA - Offline-first task management for field service crews',
+    description: 'Flux - Offline-first task management for field service crews',
     start_url: '/',
     display: 'standalone',
     background_color: backgroundColor,

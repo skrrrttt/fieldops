@@ -57,7 +57,7 @@ export async function createBranding(
       logo_url: branding.logo_url || null,
       primary_color: branding.primary_color || '#3b82f6',
       accent_color: branding.accent_color || '#10b981',
-      app_name: branding.app_name || 'FieldOps',
+      app_name: branding.app_name || 'Flux',
     } as never)
     .select()
     .single<Branding>();
