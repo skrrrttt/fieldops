@@ -64,7 +64,7 @@ export function MobileBottomNav() {
     <nav
       className="fixed bottom-0 left-0 right-0 md:hidden z-50"
       style={{
-        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+        paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)',
       }}
       role="navigation"
       aria-label="Main navigation"
@@ -115,7 +115,7 @@ export function MobileBottomNav() {
                     {item.icon}
                   </span>
                   {item.showSyncBadge && (
-                    <span className="absolute -top-1.5 -right-2.5">
+                    <span className="absolute -top-0.5 -right-1 scale-75 origin-top-right">
                       <SyncBadge />
                     </span>
                   )}
@@ -150,7 +150,7 @@ export function MobileBottomNavSpacer() {
     <div
       className="md:hidden"
       style={{
-        height: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px))',
+        height: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + 8px)',
       }}
     />
   );
