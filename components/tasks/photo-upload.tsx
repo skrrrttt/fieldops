@@ -53,6 +53,19 @@ export function PhotoUpload({ taskId, onUploadComplete }: PhotoUploadProps) {
     }
   }, [selectedPhotos.length]);
 
+  // Check if file is an image (handles iOS where file.type may be empty)
+  const isImageFile = useCallback((file: File): boolean => {
+    // Check MIME type first
+    if (file.type && file.type.startsWith('image/')) {
+      return true;
+    }
+
+    // Fallback to extension check for iOS Safari where file.type can be empty
+    const ext = file.name.split('.').pop()?.toLowerCase() || '';
+    const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic', 'heif', 'bmp', 'tiff', 'tif'];
+    return imageExtensions.includes(ext);
+  }, []);
+
   // Handle file selection (from either camera or gallery)
   const handleFileSelect = useCallback((files: FileList | null) => {
     if (!files || files.length === 0) return;
@@ -62,8 +75,8 @@ export function PhotoUpload({ taskId, onUploadComplete }: PhotoUploadProps) {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
 
-      // Only accept image files
-      if (!file.type.startsWith('image/')) {
+      // Only accept image files (with iOS fallback)
+      if (!isImageFile(file)) {
         continue;
       }
 
@@ -78,7 +91,7 @@ export function PhotoUpload({ taskId, onUploadComplete }: PhotoUploadProps) {
       setError(null);
       setSuccess(false);
     }
-  }, []);
+  }, [isImageFile]);
 
   // Handle camera button click
   const handleCameraClick = () => {
@@ -285,18 +298,26 @@ export function PhotoUpload({ taskId, onUploadComplete }: PhotoUploadProps) {
       <input
         ref={cameraInputRef}
         type="file"
-        accept="image/*"
+        accept="image/*,.heic,.heif"
         capture="environment"
         className="hidden"
-        onChange={(e) => handleFileSelect(e.target.files)}
+        onChange={(e) => {
+          handleFileSelect(e.target.files);
+          // Reset input to allow selecting the same file again
+          e.target.value = '';
+        }}
       />
       <input
         ref={galleryInputRef}
         type="file"
-        accept="image/*"
+        accept="image/*,.heic,.heif"
         multiple
         className="hidden"
-        onChange={(e) => handleFileSelect(e.target.files)}
+        onChange={(e) => {
+          handleFileSelect(e.target.files);
+          // Reset input to allow selecting the same file again
+          e.target.value = '';
+        }}
       />
 
       {/* Action buttons */}
