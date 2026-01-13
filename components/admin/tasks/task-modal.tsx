@@ -76,6 +76,7 @@ export function TaskModal({
   const [formData, setFormData] = useState({
     title: '',
     description: '',
+    specifications: '',
     status_id: defaultStatusId || '',
     division_id: '',
     assigned_user_id: '',
@@ -123,6 +124,7 @@ export function TaskModal({
       setFormData({
         title: '',
         description: '',
+        specifications: '',
         status_id: defaultStatusId || (statuses.length > 0 ? statuses[0].id : ''),
         division_id: '',
         assigned_user_id: '',
@@ -177,6 +179,7 @@ export function TaskModal({
       setFormData({
         title: task.title,
         description: task.description || '',
+        specifications: task.specifications || '',
         status_id: task.status_id,
         division_id: task.division_id || '',
         assigned_user_id: task.assigned_user_id || '',
@@ -214,6 +217,7 @@ export function TaskModal({
       setFormData({
         title: '',
         description: '',
+        specifications: '',
         status_id: defaultStatusId || (statuses.length > 0 ? statuses[0].id : ''),
         division_id: '',
         assigned_user_id: '',
@@ -303,6 +307,7 @@ export function TaskModal({
       const data = {
         title: formData.title,
         description: formData.description || null,
+        specifications: formData.specifications || null,
         status_id: formData.status_id,
         division_id: formData.division_id || null,
         assigned_user_id: formData.assigned_user_id || null,
@@ -427,6 +432,21 @@ export function TaskModal({
                   rows={3}
                   placeholder="Enter task description"
                 />
+              </div>
+
+              {/* Specifications */}
+              <div className="space-y-2">
+                <Label htmlFor="specifications">Specifications</Label>
+                <Textarea
+                  id="specifications"
+                  value={formData.specifications}
+                  onChange={(e) => setFormData({ ...formData, specifications: e.target.value })}
+                  rows={4}
+                  placeholder="Enter task specifications (visible to field users as read-only)"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Field users can view specifications but cannot edit them.
+                </p>
               </div>
 
               {/* Status and Division row */}
