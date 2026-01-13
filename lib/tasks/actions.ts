@@ -198,6 +198,7 @@ export async function getDefaultStatus(): Promise<string | null> {
 export interface CreateTaskData {
   title: string;
   description?: string | null;
+  specifications?: string | null;
   status_id: string;
   division_id?: string | null;
   assigned_user_id?: string | null;
@@ -220,6 +221,7 @@ export async function createTask(data: CreateTaskData): Promise<ActionResult<Tas
     .insert({
       title: data.title,
       description: data.description || null,
+      specifications: data.specifications || null,
       status_id: data.status_id,
       division_id: data.division_id || null,
       assigned_user_id: data.assigned_user_id || null,
@@ -245,6 +247,7 @@ export interface UpdateTaskData {
   id: string;
   title?: string;
   description?: string | null;
+  specifications?: string | null;
   status_id?: string;
   division_id?: string | null;
   assigned_user_id?: string | null;
@@ -268,6 +271,7 @@ export async function updateTask(data: UpdateTaskData): Promise<ActionResult<Tas
 
   if (data.title !== undefined) updateData.title = data.title;
   if (data.description !== undefined) updateData.description = data.description;
+  if (data.specifications !== undefined) updateData.specifications = data.specifications;
   if (data.status_id !== undefined) updateData.status_id = data.status_id;
   if (data.division_id !== undefined) updateData.division_id = data.division_id;
   if (data.assigned_user_id !== undefined) updateData.assigned_user_id = data.assigned_user_id;

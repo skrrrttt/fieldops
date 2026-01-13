@@ -16,7 +16,7 @@ import { CommentInput } from '@/components/tasks/comment-input';
 import { CommentList } from '@/components/tasks/comment-list';
 import { CustomFieldEdit } from '@/components/tasks/custom-field-edit';
 import { useBranding, getContrastColor } from '@/lib/branding/branding-context';
-import { ChevronDown, ChevronRight, Plus, Camera, Image, FileText, MessageCircle, MapPin, Calendar, User, X } from 'lucide-react';
+import { ChevronDown, ChevronRight, Plus, Camera, Image, FileText, MessageCircle, MapPin, Calendar, User, X, ClipboardList } from 'lucide-react';
 
 interface TaskDetailProps {
   task: TaskWithRelations;
@@ -147,6 +147,19 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
           </p>
         )}
       </section>
+
+      {/* Specifications Section - Read Only for Field Users */}
+      {task.specifications && (
+        <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-4">
+          <h2 className="text-base font-semibold text-zinc-900 dark:text-white flex items-center gap-2 mb-3">
+            <ClipboardList className="w-4 h-4 text-zinc-400" />
+            Specifications
+          </h2>
+          <div className="text-sm text-zinc-600 dark:text-zinc-300 whitespace-pre-wrap bg-zinc-50 dark:bg-zinc-900 rounded-lg p-3 border border-zinc-100 dark:border-zinc-700">
+            {task.specifications}
+          </div>
+        </section>
+      )}
 
       {/* Location Section - Compact */}
       {(task.address || hasLocation) && (

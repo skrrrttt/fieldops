@@ -102,6 +102,7 @@ export interface Database {
           id: string;
           title: string;
           description: string | null;
+          specifications: string | null;
           status_id: string;
           division_id: string | null;
           location_lat: number | null;
@@ -119,6 +120,7 @@ export interface Database {
           id?: string;
           title: string;
           description?: string | null;
+          specifications?: string | null;
           status_id: string;
           division_id?: string | null;
           location_lat?: number | null;
@@ -136,6 +138,7 @@ export interface Database {
           id?: string;
           title?: string;
           description?: string | null;
+          specifications?: string | null;
           status_id?: string;
           division_id?: string | null;
           location_lat?: number | null;
