@@ -172,7 +172,7 @@ export function BrandingForm({ initialBranding }: BrandingFormProps) {
             </div>
 
             <p className="text-sm text-muted-foreground">
-              Recommended: PNG or SVG, max 5MB. Logo will appear in the header.
+              Recommended: Square PNG, max 5MB. Logo will appear in the header and as the app icon on home screens.
             </p>
           </CardContent>
         </Card>
@@ -281,6 +281,37 @@ export function BrandingForm({ initialBranding }: BrandingFormProps) {
             <CardTitle>Live Preview</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
+            {/* App Icon Preview */}
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">App Icon (Home Screen)</p>
+              <div className="flex items-center gap-4">
+                <div
+                  className="w-16 h-16 rounded-xl flex items-center justify-center overflow-hidden shadow-lg"
+                  style={{ backgroundColor: primaryColor }}
+                >
+                  {logoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={logoUrl}
+                      alt="App Icon Preview"
+                      className="w-12 h-12 object-contain"
+                    />
+                  ) : (
+                    <span
+                      className="text-2xl font-bold"
+                      style={{ color: getContrastColor(primaryColor) }}
+                    >
+                      {appName.charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  <p className="font-medium text-foreground">{appName}</p>
+                  <p>How it appears on home screens</p>
+                </div>
+              </div>
+            </div>
+
             {/* Header Preview */}
             <div>
               <p className="text-sm text-muted-foreground mb-2">Header</p>
