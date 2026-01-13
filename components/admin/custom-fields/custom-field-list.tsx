@@ -144,8 +144,16 @@ export function CustomFieldList({ fields: initialFields }: CustomFieldListProps)
 
   if (fields.length === 0) {
     return (
-      <div className="text-center py-8 text-zinc-500 dark:text-zinc-400">
-        No custom fields yet. Create your first field above.
+      <div className="text-center py-12">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-zinc-100 dark:bg-zinc-800 mb-4">
+          <svg className="w-7 h-7 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+          </svg>
+        </div>
+        <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-1">No custom fields yet</h3>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto">
+          Custom fields let you capture additional data on tasks. Use the form above to create one.
+        </p>
       </div>
     );
   }

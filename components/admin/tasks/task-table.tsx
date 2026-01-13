@@ -265,9 +265,15 @@ export function TaskTable({
       />
 
       {/* Header with Create Button and Export */}
-      <div className="p-4 border-b border-zinc-200 dark:border-zinc-700 flex items-center justify-between">
+      <div className="p-4 border-b border-zinc-200 dark:border-zinc-700 flex items-center justify-between gap-4">
         <div className="text-sm text-zinc-600 dark:text-zinc-400">
-          {total} {total === 1 ? 'task' : 'tasks'} total
+          {selectedTaskIds.size > 0 ? (
+            <span className="font-medium text-blue-600 dark:text-blue-400">
+              {selectedTaskIds.size} selected
+            </span>
+          ) : (
+            <span>{total} {total === 1 ? 'task' : 'tasks'} total</span>
+          )}
         </div>
         <div className="flex items-center gap-3">
           <button
@@ -294,25 +300,20 @@ export function TaskTable({
 
       {/* Filters and Search */}
       <div className="p-4 border-b border-zinc-200 dark:border-zinc-700">
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap gap-3">
           {/* Search */}
           <form onSubmit={handleSearch} className="flex-1 min-w-[200px]">
             <div className="relative">
+              <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
               <input
                 type="text"
                 placeholder="Search by title or description..."
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                className="w-full px-4 py-2 pr-10 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white placeholder-zinc-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full h-10 pl-10 pr-4 border border-zinc-200 dark:border-zinc-700 rounded-xl bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
               />
-              <button
-                type="submit"
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </button>
             </div>
           </form>
 
@@ -320,7 +321,7 @@ export function TaskTable({
           <select
             value={currentFilters.status}
             onChange={(e) => handleFilterChange('status', e.target.value)}
-            className="px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="h-10 px-4 border border-zinc-200 dark:border-zinc-700 rounded-xl bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
           >
             <option value="">All Statuses</option>
             {statuses.map((status) => (
@@ -334,7 +335,7 @@ export function TaskTable({
           <select
             value={currentFilters.division}
             onChange={(e) => handleFilterChange('division', e.target.value)}
-            className="px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="h-10 px-4 border border-zinc-200 dark:border-zinc-700 rounded-xl bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
           >
             <option value="">All Divisions</option>
             {divisions.map((division) => (
@@ -348,7 +349,7 @@ export function TaskTable({
           <select
             value={currentFilters.user}
             onChange={(e) => handleFilterChange('user', e.target.value)}
-            className="px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="h-10 px-4 border border-zinc-200 dark:border-zinc-700 rounded-xl bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
           >
             <option value="">All Users</option>
             {users.map((user) => (
@@ -365,7 +366,7 @@ export function TaskTable({
             currentFilters.search) && (
             <button
               onClick={() => router.push('/admin/tasks')}
-              className="px-4 py-2 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-300 dark:border-zinc-600 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700"
+              className="h-10 px-4 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-zinc-700 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all"
             >
               Clear Filters
             </button>
@@ -385,8 +386,123 @@ export function TaskTable({
         />
       )}
 
-      {/* Table */}
-      <div className="overflow-x-auto">
+      {/* Mobile Card View */}
+      <div className="md:hidden">
+        {tasks.length === 0 ? (
+          <div className="px-4 py-12 text-center">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 mb-4">
+              <svg className="w-6 h-6 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+            </div>
+            <p className="text-zinc-500 dark:text-zinc-400 mb-2">No tasks found</p>
+            <p className="text-sm text-zinc-400 dark:text-zinc-500 mb-4">Try adjusting your filters or create a new task</p>
+            <button
+              onClick={handleCreateClick}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Create Task
+            </button>
+          </div>
+        ) : (
+          <div className="p-3 space-y-3">
+            {tasks.map((task, index) => (
+              <div
+                key={task.id}
+                className={`bg-white dark:bg-zinc-800 rounded-xl border shadow-sm transition-all ${
+                  selectedTaskIds.has(task.id)
+                    ? 'border-blue-500 dark:border-blue-500 ring-1 ring-blue-500/20'
+                    : 'border-zinc-200 dark:border-zinc-700'
+                }`}
+              >
+                <div className="p-4">
+                  <div className="flex items-start gap-3">
+                    <input
+                      type="checkbox"
+                      checked={selectedTaskIds.has(task.id)}
+                      onChange={(e) => handleSelectTask(task.id, index, e)}
+                      className="mt-0.5 w-5 h-5 rounded border-zinc-300 dark:border-zinc-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2 mb-1">
+                        <h3 className="font-semibold text-zinc-900 dark:text-white leading-snug">
+                          {task.title}
+                        </h3>
+                        {task.status && (
+                          <span
+                            className="flex-shrink-0 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold"
+                            style={{
+                              backgroundColor: `${task.status.color}15`,
+                              color: task.status.color,
+                              border: `1px solid ${task.status.color}30`,
+                            }}
+                          >
+                            {task.status.name}
+                          </span>
+                        )}
+                      </div>
+                      {task.description && (
+                        <p className="text-sm text-zinc-500 dark:text-zinc-400 line-clamp-2 mb-3">
+                          {task.description}
+                        </p>
+                      )}
+                      <div className="flex flex-wrap items-center gap-2">
+                        {task.division && (
+                          <span
+                            className="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium"
+                            style={{
+                              backgroundColor: `${task.division.color}15`,
+                              color: task.division.color,
+                            }}
+                          >
+                            {task.division.icon && (
+                              <span className="mr-1">{task.division.icon}</span>
+                            )}
+                            {task.division.name}
+                          </span>
+                        )}
+                        {task.due_date && (
+                          <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300">
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            {formatDate(task.due_date)}
+                          </span>
+                        )}
+                        {task.assigned_user && (
+                          <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300">
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            {task.assigned_user.email.split('@')[0]}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="px-4 py-3 border-t border-zinc-100 dark:border-zinc-700/50 bg-zinc-50/50 dark:bg-zinc-800/50 rounded-b-xl">
+                  <button
+                    onClick={() => handleEditClick(task)}
+                    className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    View & Edit Task
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full">
           <thead className="bg-zinc-50 dark:bg-zinc-700">
             <tr>
@@ -439,17 +555,25 @@ export function TaskTable({
           <tbody className="divide-y divide-zinc-200 dark:divide-zinc-700">
             {tasks.length === 0 ? (
               <tr>
-                <td
-                  colSpan={8}
-                  className="px-4 py-8 text-center text-zinc-500 dark:text-zinc-400"
-                >
-                  No tasks found. Try adjusting your filters or{' '}
-                  <button
-                    onClick={handleCreateClick}
-                    className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 underline"
-                  >
-                    create a new task
-                  </button>.
+                <td colSpan={8} className="px-4 py-12">
+                  <div className="text-center">
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 mb-4">
+                      <svg className="w-6 h-6 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                      </svg>
+                    </div>
+                    <p className="text-zinc-500 dark:text-zinc-400 mb-2">No tasks found</p>
+                    <p className="text-sm text-zinc-400 dark:text-zinc-500 mb-4">Try adjusting your filters or create a new task</p>
+                    <button
+                      onClick={handleCreateClick}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      Create Task
+                    </button>
+                  </div>
                 </td>
               </tr>
             ) : (

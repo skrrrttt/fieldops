@@ -81,21 +81,16 @@ export function TemplateList({ templates: initialTemplates, divisions, customFie
 
   if (templates.length === 0) {
     return (
-      <div className="text-center py-8 text-zinc-500 dark:text-zinc-400">
-        <svg
-          className="w-12 h-12 mx-auto mb-4 text-zinc-400 dark:text-zinc-500"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={1.5}
-            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-          />
-        </svg>
-        No templates yet. Create your first template above.
+      <div className="text-center py-12">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-zinc-100 dark:bg-zinc-800 mb-4">
+          <svg className="w-7 h-7 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        </div>
+        <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-1">No templates yet</h3>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto">
+          Templates let you quickly create tasks with pre-filled fields. Use the form above to create one.
+        </p>
       </div>
     );
   }

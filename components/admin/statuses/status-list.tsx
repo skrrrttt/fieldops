@@ -108,8 +108,16 @@ export function StatusList({ statuses: initialStatuses }: StatusListProps) {
 
   if (statuses.length === 0) {
     return (
-      <div className="text-center py-8 text-zinc-500 dark:text-zinc-400">
-        No statuses yet. Create your first status above.
+      <div className="text-center py-12">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-zinc-100 dark:bg-zinc-800 mb-4">
+          <svg className="w-7 h-7 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-1">No statuses yet</h3>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto">
+          Create statuses to track task progress. Use the form above to add your first status.
+        </p>
       </div>
     );
   }
@@ -168,8 +176,11 @@ export function StatusList({ statuses: initialStatuses }: StatusListProps) {
                         </span>
                       )}
                       {status.is_complete && (
-                        <span className="px-2 py-0.5 text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded">
-                          Complete
+                        <span className="px-2 py-0.5 text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded flex items-center gap-1">
+                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          Done
                         </span>
                       )}
                     </div>
