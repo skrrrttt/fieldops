@@ -114,29 +114,46 @@ export async function uploadLogo(formData: FormData): Promise<ActionResult<strin
     return { success: false, error: 'No file provided' };
   }
 
+  // Validate file type
+  const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp', 'image/svg+xml'];
+  if (file.type && !validTypes.includes(file.type)) {
+    return { success: false, error: `Invalid file type: ${file.type}. Please upload a PNG, JPEG, GIF, WebP, or SVG.` };
+  }
+
   // Generate unique filename
   const timestamp = Date.now();
-  const ext = file.name.split('.').pop();
+  const ext = file.name.split('.').pop() || 'png';
   const filename = `logo-${timestamp}.${ext}`;
-  const storagePath = `branding/${filename}`;
 
-  // Upload to storage
+  // Convert File to ArrayBuffer for upload
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = new Uint8Array(arrayBuffer);
+
+  // Upload to storage (directly to branding bucket, no subfolder)
   const { error: uploadError } = await supabase.storage
     .from('branding')
-    .upload(storagePath, file, {
+    .upload(filename, buffer, {
+      contentType: file.type || 'image/png',
       cacheControl: '3600',
       upsert: true,
     });
 
   if (uploadError) {
     console.error('Error uploading logo:', uploadError);
+    // Provide more helpful error messages
+    if (uploadError.message.includes('bucket') || uploadError.message.includes('not found')) {
+      return { success: false, error: 'Storage bucket "branding" not found. Please create it in Supabase Dashboard > Storage.' };
+    }
+    if (uploadError.message.includes('policy') || uploadError.message.includes('permission')) {
+      return { success: false, error: 'Permission denied. Check storage policies in Supabase Dashboard.' };
+    }
     return { success: false, error: uploadError.message };
   }
 
   // Get public URL
   const { data: publicUrlData } = supabase.storage
     .from('branding')
-    .getPublicUrl(storagePath);
+    .getPublicUrl(filename);
 
   return { success: true, data: publicUrlData.publicUrl };
 }
@@ -147,17 +164,18 @@ export async function uploadLogo(formData: FormData): Promise<ActionResult<strin
 export async function deleteOldLogo(logoUrl: string): Promise<ActionResult> {
   const supabase = await createClient();
 
-  // Extract storage path from URL
+  // Extract filename from URL (format: .../branding/logo-xxx.png)
   const urlParts = logoUrl.split('/branding/');
   if (urlParts.length < 2) {
     return { success: false, error: 'Invalid logo URL' };
   }
 
-  const storagePath = `branding/${urlParts[1]}`;
+  // Get just the filename (last part after /branding/)
+  const filename = urlParts[urlParts.length - 1].split('?')[0]; // Remove query params if any
 
   const { error } = await supabase.storage
     .from('branding')
-    .remove([storagePath]);
+    .remove([filename]);
 
   if (error) {
     console.error('Error deleting old logo:', error);
