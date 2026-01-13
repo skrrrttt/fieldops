@@ -85,8 +85,14 @@ export function TaskModal({
     location_lng: '',
   });
 
+  // Which custom fields are assigned to this task
+  const [assignedFieldIds, setAssignedFieldIds] = useState<string[]>([]);
+
   // Custom fields form state - keyed by field ID
   const [customFieldValues, setCustomFieldValues] = useState<Record<string, unknown>>({});
+
+  // Get only the custom fields that are assigned to this task
+  const assignedCustomFields = customFields.filter(f => assignedFieldIds.includes(f.id));
 
   // Initialize custom field default values
   const getDefaultCustomFieldValues = () => {
@@ -179,6 +185,8 @@ export function TaskModal({
         location_lat: task.location_lat?.toString() || '',
         location_lng: task.location_lng?.toString() || '',
       });
+      // Load assigned field IDs
+      setAssignedFieldIds((task as { assigned_field_ids?: string[] | null }).assigned_field_ids || []);
       // Load existing custom field values
       if (task.custom_fields) {
         const existingValues: Record<string, unknown> = {};
@@ -214,6 +222,7 @@ export function TaskModal({
         location_lat: '',
         location_lng: '',
       });
+      setAssignedFieldIds([]);
       setCustomFieldValues(getDefaultCustomFieldValues());
     }
     setError(null);
@@ -223,12 +232,13 @@ export function TaskModal({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [task, isOpen, defaultStatusId, statuses, customFields]);
 
-  // Validate required custom fields
+  // Validate required custom fields (only for assigned fields)
   const validateCustomFields = (): boolean => {
     const errors: Record<string, string> = {};
     let isValid = true;
 
-    customFields.forEach((field) => {
+    // Only validate fields that are assigned to this task
+    assignedCustomFields.forEach((field) => {
       if (field.required) {
         const value = customFieldValues[field.id];
         const isEmpty =
@@ -273,9 +283,9 @@ export function TaskModal({
     }
 
     try {
-      // Build custom_fields object with only non-empty values
+      // Build custom_fields object with only non-empty values for assigned fields only
       const customFieldsData: Record<string, unknown> = {};
-      customFields.forEach((field) => {
+      assignedCustomFields.forEach((field) => {
         const value = customFieldValues[field.id];
         // Store all values except empty strings for non-checkbox types
         if (field.field_type === 'checkbox') {
@@ -301,6 +311,7 @@ export function TaskModal({
         location_lat: formData.location_lat ? parseFloat(formData.location_lat) : null,
         location_lng: formData.location_lng ? parseFloat(formData.location_lng) : null,
         custom_fields: Object.keys(customFieldsData).length > 0 ? customFieldsData : null,
+        assigned_field_ids: assignedFieldIds,
       };
 
       let result;
@@ -543,98 +554,135 @@ export function TaskModal({
                 </div>
               </div>
 
-              {/* Custom Fields section */}
+              {/* Custom Fields Assignment section */}
               {customFields.length > 0 && (
                 <div className="pt-4">
                   <Separator className="mb-4" />
-                  <h3 className="text-sm font-medium mb-3">Custom Fields</h3>
-                  <div className="space-y-4">
+                  <h3 className="text-sm font-medium mb-3">Assign Custom Fields</h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Select which custom fields should be filled out for this task.
+                  </p>
+                  <div className="space-y-2 mb-4">
                     {customFields.map((field) => (
-                      <div key={field.id} className="space-y-2">
-                        <Label htmlFor={`custom-field-${field.id}`}>
-                          {field.name}
-                          {field.required && <span className="text-destructive ml-1">*</span>}
-                        </Label>
-
-                        {/* Text input */}
-                        {field.field_type === 'text' && (
-                          <Input
-                            id={`custom-field-${field.id}`}
-                            value={(customFieldValues[field.id] as string) || ''}
-                            onChange={(e) => updateCustomFieldValue(field.id, e.target.value)}
-                            className={cn(customFieldErrors[field.id] && 'border-destructive')}
-                            placeholder={`Enter ${field.name.toLowerCase()}`}
-                          />
-                        )}
-
-                        {/* Number input */}
-                        {field.field_type === 'number' && (
-                          <Input
-                            id={`custom-field-${field.id}`}
-                            type="number"
-                            step="any"
-                            value={(customFieldValues[field.id] as string) || ''}
-                            onChange={(e) => updateCustomFieldValue(field.id, e.target.value)}
-                            className={cn(customFieldErrors[field.id] && 'border-destructive')}
-                            placeholder={`Enter ${field.name.toLowerCase()}`}
-                          />
-                        )}
-
-                        {/* Date input */}
-                        {field.field_type === 'date' && (
-                          <Input
-                            id={`custom-field-${field.id}`}
-                            type="date"
-                            value={(customFieldValues[field.id] as string) || ''}
-                            onChange={(e) => updateCustomFieldValue(field.id, e.target.value)}
-                            className={cn(customFieldErrors[field.id] && 'border-destructive')}
-                          />
-                        )}
-
-                        {/* Dropdown input */}
-                        {field.field_type === 'dropdown' && (
-                          <Select
-                            value={(customFieldValues[field.id] as string) || ''}
-                            onValueChange={(value) => updateCustomFieldValue(field.id, value)}
-                          >
-                            <SelectTrigger className={cn(customFieldErrors[field.id] && 'border-destructive')}>
-                              <SelectValue placeholder={`Select ${field.name.toLowerCase()}`} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {field.options?.map((option) => (
-                                <SelectItem key={option} value={option}>
-                                  {option}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        )}
-
-                        {/* Checkbox input */}
-                        {field.field_type === 'checkbox' && (
-                          <div className="flex items-center gap-2">
-                            <Checkbox
-                              id={`custom-field-${field.id}`}
-                              checked={(customFieldValues[field.id] as boolean) || false}
-                              onCheckedChange={(checked) => updateCustomFieldValue(field.id, checked)}
-                              className={cn(customFieldErrors[field.id] && 'border-destructive')}
-                            />
-                            <Label
-                              htmlFor={`custom-field-${field.id}`}
-                              className="text-sm text-muted-foreground font-normal"
-                            >
-                              Check if applicable
-                            </Label>
-                          </div>
-                        )}
-
-                        {/* Error message */}
-                        {customFieldErrors[field.id] && (
-                          <p className="text-sm text-destructive">{customFieldErrors[field.id]}</p>
-                        )}
-                      </div>
+                      <label
+                        key={field.id}
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer"
+                      >
+                        <Checkbox
+                          checked={assignedFieldIds.includes(field.id)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setAssignedFieldIds(prev => [...prev, field.id]);
+                            } else {
+                              setAssignedFieldIds(prev => prev.filter(id => id !== field.id));
+                            }
+                          }}
+                        />
+                        <div className="flex-1">
+                          <span className="text-sm font-medium">{field.name}</span>
+                          {field.required && (
+                            <span className="ml-1 text-xs text-amber-600 dark:text-amber-400">(Required when assigned)</span>
+                          )}
+                          <p className="text-xs text-muted-foreground capitalize">{field.field_type}</p>
+                        </div>
+                      </label>
                     ))}
                   </div>
+
+                  {/* Show input fields for assigned custom fields */}
+                  {assignedCustomFields.length > 0 && (
+                    <>
+                      <Separator className="my-4" />
+                      <h4 className="text-sm font-medium mb-3">Field Values</h4>
+                      <div className="space-y-4">
+                        {assignedCustomFields.map((field) => (
+                          <div key={field.id} className="space-y-2">
+                            <Label htmlFor={`custom-field-${field.id}`}>
+                              {field.name}
+                              {field.required && <span className="text-destructive ml-1">*</span>}
+                            </Label>
+
+                            {/* Text input */}
+                            {field.field_type === 'text' && (
+                              <Input
+                                id={`custom-field-${field.id}`}
+                                value={(customFieldValues[field.id] as string) || ''}
+                                onChange={(e) => updateCustomFieldValue(field.id, e.target.value)}
+                                className={cn(customFieldErrors[field.id] && 'border-destructive')}
+                                placeholder={`Enter ${field.name.toLowerCase()}`}
+                              />
+                            )}
+
+                            {/* Number input */}
+                            {field.field_type === 'number' && (
+                              <Input
+                                id={`custom-field-${field.id}`}
+                                type="number"
+                                step="any"
+                                value={(customFieldValues[field.id] as string) || ''}
+                                onChange={(e) => updateCustomFieldValue(field.id, e.target.value)}
+                                className={cn(customFieldErrors[field.id] && 'border-destructive')}
+                                placeholder={`Enter ${field.name.toLowerCase()}`}
+                              />
+                            )}
+
+                            {/* Date input */}
+                            {field.field_type === 'date' && (
+                              <Input
+                                id={`custom-field-${field.id}`}
+                                type="date"
+                                value={(customFieldValues[field.id] as string) || ''}
+                                onChange={(e) => updateCustomFieldValue(field.id, e.target.value)}
+                                className={cn(customFieldErrors[field.id] && 'border-destructive')}
+                              />
+                            )}
+
+                            {/* Dropdown input */}
+                            {field.field_type === 'dropdown' && (
+                              <Select
+                                value={(customFieldValues[field.id] as string) || ''}
+                                onValueChange={(value) => updateCustomFieldValue(field.id, value)}
+                              >
+                                <SelectTrigger className={cn(customFieldErrors[field.id] && 'border-destructive')}>
+                                  <SelectValue placeholder={`Select ${field.name.toLowerCase()}`} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {field.options?.map((option) => (
+                                    <SelectItem key={option} value={option}>
+                                      {option}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            )}
+
+                            {/* Checkbox input */}
+                            {field.field_type === 'checkbox' && (
+                              <div className="flex items-center gap-2">
+                                <Checkbox
+                                  id={`custom-field-${field.id}`}
+                                  checked={(customFieldValues[field.id] as boolean) || false}
+                                  onCheckedChange={(checked) => updateCustomFieldValue(field.id, checked)}
+                                  className={cn(customFieldErrors[field.id] && 'border-destructive')}
+                                />
+                                <Label
+                                  htmlFor={`custom-field-${field.id}`}
+                                  className="text-sm text-muted-foreground font-normal"
+                                >
+                                  Check if applicable
+                                </Label>
+                              </div>
+                            )}
+
+                            {/* Error message */}
+                            {customFieldErrors[field.id] && (
+                              <p className="text-sm text-destructive">{customFieldErrors[field.id]}</p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
 

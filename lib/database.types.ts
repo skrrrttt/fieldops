@@ -110,6 +110,7 @@ export interface Database {
           due_date: string | null;
           assigned_user_id: string | null;
           custom_fields: Record<string, unknown> | null;
+          assigned_field_ids: string[] | null;
           created_at: string;
           updated_at: string;
           deleted_at: string | null;
@@ -126,6 +127,7 @@ export interface Database {
           due_date?: string | null;
           assigned_user_id?: string | null;
           custom_fields?: Record<string, unknown> | null;
+          assigned_field_ids?: string[] | null;
           created_at?: string;
           updated_at?: string;
           deleted_at?: string | null;
@@ -142,6 +144,7 @@ export interface Database {
           due_date?: string | null;
           assigned_user_id?: string | null;
           custom_fields?: Record<string, unknown> | null;
+          assigned_field_ids?: string[] | null;
           created_at?: string;
           updated_at?: string;
           deleted_at?: string | null;
