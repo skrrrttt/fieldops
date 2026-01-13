@@ -9,15 +9,13 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useBranding } from '@/lib/branding/branding-context';
-import { SyncBadge } from '@/components/offline/sync-status-indicator';
-import { ClipboardCheck, ImagePlus, RefreshCw, User } from 'lucide-react';
+import { ClipboardCheck, ImagePlus, User } from 'lucide-react';
 
 interface NavItem {
   key: string;
   label: string;
   href: string;
   icon: React.ReactNode;
-  showSyncBadge?: boolean;
 }
 
 export function MobileBottomNav() {
@@ -36,13 +34,6 @@ export function MobileBottomNav() {
       label: 'Upload',
       href: '/tasks?upload=true',
       icon: <ImagePlus className="w-6 h-6" />,
-    },
-    {
-      key: 'sync',
-      label: 'Sync',
-      href: '/tasks?sync=true',
-      showSyncBadge: true,
-      icon: <RefreshCw className="w-6 h-6" />,
     },
     {
       key: 'profile',
@@ -109,16 +100,9 @@ export function MobileBottomNav() {
                   />
                 )}
 
-                {/* Icon with badge */}
-                <span className="relative">
-                  <span className={`transition-transform duration-200 ${active ? 'scale-110' : ''}`}>
-                    {item.icon}
-                  </span>
-                  {item.showSyncBadge && (
-                    <span className="absolute -top-0.5 -right-1 scale-75 origin-top-right">
-                      <SyncBadge />
-                    </span>
-                  )}
+                {/* Icon */}
+                <span className={`transition-transform duration-200 ${active ? 'scale-110' : ''}`}>
+                  {item.icon}
                 </span>
 
                 {/* Label */}
