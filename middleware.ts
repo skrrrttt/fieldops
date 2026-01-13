@@ -48,6 +48,7 @@ export async function middleware(request: NextRequest) {
 
   // Check if route is public
   const isPublicRoute = publicRoutes.some((route) => pathname.startsWith(route));
+  const isAdminRoute = adminRoutes.some((route) => pathname.startsWith(route));
 
   // If not authenticated and trying to access protected route
   if (!user && !isPublicRoute) {
@@ -56,53 +57,43 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // If authenticated and trying to access login page, redirect based on role
-  if (user && pathname === '/login') {
-    // Get user role
+  // If not authenticated and at root, redirect to login
+  if (pathname === '/' && !user) {
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
+
+  // For authenticated users, fetch role ONCE if needed for routing decisions
+  let userRole: UserRole | null = null;
+  const needsRoleCheck = user && (pathname === '/login' || pathname === '/' || isAdminRoute);
+
+  if (needsRoleCheck) {
     const { data: userData } = await supabase
       .from('users')
       .select('role')
       .eq('id', user.id)
       .single<UserRoleResult>();
+    userRole = userData?.role ?? null;
+  }
 
-    if (userData?.role === 'admin') {
+  // If authenticated and trying to access login page, redirect based on role
+  if (user && pathname === '/login') {
+    if (userRole === 'admin') {
       return NextResponse.redirect(new URL('/admin/dashboard', request.url));
     }
     return NextResponse.redirect(new URL('/tasks', request.url));
   }
 
-  // Check admin routes
-  const isAdminRoute = adminRoutes.some((route) => pathname.startsWith(route));
-
-  if (isAdminRoute && user) {
-    // Get user role
-    const { data: userData } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', user.id)
-      .single<UserRoleResult>();
-
-    if (userData?.role !== 'admin') {
-      return NextResponse.redirect(new URL('/tasks', request.url));
-    }
+  // Check admin routes - only allow admins
+  if (isAdminRoute && user && userRole !== 'admin') {
+    return NextResponse.redirect(new URL('/tasks', request.url));
   }
 
   // Handle root path redirect
   if (pathname === '/' && user) {
-    const { data: userData } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', user.id)
-      .single<UserRoleResult>();
-
-    if (userData?.role === 'admin') {
+    if (userRole === 'admin') {
       return NextResponse.redirect(new URL('/admin/dashboard', request.url));
     }
     return NextResponse.redirect(new URL('/tasks', request.url));
-  }
-
-  if (pathname === '/' && !user) {
-    return NextResponse.redirect(new URL('/login', request.url));
   }
 
   return response;

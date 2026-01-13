@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import type { TaskWithRelations } from '@/lib/tasks/actions';
 import { useBranding } from '@/lib/branding/branding-context';
 import { Badge } from '@/components/ui/badge';
@@ -11,16 +12,17 @@ interface TaskCardProps {
   onClick?: () => void;
 }
 
-export function TaskCard({ task, onClick }: TaskCardProps) {
-  const { branding } = useBranding();
+// Extracted outside component to avoid recreation on each render
+function formatDate(dateString: string | null) {
+  if (!dateString) return null;
+  return new Date(dateString).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+  });
+}
 
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return null;
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-    });
-  };
+export const TaskCard = memo(function TaskCard({ task, onClick }: TaskCardProps) {
+  const { branding } = useBranding();
 
   const isOverdue = task.due_date && new Date(task.due_date) < new Date() && !task.status?.is_complete;
   const isComplete = task.status?.is_complete;
@@ -155,4 +157,4 @@ export function TaskCard({ task, onClick }: TaskCardProps) {
       </div>
     </div>
   );
-}
+});

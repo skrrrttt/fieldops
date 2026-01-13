@@ -21,9 +21,15 @@ export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
     getTask(id),
     getCustomFields(),
   ]);
-  const photos = task ? await getTaskPhotos(id) : [];
-  const files = task ? await getTaskFiles(id) : [];
-  const comments = task ? await getTaskComments(id) : [];
+
+  // Parallelize photos, files, and comments fetches for better performance
+  const [photos, files, comments] = task
+    ? await Promise.all([
+        getTaskPhotos(id),
+        getTaskFiles(id),
+        getTaskComments(id),
+      ])
+    : [[], [], []];
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900 pb-24">
