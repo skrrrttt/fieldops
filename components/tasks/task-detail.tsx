@@ -331,8 +331,8 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
         </section>
       )}
 
-      {/* Fixed Update Status Button at Bottom */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white dark:bg-zinc-800 border-t border-zinc-200 dark:border-zinc-700 shadow-lg">
+      {/* Fixed Update Status Button at Bottom - positioned above mobile bottom nav */}
+      <div className="fixed left-0 right-0 p-4 bg-white dark:bg-zinc-800 border-t border-zinc-200 dark:border-zinc-700 shadow-lg bottom-[calc(var(--bottom-nav-height)+env(safe-area-inset-bottom,0px)+8px)] md:bottom-0">
         <div className="max-w-3xl mx-auto">
           <Link
             href={`/tasks/${task.id}/status`}
