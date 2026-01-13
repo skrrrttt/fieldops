@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { TaskWithRelations } from '@/lib/tasks/actions';
@@ -16,6 +16,7 @@ import { CommentInput } from '@/components/tasks/comment-input';
 import { CommentList } from '@/components/tasks/comment-list';
 import { CustomFieldEdit } from '@/components/tasks/custom-field-edit';
 import { useBranding, getContrastColor } from '@/lib/branding/branding-context';
+import { ChevronDown, ChevronRight, Plus, Camera, Image, FileText, MessageCircle, MapPin, Calendar, User, X } from 'lucide-react';
 
 interface TaskDetailProps {
   task: TaskWithRelations;
@@ -31,30 +32,35 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
   const [refreshKey, setRefreshKey] = useState(0);
   const [comments, setComments] = useState<CommentWithUser[]>(initialComments);
 
+  // Collapsible section states
+  const [showComments, setShowComments] = useState(false);
+  const [showPhotoUpload, setShowPhotoUpload] = useState(false);
+  const [showFileUpload, setShowFileUpload] = useState(false);
+  const [showCommentInput, setShowCommentInput] = useState(false);
+
   const handlePhotoUploadComplete = useCallback(() => {
-    // Refresh the page to show newly uploaded photos
     setRefreshKey(prev => prev + 1);
+    setShowPhotoUpload(false);
     router.refresh();
   }, [router]);
 
   const handleFileUploadComplete = useCallback(() => {
-    // Refresh the page to show newly uploaded files
     setRefreshKey(prev => prev + 1);
+    setShowFileUpload(false);
     router.refresh();
   }, [router]);
 
   const handleCommentAdded = useCallback((newComment: CommentWithUser) => {
-    // Add new comment to the beginning of the list (newest first)
     setComments(prev => [newComment, ...prev]);
+    setShowCommentInput(false);
   }, []);
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return null;
     return new Date(dateString).toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
+      weekday: 'short',
+      month: 'short',
       day: 'numeric',
-      year: 'numeric',
     });
   };
 
@@ -65,7 +71,6 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
 
   const hasLocation = task.location_lat && task.location_lng;
 
-  // Build Google Maps URL for directions
   const getDirectionsUrl = () => {
     if (hasLocation) {
       return `https://www.google.com/maps/dir/?api=1&destination=${task.location_lat},${task.location_lng}`;
@@ -76,29 +81,24 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
     return null;
   };
 
-  // Build static map embed URL using OpenStreetMap
-  const getMapPreviewUrl = () => {
-    if (!hasLocation) return null;
-    const lat = task.location_lat!;
-    const lng = task.location_lng!;
-    // Using OpenStreetMap embed with a bounding box around the location
-    return `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.005},${lat - 0.003},${lng + 0.005},${lat + 0.003}&layer=mapnik&marker=${lat},${lng}`;
-  };
-
   const directionsUrl = getDirectionsUrl();
-  const mapEmbedUrl = getMapPreviewUrl();
+
+  // Get assigned custom fields
+  const assignedFieldIds = (task as { assigned_field_ids?: string[] | null }).assigned_field_ids || [];
+  const assignedFields = customFields.filter(f => assignedFieldIds.includes(f.id));
 
   return (
-    <div className="space-y-4">
-      {/* 1. Title, Status and Description */}
+    <div className="space-y-3 pb-4">
+      {/* Consolidated Header: Title, Status, Division, Description */}
       <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-4">
-        <div className="flex items-start justify-between gap-3 mb-3">
-          <h1 className="text-xl font-bold text-zinc-900 dark:text-white">
+        {/* Title and Status Row */}
+        <div className="flex items-start justify-between gap-3 mb-2">
+          <h1 className="text-xl font-bold text-zinc-900 dark:text-white leading-tight">
             {task.title}
           </h1>
           {task.status && (
             <span
-              className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0"
+              className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap flex-shrink-0"
               style={{
                 backgroundColor: `${task.status.color}20`,
                 color: task.status.color,
@@ -109,226 +109,223 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
           )}
         </div>
 
+        {/* Division + Due Date Row */}
+        <div className="flex flex-wrap items-center gap-2 mb-3">
+          {task.division && (
+            <span
+              className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
+              style={{
+                backgroundColor: `${task.division.color}15`,
+                color: task.division.color,
+              }}
+            >
+              {task.division.icon && <span className="mr-1">{task.division.icon}</span>}
+              {task.division.name}
+            </span>
+          )}
+          {task.due_date && (
+            <span className={`inline-flex items-center gap-1 text-xs font-medium ${
+              isOverdue ? 'text-red-600 dark:text-red-400' : 'text-zinc-500 dark:text-zinc-400'
+            }`}>
+              <Calendar className="w-3 h-3" />
+              {formatDate(task.due_date)}
+              {isOverdue && <span className="text-red-600">(Overdue)</span>}
+            </span>
+          )}
+          {task.assigned_user && (
+            <span className="inline-flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
+              <User className="w-3 h-3" />
+              {task.assigned_user.email.split('@')[0]}
+            </span>
+          )}
+        </div>
+
         {/* Description */}
         {task.description && (
-          <p className="text-base text-zinc-600 dark:text-zinc-300 whitespace-pre-wrap">
+          <p className="text-sm text-zinc-600 dark:text-zinc-300 whitespace-pre-wrap">
             {task.description}
           </p>
         )}
       </section>
 
-      {/* 2. Division */}
-      {task.division && (
-        <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-4">
-          <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-            Division
-          </dt>
-          <dd>
-            <span
-              className="inline-flex items-center px-2.5 py-1 rounded text-sm font-medium"
-              style={{
-                backgroundColor: `${task.division.color}15`,
-                color: task.division.color,
-                border: `1px solid ${task.division.color}40`,
-              }}
-            >
-              {task.division.icon && (
-                <span className="mr-1.5">{task.division.icon}</span>
-              )}
-              {task.division.name}
-            </span>
-          </dd>
-        </section>
-      )}
-
-      {/* 3. Comments Section */}
-      <CommentInput taskId={task.id} onCommentAdded={handleCommentAdded} />
-      <CommentList comments={comments} />
-
-      {/* 4. Photo Upload and Gallery */}
-      <PhotoUpload
-        key={refreshKey}
-        taskId={task.id}
-        onUploadComplete={handlePhotoUploadComplete}
-      />
-      <PhotoGallery key={`gallery-${refreshKey}`} photos={photos} />
-
-      {/* 5. File Upload and List */}
-      <FileUpload
-        key={`files-${refreshKey}`}
-        taskId={task.id}
-        onUploadComplete={handleFileUploadComplete}
-      />
-      <FileList key={`filelist-${refreshKey}`} files={files} />
-
-      {/* 6. Custom Fields Section - Only show fields assigned to this task */}
-      {(() => {
-        const assignedFieldIds = (task as { assigned_field_ids?: string[] | null }).assigned_field_ids || [];
-        const assignedFields = customFields.filter(f => assignedFieldIds.includes(f.id));
-        return assignedFields.length > 0 ? (
-          <CustomFieldEdit
-            taskId={task.id}
-            customFields={assignedFields}
-            initialValues={(task.custom_fields as Record<string, unknown>) || {}}
-          />
-        ) : null;
-      })()}
-
-      {/* 7. Additional Details - Due Date, Assigned User */}
-      {(task.due_date || task.assigned_user) && (
-        <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-4">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-3">
-            Details
-          </h2>
-          <div className="space-y-4">
-            {/* Due Date */}
-            {task.due_date && (
-              <div>
-                <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-                  Due Date
-                </dt>
-                <dd
-                  className={`text-base font-medium flex items-center gap-2 ${
-                    isOverdue
-                      ? 'text-red-600 dark:text-red-400'
-                      : 'text-zinc-900 dark:text-white'
-                  }`}
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                  {formatDate(task.due_date)}
-                  {isOverdue && (
-                    <span className="text-sm bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-2 py-0.5 rounded">
-                      Overdue
-                    </span>
-                  )}
-                </dd>
-              </div>
-            )}
-
-            {/* Assigned User */}
-            {task.assigned_user && (
-              <div>
-                <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-                  Assigned To
-                </dt>
-                <dd className="flex items-center gap-2 text-base text-zinc-900 dark:text-white">
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold"
-                    style={{
-                      backgroundColor: `${branding.primary_color}20`,
-                      color: branding.primary_color,
-                    }}
-                  >
-                    {task.assigned_user.email.charAt(0).toUpperCase()}
-                  </div>
-                  <span>{task.assigned_user.email}</span>
-                </dd>
-              </div>
-            )}
-          </div>
-        </section>
-      )}
-
-      {/* 8. Location Section */}
+      {/* Location Section - Compact */}
       {(task.address || hasLocation) && (
-        <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 overflow-hidden">
-          <div className="p-4">
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-3">
-              Location
-            </h2>
-
-            {/* Address */}
-            {task.address && (
-              <div className="flex items-start gap-2 mb-4">
-                <svg
-                  className="w-5 h-5 text-zinc-400 mt-0.5 flex-shrink-0"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
-                <span className="text-base text-zinc-700 dark:text-zinc-300">
-                  {task.address}
-                </span>
-              </div>
-            )}
-
-            {/* Coordinates */}
-            {hasLocation && (
-              <div className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
-                Coordinates: {task.location_lat?.toFixed(6)},{' '}
-                {task.location_lng?.toFixed(6)}
-              </div>
-            )}
-
-            {/* Get Directions Button */}
+        <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-start gap-2 flex-1 min-w-0">
+              <MapPin className="w-4 h-4 text-zinc-400 mt-0.5 flex-shrink-0" />
+              <span className="text-sm text-zinc-700 dark:text-zinc-300 truncate">
+                {task.address || `${task.location_lat?.toFixed(4)}, ${task.location_lng?.toFixed(4)}`}
+              </span>
+            </div>
             {directionsUrl && (
               <a
                 href={directionsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 w-full sm:w-auto min-h-[48px] px-6 py-3 font-medium rounded-lg transition-opacity hover:opacity-90"
+                className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ml-2 flex-shrink-0"
                 style={{
                   backgroundColor: branding.primary_color,
                   color: getContrastColor(branding.primary_color),
                 }}
               >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
-                  />
-                </svg>
-                Get Directions
+                <MapPin className="w-4 h-4" />
+                Directions
               </a>
             )}
           </div>
+        </section>
+      )}
 
-          {/* Map Preview */}
-          {mapEmbedUrl && (
-            <div className="border-t border-zinc-200 dark:border-zinc-700">
-              <iframe
-                title="Job Location Map"
-                src={mapEmbedUrl}
-                width="100%"
-                height="200"
-                className="block"
-                style={{ border: 'none' }}
-              />
+      {/* Photos Section with Inline Add */}
+      <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 overflow-hidden">
+        <div className="flex items-center justify-between p-4 pb-0">
+          <h2 className="text-base font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
+            <Camera className="w-4 h-4 text-zinc-400" />
+            Photos {photos.length > 0 && <span className="text-zinc-400">({photos.length})</span>}
+          </h2>
+          <button
+            onClick={() => setShowPhotoUpload(!showPhotoUpload)}
+            className="flex items-center gap-1 px-2.5 py-1.5 text-sm font-medium rounded-lg transition-colors"
+            style={{
+              backgroundColor: showPhotoUpload ? `${branding.primary_color}20` : 'transparent',
+              color: branding.primary_color,
+            }}
+          >
+            {showPhotoUpload ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+            {showPhotoUpload ? 'Cancel' : 'Add'}
+          </button>
+        </div>
+
+        {/* Inline Photo Upload */}
+        {showPhotoUpload && (
+          <div className="px-4 pt-3">
+            <PhotoUpload
+              key={refreshKey}
+              taskId={task.id}
+              onUploadComplete={handlePhotoUploadComplete}
+            />
+          </div>
+        )}
+
+        {/* Photo Gallery */}
+        <div className="p-4 pt-3">
+          {photos.length > 0 ? (
+            <PhotoGalleryInline key={`gallery-${refreshKey}`} photos={photos} />
+          ) : (
+            <div className="text-center py-6 text-zinc-400">
+              <Camera className="w-8 h-8 mx-auto mb-2 opacity-50" />
+              <p className="text-sm">No photos yet</p>
             </div>
           )}
-        </section>
+        </div>
+      </section>
+
+      {/* Files Section with Inline Add */}
+      <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 overflow-hidden">
+        <div className="flex items-center justify-between p-4 pb-0">
+          <h2 className="text-base font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
+            <FileText className="w-4 h-4 text-zinc-400" />
+            Files {files.length > 0 && <span className="text-zinc-400">({files.length})</span>}
+          </h2>
+          <button
+            onClick={() => setShowFileUpload(!showFileUpload)}
+            className="flex items-center gap-1 px-2.5 py-1.5 text-sm font-medium rounded-lg transition-colors"
+            style={{
+              backgroundColor: showFileUpload ? `${branding.primary_color}20` : 'transparent',
+              color: branding.primary_color,
+            }}
+          >
+            {showFileUpload ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+            {showFileUpload ? 'Cancel' : 'Add'}
+          </button>
+        </div>
+
+        {/* Inline File Upload */}
+        {showFileUpload && (
+          <div className="px-4 pt-3">
+            <FileUpload
+              key={`files-${refreshKey}`}
+              taskId={task.id}
+              onUploadComplete={handleFileUploadComplete}
+            />
+          </div>
+        )}
+
+        {/* File List */}
+        <div className="p-4 pt-3">
+          {files.length > 0 ? (
+            <FileListInline key={`filelist-${refreshKey}`} files={files} />
+          ) : (
+            <div className="text-center py-6 text-zinc-400">
+              <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
+              <p className="text-sm">No files yet</p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Comments Section - Collapsible */}
+      <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 overflow-hidden">
+        <button
+          onClick={() => setShowComments(!showComments)}
+          className="flex items-center justify-between w-full p-4 text-left"
+        >
+          <h2 className="text-base font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
+            <MessageCircle className="w-4 h-4 text-zinc-400" />
+            Comments {comments.length > 0 && <span className="text-zinc-400">({comments.length})</span>}
+          </h2>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowCommentInput(!showCommentInput);
+                if (!showComments) setShowComments(true);
+              }}
+              className="flex items-center gap-1 px-2.5 py-1.5 text-sm font-medium rounded-lg transition-colors"
+              style={{
+                backgroundColor: showCommentInput ? `${branding.primary_color}20` : 'transparent',
+                color: branding.primary_color,
+              }}
+            >
+              {showCommentInput ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+            </button>
+            {showComments ? (
+              <ChevronDown className="w-5 h-5 text-zinc-400" />
+            ) : (
+              <ChevronRight className="w-5 h-5 text-zinc-400" />
+            )}
+          </div>
+        </button>
+
+        {/* Comment Input */}
+        {showCommentInput && (
+          <div className="px-4 pb-4">
+            <CommentInputInline taskId={task.id} onCommentAdded={handleCommentAdded} />
+          </div>
+        )}
+
+        {/* Comments List */}
+        {showComments && comments.length > 0 && (
+          <div className="px-4 pb-4 border-t border-zinc-100 dark:border-zinc-700 pt-4">
+            <CommentListInline comments={comments} />
+          </div>
+        )}
+
+        {showComments && comments.length === 0 && !showCommentInput && (
+          <div className="px-4 pb-4 text-center text-zinc-400">
+            <p className="text-sm">No comments yet. Tap + to add one.</p>
+          </div>
+        )}
+      </section>
+
+      {/* Custom Fields Section */}
+      {assignedFields.length > 0 && (
+        <CustomFieldEdit
+          taskId={task.id}
+          customFields={assignedFields}
+          initialValues={(task.custom_fields as Record<string, unknown>) || {}}
+        />
       )}
 
       {/* Fixed Update Status Button at Bottom - positioned above mobile bottom nav */}
@@ -336,14 +333,14 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
         <div className="max-w-3xl mx-auto">
           <Link
             href={`/tasks/${task.id}/status`}
-            className="flex items-center justify-center gap-2 w-full min-h-[64px] px-6 py-4 text-lg font-semibold rounded-lg transition-opacity hover:opacity-90"
+            className="flex items-center justify-center gap-2 w-full min-h-[56px] px-6 py-3 text-lg font-semibold rounded-lg transition-opacity hover:opacity-90"
             style={{
               backgroundColor: branding.accent_color,
               color: getContrastColor(branding.accent_color),
             }}
           >
             <svg
-              className="w-6 h-6"
+              className="w-5 h-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -359,6 +356,226 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
           </Link>
         </div>
       </div>
+    </div>
+  );
+}
+
+// Inline Photo Gallery (simplified, without outer section wrapper)
+function PhotoGalleryInline({ photos }: { photos: PhotoWithUser[] }) {
+  const [photosWithUrls, setPhotosWithUrls] = useState<Array<PhotoWithUser & { url: string }>>([]);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchUrls = async () => {
+      const { createClient } = await import('@/lib/supabase/client');
+      const supabase = createClient();
+      const withUrls = photos.map(photo => {
+        const { data } = supabase.storage.from('photos').getPublicUrl(photo.storage_path);
+        return { ...photo, url: data.publicUrl };
+      });
+      setPhotosWithUrls(withUrls);
+    };
+    fetchUrls();
+  }, [photos]);
+
+  if (photosWithUrls.length === 0) return null;
+
+  return (
+    <>
+      <div className="grid grid-cols-4 gap-2">
+        {photosWithUrls.slice(0, 8).map((photo, index) => (
+          <button
+            key={photo.id}
+            onClick={() => setLightboxIndex(index)}
+            className="relative aspect-square rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-700"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={photo.url}
+              alt={`Photo ${index + 1}`}
+              className="w-full h-full object-cover"
+            />
+            {index === 7 && photosWithUrls.length > 8 && (
+              <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white font-semibold">
+                +{photosWithUrls.length - 8}
+              </div>
+            )}
+          </button>
+        ))}
+      </div>
+
+      {/* Lightbox */}
+      {lightboxIndex !== null && (
+        <div
+          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center"
+          onClick={() => setLightboxIndex(null)}
+        >
+          <button
+            className="absolute top-4 right-4 p-2 text-white/80 hover:text-white"
+            onClick={() => setLightboxIndex(null)}
+          >
+            <X className="w-8 h-8" />
+          </button>
+          <button
+            className="absolute left-4 top-1/2 -translate-y-1/2 p-2 text-white/80 hover:text-white"
+            onClick={(e) => {
+              e.stopPropagation();
+              setLightboxIndex(i => i === 0 ? photosWithUrls.length - 1 : (i ?? 0) - 1);
+            }}
+          >
+            <ChevronRight className="w-10 h-10 rotate-180" />
+          </button>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={photosWithUrls[lightboxIndex]?.url}
+            alt=""
+            className="max-h-[80vh] max-w-[90vw] object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <button
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-white/80 hover:text-white"
+            onClick={(e) => {
+              e.stopPropagation();
+              setLightboxIndex(i => i === photosWithUrls.length - 1 ? 0 : (i ?? 0) + 1);
+            }}
+          >
+            <ChevronRight className="w-10 h-10" />
+          </button>
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/80 text-sm">
+            {lightboxIndex + 1} / {photosWithUrls.length}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+// Inline File List (simplified, without outer section wrapper)
+function FileListInline({ files }: { files: FileWithUser[] }) {
+  const getFileUrl = (storagePath: string): string => {
+    const { createClient } = require('@/lib/supabase/client');
+    const supabase = createClient();
+    const { data } = supabase.storage.from('files').getPublicUrl(storagePath);
+    return data.publicUrl;
+  };
+
+  const handleFileClick = (file: FileWithUser) => {
+    const url = getFileUrl(file.storage_path);
+    window.open(url, '_blank');
+  };
+
+  const getFileIcon = (fileName: string) => {
+    const ext = fileName.split('.').pop()?.toLowerCase() || '';
+    if (ext === 'pdf') return <div className="w-8 h-8 bg-red-100 dark:bg-red-900/30 rounded flex items-center justify-center text-red-600 text-xs font-bold">PDF</div>;
+    if (['doc', 'docx'].includes(ext)) return <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded flex items-center justify-center text-blue-600 text-xs font-bold">DOC</div>;
+    if (['xls', 'xlsx'].includes(ext)) return <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded flex items-center justify-center text-green-600 text-xs font-bold">XLS</div>;
+    return <div className="w-8 h-8 bg-zinc-100 dark:bg-zinc-700 rounded flex items-center justify-center"><FileText className="w-4 h-4 text-zinc-400" /></div>;
+  };
+
+  const formatSize = (bytes: number) => {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  };
+
+  return (
+    <div className="space-y-2">
+      {files.map((file) => (
+        <button
+          key={file.id}
+          onClick={() => handleFileClick(file)}
+          className="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700/50 transition-colors text-left"
+        >
+          {getFileIcon(file.file_name)}
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-zinc-900 dark:text-white truncate">
+              {file.file_name}
+            </p>
+            <p className="text-xs text-zinc-500">{formatSize(file.file_size)}</p>
+          </div>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// Inline Comment Input (simplified)
+function CommentInputInline({ taskId, onCommentAdded }: { taskId: string; onCommentAdded: (comment: CommentWithUser) => void }) {
+  const [content, setContent] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!content.trim() || isSubmitting) return;
+
+    setIsSubmitting(true);
+    try {
+      const { createComment } = await import('@/lib/comments/actions');
+      const result = await createComment({ task_id: taskId, content: content.trim() });
+      if (result.success && result.data) {
+        setContent('');
+        onCommentAdded(result.data);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="flex gap-2">
+      <input
+        type="text"
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        placeholder="Add a comment..."
+        className="flex-1 px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white placeholder:text-zinc-400"
+        disabled={isSubmitting}
+      />
+      <button
+        type="submit"
+        disabled={!content.trim() || isSubmitting}
+        className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {isSubmitting ? '...' : 'Post'}
+      </button>
+    </form>
+  );
+}
+
+// Inline Comment List (simplified)
+function CommentListInline({ comments }: { comments: CommentWithUser[] }) {
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 60) return `${diffMins}m ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    const diffDays = Math.floor(diffHours / 24);
+    return `${diffDays}d ago`;
+  };
+
+  return (
+    <div className="space-y-3">
+      {comments.map((comment) => (
+        <div key={comment.id} className="flex gap-2">
+          <div className="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 text-xs font-semibold flex-shrink-0">
+            {comment.user?.email?.charAt(0).toUpperCase() || '?'}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300 truncate">
+                {comment.user?.email?.split('@')[0] || 'Unknown'}
+              </span>
+              <span className="text-xs text-zinc-400">{formatTime(comment.created_at)}</span>
+            </div>
+            <p className="text-sm text-zinc-600 dark:text-zinc-300 break-words">
+              {comment.content}
+            </p>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
