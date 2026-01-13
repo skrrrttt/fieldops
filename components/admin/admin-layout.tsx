@@ -6,10 +6,11 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { AdminSidebar } from './admin-sidebar';
 import { LogoutButton } from '@/components/auth/logout-button';
 import { ThemeToggleCompact } from '@/components/theme/theme-toggle';
+import { useBranding } from '@/lib/branding/branding-context';
 import { Menu, Search, X } from 'lucide-react';
 
 interface AdminUser {
@@ -29,12 +30,19 @@ const SIDEBAR_WIDTH_COLLAPSED = 68; // w-[68px]
 
 export function AdminLayout({ children, user }: AdminLayoutProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const { branding } = useBranding();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showShortcutsModal, setShowShortcutsModal] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isMounted, setIsMounted] = useState(false);
+
+  // Auto-close mobile menu on navigation
+  useEffect(() => {
+    setShowMobileMenu(false);
+  }, [pathname]);
 
   // Track mount state to avoid hydration mismatch
   useEffect(() => {
@@ -146,15 +154,37 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
       >
         {/* Top header bar */}
         <header className="bg-card/80 backdrop-blur-md border-b border-border/50 sticky top-0 z-10">
-          <div className="px-6 lg:px-10 py-4 flex items-center justify-between">
+          <div className="px-4 sm:px-6 lg:px-10 py-3 sm:py-4 flex items-center justify-between gap-3">
             {/* Mobile menu button */}
             <button
-              className="lg:hidden p-2.5 rounded-xl hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
+              className="lg:hidden p-2.5 rounded-xl hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
               onClick={() => setShowMobileMenu(true)}
               aria-label="Open menu"
             >
               <Menu className="w-5 h-5" />
             </button>
+
+            {/* Logo and app name (mobile only - sidebar shows on desktop) */}
+            <div className="flex items-center gap-2 lg:hidden flex-shrink-0">
+              {branding.logo_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={branding.logo_url}
+                  alt={branding.app_name}
+                  className="h-7 w-auto object-contain"
+                />
+              ) : (
+                <div
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-bold text-white"
+                  style={{ backgroundColor: branding.primary_color }}
+                >
+                  {branding.app_name.charAt(0).toUpperCase()}
+                </div>
+              )}
+              <span className="font-semibold text-foreground text-sm hidden xs:inline truncate max-w-[120px]">
+                {branding.app_name}
+              </span>
+            </div>
 
             {/* Search button (desktop) */}
             <button

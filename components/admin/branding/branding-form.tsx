@@ -112,7 +112,7 @@ export function BrandingForm({ initialBranding }: BrandingFormProps) {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 overflow-x-hidden">
       {/* Settings Section */}
       <div className="space-y-6">
         {/* Logo Upload */}
@@ -316,35 +316,35 @@ export function BrandingForm({ initialBranding }: BrandingFormProps) {
             <div>
               <p className="text-sm text-muted-foreground mb-2">Header</p>
               <div
-                className="rounded-lg p-4 flex items-center justify-between"
+                className="rounded-lg p-3 sm:p-4 flex items-center justify-between gap-2 overflow-hidden"
                 style={{ backgroundColor: primaryColor }}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                   {logoUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={logoUrl}
                       alt="Logo Preview"
-                      className="h-8 object-contain"
-                      style={{ maxWidth: '120px' }}
+                      className="h-6 sm:h-8 object-contain flex-shrink-0"
+                      style={{ maxWidth: '80px' }}
                     />
                   ) : (
-                    <div className="h-8 w-8 bg-white/20 rounded flex items-center justify-center">
+                    <div className="h-6 w-6 sm:h-8 sm:w-8 bg-white/20 rounded flex items-center justify-center flex-shrink-0">
                       <span style={{ color: getContrastColor(primaryColor) }} className="text-xs font-bold">
                         {appName.charAt(0)}
                       </span>
                     </div>
                   )}
                   <span
-                    className="font-semibold"
+                    className="font-semibold text-sm sm:text-base truncate"
                     style={{ color: getContrastColor(primaryColor) }}
                   >
                     {appName}
                   </span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-shrink-0">
                   <span
-                    className="text-sm"
+                    className="text-xs sm:text-sm hidden xs:inline"
                     style={{ color: getContrastColor(primaryColor), opacity: 0.8 }}
                   >
                     user@example.com

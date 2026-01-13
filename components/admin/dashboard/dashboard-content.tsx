@@ -384,11 +384,11 @@ function QuickLink({ href, label, icon, shortcut, color }: QuickLinkProps) {
   return (
     <Link
       href={href}
-      className="group flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-secondary transition-all"
+      className="group flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-secondary/80 active:scale-[0.98] transition-all duration-150"
     >
       <div className="flex items-center gap-3">
         <span
-          className="p-1.5 rounded-lg transition-colors"
+          className="p-1.5 rounded-lg transition-all duration-150 group-hover:scale-110 group-hover:shadow-sm"
           style={{
             backgroundColor: `${color}10`,
             color: color,
@@ -396,15 +396,18 @@ function QuickLink({ href, label, icon, shortcut, color }: QuickLinkProps) {
         >
           {icon}
         </span>
-        <span className="text-sm font-medium text-foreground group-hover:text-foreground">
+        <span className="text-sm font-medium text-foreground">
           {label}
         </span>
       </div>
-      {shortcut && (
-        <kbd className="px-2 py-0.5 text-xs bg-secondary rounded font-mono text-muted-foreground">
-          {shortcut}
-        </kbd>
-      )}
+      <div className="flex items-center gap-2">
+        {shortcut && (
+          <kbd className="px-2 py-0.5 text-xs bg-secondary rounded font-mono text-muted-foreground group-hover:bg-background">
+            {shortcut}
+          </kbd>
+        )}
+        <ArrowRight className="w-4 h-4 text-muted-foreground opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150" />
+      </div>
     </Link>
   );
 }
