@@ -7,6 +7,7 @@
 
 import Link from 'next/link';
 import { useBranding, getContrastColor } from '@/lib/branding/branding-context';
+import { ConnectionIndicator } from '@/components/offline/connection-indicator';
 
 interface AppHeaderProps {
   /** Right-side content (user info, logout button, etc.) */
@@ -118,9 +119,13 @@ export function AppHeader({
         </div>
 
         {/* Right side content */}
-        {children && (
-          <div className="flex items-center gap-4">{children}</div>
-        )}
+        <div className="flex items-center gap-4">
+          {/* Connection indicator - mobile only */}
+          <div className="md:hidden">
+            <ConnectionIndicator />
+          </div>
+          {children}
+        </div>
       </div>
     </header>
   );
