@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { useBranding, getContrastColor } from '@/lib/branding/branding-context';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -11,6 +12,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { branding } = useBranding();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,8 +76,31 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-8">
           <div className="text-center mb-8">
+            {/* App Icon */}
+            <div className="flex justify-center mb-4">
+              {branding.logo_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={branding.logo_url}
+                  alt={branding.app_name}
+                  className="w-16 h-16 object-contain"
+                />
+              ) : (
+                <div
+                  className="w-16 h-16 rounded-xl flex items-center justify-center"
+                  style={{ backgroundColor: branding.primary_color }}
+                >
+                  <span
+                    className="text-2xl font-bold"
+                    style={{ color: getContrastColor(branding.primary_color) }}
+                  >
+                    {branding.app_name.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              )}
+            </div>
             <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">
-              FieldOps
+              {branding.app_name}
             </h1>
             <p className="text-zinc-600 dark:text-zinc-400 mt-2">
               Sign in to your account
@@ -146,7 +171,11 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-4 bg-blue-600 active:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-zinc-800 text-base touch-target"
+              className="w-full py-3 px-4 text-white font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-zinc-800 text-base touch-target disabled:opacity-50"
+              style={{
+                backgroundColor: branding.primary_color,
+                color: getContrastColor(branding.primary_color)
+              }}
             >
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
