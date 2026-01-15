@@ -80,7 +80,9 @@ export async function getTasks(
     query = query.eq('assigned_user_id', assignedUserId);
   }
   if (search) {
-    query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
+    // Escape special LIKE pattern characters to prevent pattern injection
+    const escapedSearch = search.replace(/[%_\\]/g, '\\$&');
+    query = query.or(`title.ilike.%${escapedSearch}%,description.ilike.%${escapedSearch}%`);
   }
 
   // Apply sorting
