@@ -12,7 +12,7 @@ export default function AppleIcon() {
       <div
         style={{
           fontSize: 100,
-          background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+          background: '#0f172a',
           width: '100%',
           height: '100%',
           display: 'flex',
@@ -23,13 +23,13 @@ export default function AppleIcon() {
       >
         <span
           style={{
-            color: 'white',
-            fontWeight: 700,
+            color: '#f97316',
+            fontWeight: 800,
             fontFamily: 'system-ui, sans-serif',
             letterSpacing: '-0.02em',
           }}
         >
-          F
+          P
         </span>
       </div>
     ),

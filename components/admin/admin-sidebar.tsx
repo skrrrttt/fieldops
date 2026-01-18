@@ -8,7 +8,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useBranding, getContrastColor } from '@/lib/branding/branding-context';
 import {
   LayoutDashboard,
   ClipboardList,
@@ -18,12 +17,16 @@ import {
   Tags,
   CheckCircle,
   FileText,
-  Palette,
   ChevronLeft,
   ChevronDown,
   Layers,
   MessageSquareText,
 } from 'lucide-react';
+
+// ProStreet brand constants
+const APP_NAME = 'ProStreet';
+const PRIMARY_COLOR = '#f97316';
+const DARK_BG = '#0f172a';
 
 interface NavItem {
   label: string;
@@ -82,11 +85,6 @@ const navItems: NavItem[] = [
         href: '/admin/templates',
         icon: <FileText className="w-4 h-4" />,
       },
-      {
-        label: 'Branding',
-        href: '/admin/branding',
-        icon: <Palette className="w-4 h-4" />,
-      },
     ],
   },
 ];
@@ -98,7 +96,6 @@ interface AdminSidebarProps {
 
 export function AdminSidebar({ isCollapsed, onToggleCollapse }: AdminSidebarProps) {
   const pathname = usePathname();
-  const { branding } = useBranding();
   const [expandedSections, setExpandedSections] = useState<string[]>(['Configuration']);
 
   useEffect(() => {
@@ -131,7 +128,7 @@ export function AdminSidebar({ isCollapsed, onToggleCollapse }: AdminSidebarProp
     return false;
   };
 
-  const initial = branding.app_name.charAt(0).toUpperCase();
+  const initial = APP_NAME.charAt(0).toUpperCase();
 
   return (
     <aside
@@ -148,27 +145,18 @@ export function AdminSidebar({ isCollapsed, onToggleCollapse }: AdminSidebarProp
           href="/admin/dashboard"
           className="flex items-center gap-3 overflow-hidden group"
         >
-          {branding.logo_url ? (
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img
-              src={branding.logo_url}
-              alt={branding.app_name}
-              className="h-9 w-9 object-contain flex-shrink-0 rounded-lg"
-            />
-          ) : (
-            <div
-              className="w-9 h-9 rounded-xl flex items-center justify-center text-lg font-bold flex-shrink-0 shadow-md transition-transform group-hover:scale-105"
-              style={{
-                background: `linear-gradient(135deg, ${branding.primary_color}, ${branding.primary_color}dd)`,
-                color: getContrastColor(branding.primary_color),
-              }}
-            >
-              {initial}
-            </div>
-          )}
+          <div
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-lg font-bold flex-shrink-0 shadow-md transition-transform group-hover:scale-105"
+            style={{
+              backgroundColor: DARK_BG,
+              color: PRIMARY_COLOR,
+            }}
+          >
+            {initial}
+          </div>
           {!isCollapsed && (
             <span className="text-lg font-bold text-sidebar-foreground truncate tracking-tight">
-              {branding.app_name}
+              {APP_NAME}
             </span>
           )}
         </Link>
@@ -201,8 +189,8 @@ export function AdminSidebar({ isCollapsed, onToggleCollapse }: AdminSidebarProp
                   style={
                     isActive(item.href)
                       ? {
-                          background: `linear-gradient(135deg, ${branding.primary_color}, ${branding.primary_color}dd)`,
-                          color: getContrastColor(branding.primary_color),
+                          background: `linear-gradient(135deg, ${PRIMARY_COLOR}, ${PRIMARY_COLOR}dd)`,
+                          color: DARK_BG,
                         }
                       : undefined
                   }
@@ -252,7 +240,7 @@ export function AdminSidebar({ isCollapsed, onToggleCollapse }: AdminSidebarProp
                             `}
                             style={
                               isActive(child.href)
-                                ? { color: branding.primary_color }
+                                ? { color: PRIMARY_COLOR }
                                 : undefined
                             }
                             title={isCollapsed ? child.label : undefined}
@@ -262,7 +250,7 @@ export function AdminSidebar({ isCollapsed, onToggleCollapse }: AdminSidebarProp
                             {isActive(child.href) && !isCollapsed && (
                               <span
                                 className="ml-auto w-1.5 h-1.5 rounded-full"
-                                style={{ backgroundColor: branding.primary_color }}
+                                style={{ backgroundColor: PRIMARY_COLOR }}
                               />
                             )}
                           </Link>

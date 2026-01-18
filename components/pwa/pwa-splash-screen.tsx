@@ -1,16 +1,19 @@
 'use client';
 
 /**
- * PWASplashScreen - Shows branded splash screen on PWA app launch
- * Displays company logo (from branding) and theme colors
+ * PWASplashScreen - Shows ProStreet splash screen on PWA app launch
  * Only shown when app is running in standalone mode (installed PWA)
  */
 
 import { useEffect, useState, useRef } from 'react';
-import { useBranding, getContrastColor } from '@/lib/branding/branding-context';
+
+// ProStreet brand constants
+const APP_NAME = 'ProStreet';
+const PRIMARY_COLOR = '#f97316';
+const DARK_BG = '#0f172a';
 
 // Key to track if splash has been shown this session
-const SPLASH_SHOWN_KEY = 'fieldops_splash_shown';
+const SPLASH_SHOWN_KEY = 'prostreet_splash_shown';
 
 /**
  * Check if app is running in standalone mode (installed PWA)
@@ -38,7 +41,6 @@ function markSplashShown(): void {
 }
 
 export function PWASplashScreen() {
-  const { branding, isLoading } = useBranding();
   const [showSplash, setShowSplash] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
   const hasCheckedRef = useRef(false);
@@ -53,7 +55,7 @@ export function PWASplashScreen() {
       setShowSplash(true);
       markSplashShown();
 
-      // Hide splash after a short delay (let branding load + animation)
+      // Hide splash after a short delay
       const hideTimer = setTimeout(() => {
         setIsExiting(true);
         // Remove from DOM after exit animation
@@ -71,45 +73,34 @@ export function PWASplashScreen() {
     return null;
   }
 
-  const textColor = getContrastColor(branding.primary_color);
-
   return (
     <div
       className={`fixed inset-0 z-[200] flex flex-col items-center justify-center transition-opacity duration-300 ${
         isExiting ? 'opacity-0' : 'opacity-100'
       }`}
-      style={{ backgroundColor: branding.primary_color }}
+      style={{ backgroundColor: DARK_BG }}
     >
-      {/* Logo or initial */}
-      <div className={`animate-fade-in-up ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
-        {branding.logo_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={branding.logo_url}
-            alt={branding.app_name}
-            className="w-32 h-32 object-contain"
-          />
-        ) : (
-          <div
-            className="w-32 h-32 rounded-3xl flex items-center justify-center"
-            style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
+      {/* ProStreet Logo */}
+      <div className="animate-fade-in-up">
+        <div
+          className="w-32 h-32 rounded-3xl flex items-center justify-center"
+          style={{ backgroundColor: 'rgba(249,115,22,0.15)' }}
+        >
+          <span
+            className="text-6xl font-bold"
+            style={{ color: PRIMARY_COLOR }}
           >
-            <span
-              className="text-6xl font-bold"
-              style={{ color: textColor }}
-            >
-              {branding.app_name.charAt(0)}
-            </span>
-          </div>
-        )}
+            P
+          </span>
+        </div>
       </div>
 
       {/* App name */}
       <h1
-        className="mt-6 text-2xl font-bold animate-fade-in-up"
-        style={{ color: textColor, animationDelay: '100ms' }}
+        className="mt-6 text-2xl font-bold animate-fade-in-up text-white"
+        style={{ animationDelay: '100ms' }}
       >
-        {branding.app_name}
+        {APP_NAME}
       </h1>
 
       {/* Loading indicator */}
@@ -123,7 +114,7 @@ export function PWASplashScreen() {
               key={i}
               className="w-2.5 h-2.5 rounded-full animate-bounce"
               style={{
-                backgroundColor: textColor,
+                backgroundColor: PRIMARY_COLOR,
                 opacity: 0.6,
                 animationDelay: `${i * 150}ms`,
               }}

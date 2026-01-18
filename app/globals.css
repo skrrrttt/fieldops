@@ -2,8 +2,8 @@
 @import "tw-animate-css";
 
 /* ============================================
-   FIELDOPS DESIGN SYSTEM V2
-   Electric • Vibrant • Premium
+   PROSTREET DESIGN SYSTEM
+   Bold • Dark • Electric Orange
    ============================================ */
 
 /* Enable class-based dark mode in Tailwind v4 */
@@ -22,31 +22,25 @@
   --bottom-nav-height: 68px;
   --radius: 0.75rem;
 
-  /* === Brand Colors (Enhanced by BrandingProvider) === */
-  --brand-primary: #0ea5e9;
-  --brand-primary-text: #ffffff;
-  --brand-accent: #06b6d4;
-  --brand-accent-text: #ffffff;
+  /* === Electric Orange Palette === */
+  --electric-50: oklch(0.98 0.02 45);
+  --electric-100: oklch(0.95 0.04 45);
+  --electric-200: oklch(0.88 0.10 45);
+  --electric-300: oklch(0.80 0.14 45);
+  --electric-400: oklch(0.75 0.16 45);
+  --electric-500: oklch(0.70 0.18 45);
+  --electric-600: oklch(0.60 0.18 45);
+  --electric-700: oklch(0.50 0.16 45);
+  --electric-800: oklch(0.40 0.12 45);
+  --electric-900: oklch(0.30 0.08 45);
 
-  /* === Electric Color Palette === */
-  --electric-50: oklch(0.97 0.02 220);
-  --electric-100: oklch(0.93 0.04 220);
-  --electric-200: oklch(0.86 0.08 220);
-  --electric-300: oklch(0.76 0.12 220);
-  --electric-400: oklch(0.65 0.18 220);
-  --electric-500: oklch(0.55 0.22 220);
-  --electric-600: oklch(0.48 0.20 220);
-  --electric-700: oklch(0.40 0.16 220);
-  --electric-800: oklch(0.32 0.12 220);
-  --electric-900: oklch(0.24 0.08 220);
-
-  /* === Cyan Accent Palette === */
-  --cyan-50: oklch(0.97 0.02 195);
-  --cyan-100: oklch(0.93 0.05 195);
-  --cyan-200: oklch(0.86 0.10 195);
-  --cyan-300: oklch(0.76 0.14 195);
-  --cyan-400: oklch(0.68 0.16 195);
-  --cyan-500: oklch(0.60 0.15 195);
+  /* === Steel Blue Accent Palette === */
+  --steel-50: oklch(0.97 0.02 240);
+  --steel-100: oklch(0.93 0.04 240);
+  --steel-200: oklch(0.86 0.06 240);
+  --steel-300: oklch(0.75 0.08 240);
+  --steel-400: oklch(0.65 0.08 240);
+  --steel-500: oklch(0.55 0.08 240);
 
   /* === Semantic Colors (Light Mode) === */
   --background: oklch(0.99 0.002 260);
@@ -55,13 +49,13 @@
   --card-foreground: oklch(0.12 0.02 260);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.12 0.02 260);
-  --primary: oklch(0.55 0.22 220);
+  --primary: oklch(0.70 0.18 45);
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.96 0.01 260);
   --secondary-foreground: oklch(0.25 0.02 260);
   --muted: oklch(0.96 0.005 260);
   --muted-foreground: oklch(0.45 0.02 260);
-  --accent: oklch(0.60 0.15 195);
+  --accent: oklch(0.55 0.08 240);
   --accent-foreground: oklch(1 0 0);
   --destructive: oklch(0.55 0.22 25);
   --destructive-foreground: oklch(1 0 0);
@@ -71,11 +65,11 @@
   --warning-foreground: oklch(0.20 0.02 80);
   --border: oklch(0.90 0.01 260);
   --input: oklch(0.96 0.005 260);
-  --ring: oklch(0.55 0.22 220);
+  --ring: oklch(0.70 0.18 45);
 
   /* === Chart Colors === */
-  --chart-1: oklch(0.55 0.22 220);
-  --chart-2: oklch(0.60 0.15 195);
+  --chart-1: oklch(0.70 0.18 45);
+  --chart-2: oklch(0.55 0.08 240);
   --chart-3: oklch(0.60 0.18 155);
   --chart-4: oklch(0.75 0.18 80);
   --chart-5: oklch(0.65 0.20 320);
@@ -83,12 +77,12 @@
   /* === Sidebar (Light) === */
   --sidebar: oklch(0.98 0.005 260);
   --sidebar-foreground: oklch(0.25 0.02 260);
-  --sidebar-primary: oklch(0.55 0.22 220);
+  --sidebar-primary: oklch(0.70 0.18 45);
   --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.94 0.02 220);
+  --sidebar-accent: oklch(0.95 0.03 45);
   --sidebar-accent-foreground: oklch(0.25 0.02 260);
   --sidebar-border: oklch(0.92 0.01 260);
-  --sidebar-ring: oklch(0.55 0.22 220);
+  --sidebar-ring: oklch(0.70 0.18 45);
 
   /* === Visual Hierarchy === */
   --heading-weight: 700;
@@ -101,65 +95,65 @@
   --shadow-md: 0 4px 12px oklch(0.20 0.02 260 / 0.08);
   --shadow-lg: 0 8px 24px oklch(0.20 0.02 260 / 0.10);
   --shadow-xl: 0 16px 48px oklch(0.20 0.02 260 / 0.12);
-  --shadow-glow: 0 0 20px oklch(0.55 0.22 220 / 0.25);
-  --shadow-glow-accent: 0 0 20px oklch(0.60 0.15 195 / 0.25);
+  --shadow-glow: 0 0 20px oklch(0.70 0.18 45 / 0.25);
+  --shadow-glow-accent: 0 0 20px oklch(0.55 0.08 240 / 0.25);
 }
 
 /* ============================================
-   DARK MODE (Electric & Premium)
+   DARK MODE (Bold & Electric Orange)
    ============================================ */
 .dark {
-  /* === Deep Space Background === */
-  --background: oklch(0.10 0.015 260);
+  /* === Deep Slate Background === */
+  --background: oklch(0.08 0.015 260);
   --foreground: oklch(0.95 0.005 260);
-  --card: oklch(0.14 0.015 260);
+  --card: oklch(0.12 0.015 260);
   --card-foreground: oklch(0.95 0.005 260);
-  --popover: oklch(0.16 0.015 260);
+  --popover: oklch(0.14 0.015 260);
   --popover-foreground: oklch(0.95 0.005 260);
 
-  /* === Primary Electric Blue === */
-  --primary: oklch(0.65 0.20 220);
-  --primary-foreground: oklch(0.10 0.015 260);
+  /* === Primary Electric Orange === */
+  --primary: oklch(0.70 0.18 45);
+  --primary-foreground: oklch(0.08 0.015 260);
 
   /* === Secondary & Muted === */
-  --secondary: oklch(0.20 0.015 260);
+  --secondary: oklch(0.18 0.015 260);
   --secondary-foreground: oklch(0.90 0.005 260);
-  --muted: oklch(0.18 0.01 260);
+  --muted: oklch(0.16 0.01 260);
   --muted-foreground: oklch(0.60 0.02 260);
 
-  /* === Accent Cyan === */
-  --accent: oklch(0.70 0.14 195);
-  --accent-foreground: oklch(0.10 0.015 260);
+  /* === Accent Steel Blue === */
+  --accent: oklch(0.55 0.08 240);
+  --accent-foreground: oklch(0.95 0.005 260);
 
   /* === Status Colors === */
   --destructive: oklch(0.65 0.22 25);
-  --destructive-foreground: oklch(0.10 0.015 260);
+  --destructive-foreground: oklch(0.08 0.015 260);
   --success: oklch(0.70 0.18 155);
-  --success-foreground: oklch(0.10 0.015 260);
+  --success-foreground: oklch(0.08 0.015 260);
   --warning: oklch(0.80 0.16 80);
   --warning-foreground: oklch(0.15 0.02 80);
 
   /* === Borders & Inputs === */
-  --border: oklch(0.25 0.02 260);
-  --input: oklch(0.18 0.015 260);
-  --ring: oklch(0.65 0.20 220);
+  --border: oklch(0.22 0.02 260);
+  --input: oklch(0.16 0.015 260);
+  --ring: oklch(0.70 0.18 45);
 
   /* === Chart Colors (Vibrant) === */
-  --chart-1: oklch(0.65 0.20 220);
-  --chart-2: oklch(0.70 0.14 195);
+  --chart-1: oklch(0.70 0.18 45);
+  --chart-2: oklch(0.55 0.08 240);
   --chart-3: oklch(0.70 0.18 155);
   --chart-4: oklch(0.80 0.16 80);
   --chart-5: oklch(0.70 0.18 320);
 
-  /* === Sidebar (Dark Premium) === */
-  --sidebar: oklch(0.12 0.015 260);
+  /* === Sidebar (Dark Slate) === */
+  --sidebar: oklch(0.10 0.015 260);
   --sidebar-foreground: oklch(0.90 0.005 260);
-  --sidebar-primary: oklch(0.65 0.20 220);
-  --sidebar-primary-foreground: oklch(0.10 0.015 260);
-  --sidebar-accent: oklch(0.18 0.02 220);
+  --sidebar-primary: oklch(0.70 0.18 45);
+  --sidebar-primary-foreground: oklch(0.08 0.015 260);
+  --sidebar-accent: oklch(0.16 0.02 45);
   --sidebar-accent-foreground: oklch(0.95 0.005 260);
-  --sidebar-border: oklch(0.22 0.02 260);
-  --sidebar-ring: oklch(0.65 0.20 220);
+  --sidebar-border: oklch(0.20 0.02 260);
+  --sidebar-ring: oklch(0.70 0.18 45);
 
   /* === Enhanced Shadows for Dark === */
   --shadow-xs: 0 1px 2px oklch(0 0 0 / 0.2);
@@ -167,8 +161,8 @@
   --shadow-md: 0 4px 12px oklch(0 0 0 / 0.3);
   --shadow-lg: 0 8px 24px oklch(0 0 0 / 0.35);
   --shadow-xl: 0 16px 48px oklch(0 0 0 / 0.4);
-  --shadow-glow: 0 0 30px oklch(0.65 0.20 220 / 0.3);
-  --shadow-glow-accent: 0 0 30px oklch(0.70 0.14 195 / 0.3);
+  --shadow-glow: 0 0 30px oklch(0.70 0.18 45 / 0.3);
+  --shadow-glow-accent: 0 0 30px oklch(0.55 0.08 240 / 0.3);
 }
 
 /* ============================================
@@ -322,10 +316,10 @@ p, li, span, label {
 
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 20px oklch(0.65 0.20 220 / 0.3);
+    box-shadow: 0 0 20px oklch(0.70 0.18 45 / 0.3);
   }
   50% {
-    box-shadow: 0 0 30px oklch(0.65 0.20 220 / 0.5);
+    box-shadow: 0 0 30px oklch(0.70 0.18 45 / 0.5);
   }
 }
 
@@ -381,31 +375,31 @@ button, a, [role="button"], input, select, textarea {
    ============================================ */
 .gradient-electric {
   background: linear-gradient(135deg,
-    oklch(0.55 0.22 220) 0%,
-    oklch(0.60 0.18 200) 50%,
-    oklch(0.60 0.15 195) 100%
+    oklch(0.70 0.18 45) 0%,
+    oklch(0.65 0.16 50) 50%,
+    oklch(0.60 0.18 45) 100%
   );
 }
 
 .gradient-electric-subtle {
   background: linear-gradient(135deg,
-    oklch(0.55 0.22 220 / 0.1) 0%,
-    oklch(0.60 0.15 195 / 0.1) 100%
+    oklch(0.70 0.18 45 / 0.1) 0%,
+    oklch(0.55 0.08 240 / 0.1) 100%
   );
 }
 
 .gradient-dark-radial {
   background: radial-gradient(
     ellipse at top,
-    oklch(0.16 0.02 220) 0%,
-    oklch(0.10 0.015 260) 100%
+    oklch(0.12 0.02 260) 0%,
+    oklch(0.08 0.015 260) 100%
   );
 }
 
 .text-gradient-electric {
   background: linear-gradient(135deg,
-    oklch(0.65 0.20 220) 0%,
-    oklch(0.70 0.14 195) 100%
+    oklch(0.70 0.18 45) 0%,
+    oklch(0.75 0.16 50) 100%
   );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

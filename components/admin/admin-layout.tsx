@@ -10,7 +10,10 @@ import { useRouter, usePathname } from 'next/navigation';
 import { AdminSidebar } from './admin-sidebar';
 import { LogoutButton } from '@/components/auth/logout-button';
 import { ThemeToggleCompact } from '@/components/theme/theme-toggle';
-import { useBranding } from '@/lib/branding/branding-context';
+// ProStreet brand constants
+const APP_NAME = 'ProStreet';
+const PRIMARY_COLOR = '#f97316';
+const DARK_BG = '#0f172a';
 import { Menu, Search, X } from 'lucide-react';
 
 interface AdminUser {
@@ -31,7 +34,6 @@ const SIDEBAR_WIDTH_COLLAPSED = 68; // w-[68px]
 export function AdminLayout({ children, user }: AdminLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { branding } = useBranding();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showShortcutsModal, setShowShortcutsModal] = useState(false);
@@ -166,23 +168,14 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
 
             {/* Logo and app name (mobile only - sidebar shows on desktop) */}
             <div className="flex items-center gap-2 lg:hidden flex-shrink-0">
-              {branding.logo_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={branding.logo_url}
-                  alt={branding.app_name}
-                  className="h-7 w-auto object-contain"
-                />
-              ) : (
-                <div
-                  className="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-bold text-white"
-                  style={{ backgroundColor: branding.primary_color }}
-                >
-                  {branding.app_name.charAt(0).toUpperCase()}
-                </div>
-              )}
+              <div
+                className="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-bold"
+                style={{ backgroundColor: DARK_BG, color: PRIMARY_COLOR }}
+              >
+                P
+              </div>
               <span className="font-semibold text-foreground text-sm hidden xs:inline truncate max-w-[120px]">
-                {branding.app_name}
+                {APP_NAME}
               </span>
             </div>
 

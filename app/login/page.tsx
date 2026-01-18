@@ -3,7 +3,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { useBranding, getContrastColor } from '@/lib/branding/branding-context';
+// ProStreet brand constants
+const APP_NAME = 'ProStreet';
+const PRIMARY_COLOR = '#f97316';
+const DARK_BG = '#0f172a';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -12,7 +15,6 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { branding } = useBranding();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,9 +43,9 @@ export default function LoginPage() {
 
       // Store remember me preference in localStorage
       if (rememberMe) {
-        localStorage.setItem('fieldops_remember_me', 'true');
+        localStorage.setItem('prostreet_remember_me', 'true');
       } else {
-        localStorage.removeItem('fieldops_remember_me');
+        localStorage.removeItem('prostreet_remember_me');
       }
 
       // Get user role from the users table
@@ -78,29 +80,20 @@ export default function LoginPage() {
           <div className="text-center mb-8">
             {/* App Icon */}
             <div className="flex justify-center mb-4">
-              {branding.logo_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={branding.logo_url}
-                  alt={branding.app_name}
-                  className="w-16 h-16 object-contain"
-                />
-              ) : (
-                <div
-                  className="w-16 h-16 rounded-xl flex items-center justify-center"
-                  style={{ backgroundColor: branding.primary_color }}
+              <div
+                className="w-16 h-16 rounded-xl flex items-center justify-center"
+                style={{ backgroundColor: DARK_BG }}
+              >
+                <span
+                  className="text-2xl font-bold"
+                  style={{ color: PRIMARY_COLOR }}
                 >
-                  <span
-                    className="text-2xl font-bold"
-                    style={{ color: getContrastColor(branding.primary_color) }}
-                  >
-                    {branding.app_name.charAt(0).toUpperCase()}
-                  </span>
-                </div>
-              )}
+                  P
+                </span>
+              </div>
             </div>
             <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">
-              {branding.app_name}
+              {APP_NAME}
             </h1>
             <p className="text-zinc-600 dark:text-zinc-400 mt-3">
               Sign in to your account
@@ -173,8 +166,8 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full py-3.5 px-4 text-white font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-zinc-800 text-base touch-target disabled:opacity-50 mt-2"
               style={{
-                backgroundColor: branding.primary_color,
-                color: getContrastColor(branding.primary_color)
+                backgroundColor: PRIMARY_COLOR,
+                color: '#ffffff'
               }}
             >
               {loading ? 'Signing in...' : 'Sign in'}

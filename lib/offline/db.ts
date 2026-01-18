@@ -196,7 +196,7 @@ class FieldOpsDB extends Dexie {
   pending_mutations!: Table<TypedPendingMutation, string>;
 
   constructor() {
-    super('fieldops_db');
+    super('prostreet_db');
 
     // Define schema version 1 - original tables
     this.version(1).stores({
