@@ -57,10 +57,16 @@ export async function uploadAvatar(formData: FormData): Promise<UpdateProfileRes
     return { success: false, error: 'No file provided' };
   }
 
-  // Validate file type
-  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-  if (!allowedTypes.includes(file.type)) {
-    return { success: false, error: 'Invalid file type. Please upload a JPEG, PNG, GIF, or WebP image.' };
+  // Validate file type (with iOS fallback where file.type can be empty)
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/heic', 'image/heif'];
+  const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic', 'heif'];
+  const fileExt = file.name.split('.').pop()?.toLowerCase() || '';
+
+  const isValidType = allowedTypes.includes(file.type) ||
+    ((!file.type || file.type === 'application/octet-stream') && allowedExtensions.includes(fileExt));
+
+  if (!isValidType) {
+    return { success: false, error: 'Invalid file type. Please upload a JPEG, PNG, GIF, WebP, or HEIC image.' };
   }
 
   // Validate file size (5MB max)
@@ -68,9 +74,8 @@ export async function uploadAvatar(formData: FormData): Promise<UpdateProfileRes
     return { success: false, error: 'File too large. Maximum size is 5MB.' };
   }
 
-  // Generate unique filename
-  const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-  const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+  // Generate unique filename (reuse fileExt from validation above)
+  const fileName = `${user.id}/${Date.now()}.${fileExt || 'jpg'}`;
 
   // Delete old avatar if exists
   const { data: currentUser } = await supabase
