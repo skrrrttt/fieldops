@@ -135,7 +135,7 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
           {task.assigned_user && (
             <span className="inline-flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
               <User className="w-3 h-3" />
-              {task.assigned_user.email.split('@')[0]}
+              {task.assigned_user.display_name || task.assigned_user.email.split('@')[0]}
             </span>
           )}
         </div>
@@ -569,17 +569,37 @@ function CommentListInline({ comments }: { comments: CommentWithUser[] }) {
     return `${diffDays}d ago`;
   };
 
+  const getUserDisplayName = (user: CommentWithUser['user']) => {
+    if (!user) return 'Unknown';
+    return user.display_name || user.email?.split('@')[0] || 'Unknown';
+  };
+
+  const getUserInitial = (user: CommentWithUser['user']) => {
+    if (!user) return '?';
+    if (user.display_name) return user.display_name.charAt(0).toUpperCase();
+    return user.email?.charAt(0).toUpperCase() || '?';
+  };
+
   return (
     <div className="space-y-3">
       {comments.map((comment) => (
         <div key={comment.id} className="flex gap-2">
-          <div className="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 text-xs font-semibold flex-shrink-0">
-            {comment.user?.email?.charAt(0).toUpperCase() || '?'}
-          </div>
+          {comment.user?.avatar_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={comment.user.avatar_url}
+              alt={getUserDisplayName(comment.user)}
+              className="w-7 h-7 rounded-full object-cover flex-shrink-0"
+            />
+          ) : (
+            <div className="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 text-xs font-semibold flex-shrink-0">
+              {getUserInitial(comment.user)}
+            </div>
+          )}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300 truncate">
-                {comment.user?.email?.split('@')[0] || 'Unknown'}
+                {getUserDisplayName(comment.user)}
               </span>
               <span className="text-xs text-zinc-400">{formatTime(comment.created_at)}</span>
             </div>

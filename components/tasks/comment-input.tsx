@@ -201,7 +201,7 @@ export function CommentInput({ taskId, onCommentAdded }: CommentInputProps) {
           user_id: 'offline_user', // Placeholder, will be set on sync
           content: commentContent,
           created_at: new Date().toISOString(),
-          user: { id: 'offline_user', email: 'You (pending sync)' },
+          user: { id: 'offline_user', email: 'You (pending sync)', display_name: null, avatar_url: null },
         };
 
         // Save to local cache
@@ -217,7 +217,7 @@ export function CommentInput({ taskId, onCommentAdded }: CommentInputProps) {
           user_id: 'offline_user',
           content: commentContent,
           created_at: new Date().toISOString(),
-          user: { id: 'offline_user', email: 'You (pending sync)' },
+          user: { id: 'offline_user', email: 'You (pending sync)', display_name: null, avatar_url: null },
         };
         onCommentAdded(tempComment);
       } catch {

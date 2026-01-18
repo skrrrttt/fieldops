@@ -172,7 +172,12 @@ export function useTaskOffline(options: UseTaskOfflineOptions): UseTaskOfflineRe
 
       setComments(cachedComments.map(c => ({
         ...c,
-        user: c.user ?? null,
+        user: c.user ? {
+          id: c.user.id,
+          email: c.user.email,
+          display_name: c.user.display_name ?? null,
+          avatar_url: c.user.avatar_url ?? null,
+        } : null,
       })));
 
       setIsFromCache(true);
