@@ -20,6 +20,8 @@ import type {
 export interface LocalUserInfo {
   id: string;
   email: string;
+  display_name?: string | null;
+  avatar_url?: string | null;
   role?: string;
   created_at?: string;
   updated_at?: string;
@@ -36,17 +38,17 @@ export interface LocalTask extends Task {
 }
 
 export interface LocalComment extends Comment {
-  user?: { id: string; email: string };
+  user?: { id: string; email: string; display_name?: string | null; avatar_url?: string | null };
 }
 
 export interface LocalPhoto extends Photo {
-  user?: { id: string; email: string };
+  user?: { id: string; email: string; display_name?: string | null; avatar_url?: string | null };
   // For offline photos, store blob locally
   local_blob?: Blob;
 }
 
 export interface LocalFile extends FileRecord {
-  user?: { id: string; email: string };
+  user?: { id: string; email: string; display_name?: string | null; avatar_url?: string | null };
   // For offline files, store blob locally
   local_blob?: Blob;
 }

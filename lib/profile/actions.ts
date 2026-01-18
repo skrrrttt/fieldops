@@ -34,8 +34,10 @@ export async function updateProfile(data: {
     return { success: false, error: error.message };
   }
 
+  // Revalidate all pages that display user info
   revalidatePath('/profile');
-  revalidatePath('/tasks');
+  revalidatePath('/tasks', 'layout');
+  revalidatePath('/admin', 'layout');
   return { success: true };
 }
 
@@ -117,8 +119,10 @@ export async function uploadAvatar(formData: FormData): Promise<UpdateProfileRes
     return { success: false, error: updateError.message };
   }
 
+  // Revalidate all pages that display user info
   revalidatePath('/profile');
-  revalidatePath('/tasks');
+  revalidatePath('/tasks', 'layout');
+  revalidatePath('/admin', 'layout');
   return { success: true, url: publicUrl };
 }
 
@@ -162,7 +166,9 @@ export async function removeAvatar(): Promise<UpdateProfileResult> {
     return { success: false, error: error.message };
   }
 
+  // Revalidate all pages that display user info
   revalidatePath('/profile');
-  revalidatePath('/tasks');
+  revalidatePath('/tasks', 'layout');
+  revalidatePath('/admin', 'layout');
   return { success: true };
 }

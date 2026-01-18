@@ -11,7 +11,7 @@ export interface ActionResult<T = void> {
 }
 
 export interface CommentWithUser extends Comment {
-  user: { id: string; email: string } | null;
+  user: { id: string; email: string; display_name: string | null; avatar_url: string | null } | null;
 }
 
 /**
@@ -24,7 +24,7 @@ export async function getTaskComments(taskId: string): Promise<CommentWithUser[]
     .from('comments')
     .select(`
       *,
-      user:users(id, email)
+      user:users(id, email, display_name, avatar_url)
     `)
     .eq('task_id', taskId)
     .order('created_at', { ascending: false });
@@ -66,7 +66,7 @@ export async function createComment(data: CreateCommentData): Promise<ActionResu
     } as never)
     .select(`
       *,
-      user:users(id, email)
+      user:users(id, email, display_name, avatar_url)
     `)
     .single();
 
