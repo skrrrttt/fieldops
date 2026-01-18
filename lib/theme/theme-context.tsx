@@ -12,7 +12,7 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-const STORAGE_KEY = 'fieldops_theme_preference';
+const STORAGE_KEY = 'prostreet_theme_preference';
 
 // Get initial values from localStorage synchronously to avoid flash
 function getInitialMode(): ThemeMode {

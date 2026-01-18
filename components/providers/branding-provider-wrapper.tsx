@@ -1,28 +1,22 @@
 'use client';
 
 /**
- * Client-side wrapper for BrandingProvider and ThemeProvider
- * Used in root layout to provide branding and theme context to all pages
+ * Client-side wrapper for ThemeProvider
+ * Used in root layout to provide theme context to all pages
  */
 
-import { BrandingProvider } from '@/lib/branding/branding-context';
 import { ThemeProvider } from '@/lib/theme/theme-context';
-import type { Branding } from '@/lib/database.types';
 
-interface BrandingProviderWrapperProps {
+interface ThemeProviderWrapperProps {
   children: React.ReactNode;
-  initialBranding?: Branding | null;
 }
 
-export function BrandingProviderWrapper({
+export function ThemeProviderWrapper({
   children,
-  initialBranding,
-}: BrandingProviderWrapperProps) {
+}: ThemeProviderWrapperProps) {
   return (
     <ThemeProvider>
-      <BrandingProvider initialBranding={initialBranding}>
-        {children}
-      </BrandingProvider>
+      {children}
     </ThemeProvider>
   );
 }

@@ -2,7 +2,8 @@
 
 import { memo } from 'react';
 import type { TaskWithRelations } from '@/lib/tasks/actions';
-import { useBranding } from '@/lib/branding/branding-context';
+// ProStreet brand constant
+const PRIMARY_COLOR = '#f97316';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { MapPin, Calendar, ChevronRight, AlertCircle } from 'lucide-react';
@@ -22,7 +23,6 @@ function formatDate(dateString: string | null) {
 }
 
 export const TaskCard = memo(function TaskCard({ task, onClick }: TaskCardProps) {
-  const { branding } = useBranding();
 
   const isOverdue = task.due_date && new Date(task.due_date) < new Date() && !task.status?.is_complete;
   const isComplete = task.status?.is_complete;
@@ -49,7 +49,7 @@ export const TaskCard = memo(function TaskCard({ task, onClick }: TaskCardProps)
         style={{
           backgroundColor: isOverdue
             ? 'var(--destructive)'
-            : task.status?.color || branding.primary_color
+            : task.status?.color || PRIMARY_COLOR
         }}
       />
 
@@ -141,8 +141,8 @@ export const TaskCard = memo(function TaskCard({ task, onClick }: TaskCardProps)
                 <AvatarFallback
                   className="text-xs font-bold"
                   style={{
-                    background: `linear-gradient(135deg, ${branding.primary_color}20, ${branding.primary_color}40)`,
-                    color: branding.primary_color,
+                    background: `linear-gradient(135deg, ${PRIMARY_COLOR}20, ${PRIMARY_COLOR}40)`,
+                    color: PRIMARY_COLOR,
                   }}
                 >
                   {task.assigned_user.email.charAt(0).toUpperCase()}

@@ -6,9 +6,13 @@
  */
 
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { useBranding, getContrastColor } from '@/lib/branding/branding-context';
 import { Button } from '@/components/ui/button';
 import { X, Download, Loader2, Sparkles } from 'lucide-react';
+
+// ProStreet brand constants
+const APP_NAME = 'ProStreet';
+const PRIMARY_COLOR = '#f97316';
+const ACCENT_COLOR = '#64748b';
 
 // Extended Window interface for PWA install prompt
 interface BeforeInstallPromptEvent extends Event {
@@ -27,9 +31,9 @@ declare global {
 }
 
 // Storage keys
-const VISIT_COUNT_KEY = 'fieldops_visit_count';
-const INSTALL_DISMISSED_KEY = 'fieldops_install_dismissed';
-const MEANINGFUL_ACTION_KEY = 'fieldops_meaningful_action';
+const VISIT_COUNT_KEY = 'prostreet_visit_count';
+const INSTALL_DISMISSED_KEY = 'prostreet_install_dismissed';
+const MEANINGFUL_ACTION_KEY = 'prostreet_meaningful_action';
 
 const MIN_VISITS_FOR_BANNER = 2;
 
@@ -64,7 +68,7 @@ function hasMeaningfulAction(): boolean {
 export function trackMeaningfulAction(): void {
   if (typeof window === 'undefined') return;
   localStorage.setItem(MEANINGFUL_ACTION_KEY, 'true');
-  window.dispatchEvent(new CustomEvent('fieldops-meaningful-action'));
+  window.dispatchEvent(new CustomEvent('prostreet-meaningful-action'));
 }
 
 function isAppInstalled(): boolean {
@@ -76,7 +80,6 @@ function isAppInstalled(): boolean {
 }
 
 export function PWAInstallPrompt() {
-  const { branding } = useBranding();
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showBanner, setShowBanner] = useState(false);
   const [isInstalling, setIsInstalling] = useState(false);
@@ -118,12 +121,12 @@ export function PWAInstallPrompt() {
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
-    window.addEventListener('fieldops-meaningful-action', handleMeaningfulAction);
+    window.addEventListener('prostreet-meaningful-action', handleMeaningfulAction);
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
-      window.removeEventListener('fieldops-meaningful-action', handleMeaningfulAction);
+      window.removeEventListener('prostreet-meaningful-action', handleMeaningfulAction);
     };
   }, [checkShouldShowBanner, deferredPrompt, showBanner]);
 
@@ -159,8 +162,6 @@ export function PWAInstallPrompt() {
     return null;
   }
 
-  const textColor = getContrastColor(branding.primary_color);
-
   return (
     <div
       className="fixed bottom-0 left-0 right-0 z-[100] p-4 animate-fade-up"
@@ -169,62 +170,44 @@ export function PWAInstallPrompt() {
       <div
         className="relative max-w-lg mx-auto rounded-2xl shadow-2xl overflow-hidden"
         style={{
-          background: `linear-gradient(135deg, ${branding.primary_color}, ${branding.primary_color}dd)`,
+          background: `linear-gradient(135deg, ${PRIMARY_COLOR}, ${PRIMARY_COLOR}dd)`,
         }}
       >
         {/* Decorative glow */}
         <div
           className="absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl opacity-30"
-          style={{ backgroundColor: branding.accent_color }}
+          style={{ backgroundColor: ACCENT_COLOR }}
         />
 
         <div className="relative p-5">
           <div className="flex items-start gap-4">
-            {/* App icon or logo */}
+            {/* App icon */}
             <div className="flex-shrink-0">
-              {branding.logo_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={branding.logo_url}
-                  alt={branding.app_name}
-                  className="w-16 h-16 rounded-2xl object-contain bg-white/10 backdrop-blur-sm p-2 ring-2 ring-white/20"
-                />
-              ) : (
-                <div
-                  className="w-16 h-16 rounded-2xl flex items-center justify-center ring-2 ring-white/20"
-                  style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}
+              <div
+                className="w-16 h-16 rounded-2xl flex items-center justify-center ring-2 ring-white/20"
+                style={{ backgroundColor: '#0f172a' }}
+              >
+                <span
+                  className="text-3xl font-bold"
+                  style={{ color: PRIMARY_COLOR }}
                 >
-                  <span
-                    className="text-3xl font-bold"
-                    style={{ color: textColor }}
-                  >
-                    {branding.app_name.charAt(0)}
-                  </span>
-                </div>
-              )}
+                  P
+                </span>
+              </div>
             </div>
 
             {/* Content */}
             <div className="flex-1 min-w-0 pt-1">
               <div className="flex items-center gap-2 mb-1">
-                <Sparkles className="w-4 h-4" style={{ color: textColor, opacity: 0.8 }} />
-                <span
-                  className="text-xs font-semibold uppercase tracking-wider"
-                  style={{ color: textColor, opacity: 0.7 }}
-                >
+                <Sparkles className="w-4 h-4 text-white/80" />
+                <span className="text-xs font-semibold uppercase tracking-wider text-white/70">
                   Get the app
                 </span>
               </div>
-              <h3
-                className="text-xl font-bold tracking-tight"
-                style={{ color: textColor }}
-              >
-                Install {branding.app_name}
+              <h3 className="text-xl font-bold tracking-tight text-white">
+                Install {APP_NAME}
               </h3>
-              <p
-                className="text-sm mt-1 leading-relaxed"
-                style={{ color: textColor, opacity: 0.85 }}
-              >
+              <p className="text-sm mt-1 leading-relaxed text-white/85">
                 Add to your home screen for instant access and offline use
               </p>
             </div>
@@ -232,8 +215,7 @@ export function PWAInstallPrompt() {
             {/* Dismiss button */}
             <button
               onClick={handleDismiss}
-              className="flex-shrink-0 p-2 rounded-xl transition-all hover:bg-white/10 active:scale-95"
-              style={{ color: textColor, opacity: 0.7 }}
+              className="flex-shrink-0 p-2 rounded-xl transition-all hover:bg-white/10 active:scale-95 text-white/70"
               aria-label="Dismiss install prompt"
             >
               <X className="w-5 h-5" />
@@ -246,7 +228,7 @@ export function PWAInstallPrompt() {
             disabled={isInstalling}
             size="lg"
             className="w-full mt-5 bg-white hover:bg-white/95 shadow-lg font-bold text-base h-14 rounded-xl transition-all active:scale-[0.98]"
-            style={{ color: branding.primary_color }}
+            style={{ color: PRIMARY_COLOR }}
           >
             {isInstalling ? (
               <>

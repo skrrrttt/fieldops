@@ -13,7 +13,8 @@ import { createClient } from '@/lib/supabase/client';
 import { createPhotoRecord } from '@/lib/photos/actions';
 import { processPhoto, requestGpsCoordinates } from '@/lib/photos/process-photo';
 import { useOnlineStatus, queuePhotoMutation, saveToLocal, type LocalPhoto } from '@/lib/offline';
-import { useBranding } from '@/lib/branding/branding-context';
+// ProStreet brand constant
+const PRIMARY_COLOR = '#f97316';
 import { MobileBottomNav, MobileBottomNavSpacer } from '@/components/layout/mobile-bottom-nav';
 
 interface Task {
@@ -32,7 +33,6 @@ type Step = 'capture' | 'select-task' | 'uploading' | 'done';
 
 export default function UploadPage() {
   const router = useRouter();
-  const { branding } = useBranding();
   const isOnline = useOnlineStatus();
 
   const [step, setStep] = useState<Step>('capture');
@@ -275,9 +275,9 @@ export default function UploadPage() {
             <div className="text-center mb-4">
               <div
                 className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4"
-                style={{ backgroundColor: `${branding.primary_color}15` }}
+                style={{ backgroundColor: `${PRIMARY_COLOR}15` }}
               >
-                <Camera className="w-12 h-12" style={{ color: branding.primary_color }} />
+                <Camera className="w-12 h-12" style={{ color: PRIMARY_COLOR }} />
               </div>
               <h2 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">
                 Capture a Photo
@@ -291,7 +291,7 @@ export default function UploadPage() {
               <button
                 onClick={() => cameraInputRef.current?.click()}
                 className="w-full flex items-center justify-center gap-3 py-4 px-6 rounded-xl text-white font-semibold text-lg shadow-lg active:scale-[0.98] transition-transform"
-                style={{ backgroundColor: branding.primary_color }}
+                style={{ backgroundColor: PRIMARY_COLOR }}
               >
                 <Camera className="w-6 h-6" />
                 Take Photo
@@ -372,7 +372,7 @@ export default function UploadPage() {
                           : 'bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700'
                       }`}
                       style={selectedTaskId === task.id ? {
-                        boxShadow: `0 0 0 2px ${branding.primary_color}`,
+                        boxShadow: `0 0 0 2px ${PRIMARY_COLOR}`,
                       } : undefined}
                     >
                       <div className="flex items-start justify-between">
@@ -389,7 +389,7 @@ export default function UploadPage() {
                         {selectedTaskId === task.id && (
                           <div
                             className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
-                            style={{ backgroundColor: branding.primary_color }}
+                            style={{ backgroundColor: PRIMARY_COLOR }}
                           >
                             <Check className="w-4 h-4 text-white" />
                           </div>
@@ -412,7 +412,7 @@ export default function UploadPage() {
                 onClick={uploadPhoto}
                 disabled={!selectedTaskId}
                 className="mt-4 w-full py-4 rounded-xl text-white font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] transition-transform"
-                style={{ backgroundColor: branding.primary_color }}
+                style={{ backgroundColor: PRIMARY_COLOR }}
               >
                 Upload Photo
               </button>
@@ -437,7 +437,7 @@ export default function UploadPage() {
                   cx="64"
                   cy="64"
                   r="56"
-                  stroke={branding.primary_color}
+                  stroke={PRIMARY_COLOR}
                   strokeWidth="8"
                   fill="none"
                   strokeLinecap="round"
@@ -479,7 +479,7 @@ export default function UploadPage() {
               <button
                 onClick={resetUpload}
                 className="w-full py-4 rounded-xl text-white font-semibold text-lg active:scale-[0.98] transition-transform"
-                style={{ backgroundColor: branding.primary_color }}
+                style={{ backgroundColor: PRIMARY_COLOR }}
               >
                 Take Another Photo
               </button>

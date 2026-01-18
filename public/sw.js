@@ -1,13 +1,11 @@
 /// <reference lib="webworker" />
 
-const CACHE_NAME = 'fieldops-v1';
+const CACHE_NAME = 'prostreet-v1';
 const STATIC_ASSETS = [
   '/',
   '/login',
   '/tasks',
   '/manifest.json',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png',
 ];
 
 // Background Sync tag for mutations

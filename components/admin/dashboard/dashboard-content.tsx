@@ -6,7 +6,8 @@
  */
 
 import Link from 'next/link';
-import { useBranding } from '@/lib/branding/branding-context';
+// ProStreet brand constant
+const PRIMARY_COLOR = '#f97316';
 import type { DashboardStats } from '@/lib/dashboard/actions';
 import { createClient } from '@/lib/supabase/client';
 import { formatDistanceToNow } from '@/lib/utils/date';
@@ -29,7 +30,6 @@ interface DashboardContentProps {
 }
 
 export function DashboardContent({ stats }: DashboardContentProps) {
-  const { branding } = useBranding();
   const supabase = createClient();
 
   const completionPercentage = stats.totalTasks > 0
@@ -63,7 +63,7 @@ export function DashboardContent({ stats }: DashboardContentProps) {
           value={stats.totalTasks}
           icon={<ClipboardList className="w-6 h-6" />}
           href="/admin/tasks"
-          color={branding.primary_color}
+          color={PRIMARY_COLOR}
           trend={stats.totalTasks > 0 ? 'active' : undefined}
         />
         <StatCard
@@ -101,7 +101,7 @@ export function DashboardContent({ stats }: DashboardContentProps) {
               <Link
                 href="/admin/tasks"
                 className="text-sm font-medium flex items-center gap-1 transition-colors hover:gap-2"
-                style={{ color: branding.primary_color }}
+                style={{ color: PRIMARY_COLOR }}
               >
                 View all
                 <ArrowRight className="w-4 h-4" />
@@ -158,7 +158,7 @@ export function DashboardContent({ stats }: DashboardContentProps) {
                 <Link
                   href="/admin/statuses"
                   className="inline-flex items-center gap-1.5 text-sm font-medium mt-2"
-                  style={{ color: branding.primary_color }}
+                  style={{ color: PRIMARY_COLOR }}
                 >
                   Create statuses
                   <ArrowRight className="w-4 h-4" />
@@ -176,8 +176,8 @@ export function DashboardContent({ stats }: DashboardContentProps) {
               <div
                 className="p-2.5 rounded-xl"
                 style={{
-                  backgroundColor: `${branding.primary_color}15`,
-                  color: branding.primary_color,
+                  backgroundColor: `${PRIMARY_COLOR}15`,
+                  color: PRIMARY_COLOR,
                 }}
               >
                 <Users className="w-5 h-5" />
@@ -202,8 +202,8 @@ export function DashboardContent({ stats }: DashboardContentProps) {
               href="/admin/users"
               className="flex items-center justify-center gap-2 w-full mt-5 py-2.5 rounded-xl font-medium text-sm transition-all hover:gap-3"
               style={{
-                backgroundColor: `${branding.primary_color}12`,
-                color: branding.primary_color,
+                backgroundColor: `${PRIMARY_COLOR}12`,
+                color: PRIMARY_COLOR,
               }}
             >
               Manage Users
@@ -222,25 +222,25 @@ export function DashboardContent({ stats }: DashboardContentProps) {
                 label="Create Task"
                 icon={<Plus className="w-4 h-4" />}
                 shortcut="n"
-                color={branding.primary_color}
+                color={PRIMARY_COLOR}
               />
               <QuickLink
                 href="/admin/media"
                 label="View Media"
                 icon={<ImageIcon className="w-4 h-4" />}
-                color={branding.primary_color}
+                color={PRIMARY_COLOR}
               />
               <QuickLink
                 href="/admin/divisions"
                 label="Manage Divisions"
                 icon={<Tags className="w-4 h-4" />}
-                color={branding.primary_color}
+                color={PRIMARY_COLOR}
               />
               <QuickLink
                 href="/admin/templates"
                 label="Task Templates"
                 icon={<FileText className="w-4 h-4" />}
-                color={branding.primary_color}
+                color={PRIMARY_COLOR}
               />
             </div>
           </div>
@@ -256,7 +256,7 @@ export function DashboardContent({ stats }: DashboardContentProps) {
           <Link
             href="/admin/media"
             className="text-sm font-medium flex items-center gap-1 transition-colors hover:gap-2"
-            style={{ color: branding.primary_color }}
+            style={{ color: PRIMARY_COLOR }}
           >
             View all media
             <ArrowRight className="w-4 h-4" />

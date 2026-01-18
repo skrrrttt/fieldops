@@ -8,8 +8,10 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useBranding } from '@/lib/branding/branding-context';
 import { ClipboardCheck, ImagePlus, User } from 'lucide-react';
+
+// ProStreet brand constants
+const PRIMARY_COLOR = '#f97316';
 
 interface NavItem {
   key: string;
@@ -20,7 +22,6 @@ interface NavItem {
 
 export function MobileBottomNav() {
   const pathname = usePathname();
-  const { branding } = useBranding();
 
   const navItems: NavItem[] = [
     {
@@ -70,7 +71,7 @@ export function MobileBottomNav() {
         <div
           className="absolute top-0 left-0 right-0 h-px opacity-50"
           style={{
-            background: `linear-gradient(90deg, transparent, ${branding.primary_color}40, transparent)`,
+            background: `linear-gradient(90deg, transparent, ${PRIMARY_COLOR}40, transparent)`,
           }}
         />
 
@@ -91,7 +92,7 @@ export function MobileBottomNav() {
                     : 'text-muted-foreground hover:text-foreground'
                   }
                 `}
-                style={active ? { color: branding.primary_color } : undefined}
+                style={active ? { color: PRIMARY_COLOR } : undefined}
                 aria-current={active ? 'page' : undefined}
               >
                 {/* Active background pill */}
@@ -99,7 +100,7 @@ export function MobileBottomNav() {
                   <span
                     className="absolute inset-x-3 inset-y-2 rounded-xl -z-10 animate-scale-in"
                     style={{
-                      backgroundColor: `${branding.primary_color}12`,
+                      backgroundColor: `${PRIMARY_COLOR}12`,
                     }}
                   />
                 )}
@@ -118,7 +119,7 @@ export function MobileBottomNav() {
                 {active && (
                   <span
                     className="absolute bottom-1 w-1 h-1 rounded-full animate-scale-in"
-                    style={{ backgroundColor: branding.primary_color }}
+                    style={{ backgroundColor: PRIMARY_COLOR }}
                   />
                 )}
               </Link>

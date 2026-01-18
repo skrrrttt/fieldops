@@ -12,7 +12,7 @@ export function LogoutButton() {
     await supabase.auth.signOut();
 
     // Clear remember me preference
-    localStorage.removeItem('fieldops_remember_me');
+    localStorage.removeItem('prostreet_remember_me');
 
     router.push('/login');
     router.refresh();

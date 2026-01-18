@@ -15,7 +15,9 @@ import { FileList } from '@/components/tasks/file-list';
 import { CommentInput } from '@/components/tasks/comment-input';
 import { CommentList } from '@/components/tasks/comment-list';
 import { CustomFieldEdit } from '@/components/tasks/custom-field-edit';
-import { useBranding, getContrastColor } from '@/lib/branding/branding-context';
+// ProStreet brand constants
+const PRIMARY_COLOR = '#f97316';
+const ACCENT_COLOR = '#64748b';
 import { ChevronDown, ChevronRight, Plus, Camera, Image, FileText, MessageCircle, MapPin, Calendar, User, X, ClipboardList } from 'lucide-react';
 
 interface TaskDetailProps {
@@ -28,7 +30,6 @@ interface TaskDetailProps {
 
 export function TaskDetail({ task, photos, files, comments: initialComments, customFields }: TaskDetailProps) {
   const router = useRouter();
-  const { branding } = useBranding();
   const [refreshKey, setRefreshKey] = useState(0);
   const [comments, setComments] = useState<CommentWithUser[]>(initialComments);
 
@@ -178,8 +179,8 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
                 rel="noopener noreferrer"
                 className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ml-2 flex-shrink-0"
                 style={{
-                  backgroundColor: branding.primary_color,
-                  color: getContrastColor(branding.primary_color),
+                  backgroundColor: PRIMARY_COLOR,
+                  color: '#ffffff',
                 }}
               >
                 <MapPin className="w-4 h-4" />
@@ -201,8 +202,8 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
             onClick={() => setShowPhotoUpload(!showPhotoUpload)}
             className="flex items-center gap-1 px-2.5 py-1.5 text-sm font-medium rounded-lg transition-colors"
             style={{
-              backgroundColor: showPhotoUpload ? `${branding.primary_color}20` : 'transparent',
-              color: branding.primary_color,
+              backgroundColor: showPhotoUpload ? `${PRIMARY_COLOR}20` : 'transparent',
+              color: PRIMARY_COLOR,
             }}
           >
             {showPhotoUpload ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
@@ -245,8 +246,8 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
             onClick={() => setShowFileUpload(!showFileUpload)}
             className="flex items-center gap-1 px-2.5 py-1.5 text-sm font-medium rounded-lg transition-colors"
             style={{
-              backgroundColor: showFileUpload ? `${branding.primary_color}20` : 'transparent',
-              color: branding.primary_color,
+              backgroundColor: showFileUpload ? `${PRIMARY_COLOR}20` : 'transparent',
+              color: PRIMARY_COLOR,
             }}
           >
             {showFileUpload ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
@@ -297,8 +298,8 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
               }}
               className="flex items-center gap-1 px-2.5 py-1.5 text-sm font-medium rounded-lg transition-colors"
               style={{
-                backgroundColor: showCommentInput ? `${branding.primary_color}20` : 'transparent',
-                color: branding.primary_color,
+                backgroundColor: showCommentInput ? `${PRIMARY_COLOR}20` : 'transparent',
+                color: PRIMARY_COLOR,
               }}
             >
               {showCommentInput ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
@@ -348,8 +349,8 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
             href={`/tasks/${task.id}/status`}
             className="flex items-center justify-center gap-2 w-full min-h-[56px] px-6 py-3 text-lg font-semibold rounded-lg transition-opacity hover:opacity-90"
             style={{
-              backgroundColor: branding.accent_color,
-              color: getContrastColor(branding.accent_color),
+              backgroundColor: ACCENT_COLOR,
+              color: '#ffffff',
             }}
           >
             <svg

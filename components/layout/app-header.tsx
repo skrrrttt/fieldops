@@ -1,13 +1,16 @@
 'use client';
 
 /**
- * AppHeader - Branded header component that uses branding context
- * Displays logo (or app name initial), app name, and supports custom children
+ * AppHeader - Header component for ProStreet
+ * Displays app name initial and supports custom children
  */
 
 import Link from 'next/link';
-import { useBranding, getContrastColor } from '@/lib/branding/branding-context';
 import { ConnectionIndicator } from '@/components/offline/connection-indicator';
+
+// ProStreet brand constants
+const APP_NAME = 'ProStreet';
+const PRIMARY_COLOR = '#f97316';
 
 interface AppHeaderProps {
   /** Right-side content (user info, logout button, etc.) */
@@ -29,22 +32,12 @@ export function AppHeader({
   usePrimaryBackground = false,
   className = '',
 }: AppHeaderProps) {
-  const { branding } = useBranding();
-
-  // Calculate text color based on background
-  const textColor = usePrimaryBackground
-    ? getContrastColor(branding.primary_color)
-    : undefined;
-
-  // Get initial for fallback when no logo
-  const initial = branding.app_name.charAt(0).toUpperCase();
-
   return (
     <header
       className={`shadow-sm sticky top-0 z-10 ${className}`}
       style={
         usePrimaryBackground
-          ? { backgroundColor: branding.primary_color }
+          ? { backgroundColor: PRIMARY_COLOR }
           : undefined
       }
     >
@@ -55,39 +48,27 @@ export function AppHeader({
             href={href}
             className="flex items-center gap-3 hover:opacity-80 transition-opacity"
           >
-            {/* Logo or Initial */}
-            {branding.logo_url ? (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img
-                src={branding.logo_url}
-                alt={branding.app_name}
-                className="h-8 w-auto object-contain"
-              />
-            ) : (
-              <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-lg font-bold"
-                style={{
-                  backgroundColor: usePrimaryBackground
-                    ? 'rgba(255,255,255,0.2)'
-                    : branding.primary_color,
-                  color: usePrimaryBackground
-                    ? textColor
-                    : getContrastColor(branding.primary_color),
-                }}
-              >
-                {initial}
-              </div>
-            )}
+            {/* ProStreet Initial */}
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-lg font-bold"
+              style={{
+                backgroundColor: usePrimaryBackground
+                  ? 'rgba(255,255,255,0.2)'
+                  : '#0f172a',
+                color: PRIMARY_COLOR,
+              }}
+            >
+              P
+            </div>
             {/* App Name */}
             <span
               className={`text-xl font-semibold ${
                 usePrimaryBackground
-                  ? ''
+                  ? 'text-white'
                   : 'text-zinc-900 dark:text-white'
               }`}
-              style={usePrimaryBackground ? { color: textColor } : undefined}
             >
-              {branding.app_name}
+              {APP_NAME}
             </span>
           </Link>
 
@@ -97,20 +78,18 @@ export function AppHeader({
               <span
                 className={
                   usePrimaryBackground
-                    ? 'opacity-60'
+                    ? 'text-white/60'
                     : 'text-zinc-400'
                 }
-                style={usePrimaryBackground ? { color: textColor } : undefined}
               >
                 /
               </span>
               <span
                 className={`text-lg ${
                   usePrimaryBackground
-                    ? 'opacity-80'
+                    ? 'text-white/80'
                     : 'text-zinc-600 dark:text-zinc-400'
                 }`}
-                style={usePrimaryBackground ? { color: textColor } : undefined}
               >
                 {subtitle}
               </span>
@@ -142,20 +121,16 @@ interface DetailHeaderProps {
 }
 
 export function DetailHeader({ title, backHref }: DetailHeaderProps) {
-  const { branding } = useBranding();
-
   return (
     <header className="bg-white dark:bg-zinc-800 shadow-sm sticky top-0 z-10">
       <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-4">
         <Link
           href={backHref}
-          className="flex items-center justify-center w-12 h-12 rounded-lg active:bg-zinc-100 dark:active:bg-zinc-700 transition-colors touch-target"
-          style={{ backgroundColor: `${branding.primary_color}15` }}
+          className="flex items-center justify-center w-12 h-12 rounded-lg active:bg-zinc-100 dark:active:bg-zinc-700 transition-colors touch-target bg-primary/10"
           aria-label="Go back"
         >
           <svg
-            className="w-6 h-6"
-            style={{ color: branding.primary_color }}
+            className="w-6 h-6 text-primary"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
