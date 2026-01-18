@@ -32,7 +32,7 @@ export function MobileBottomNav() {
     {
       key: 'upload',
       label: 'Upload',
-      href: '/tasks?upload=true',
+      href: '/upload',
       icon: <ImagePlus className="w-6 h-6" />,
     },
     {
@@ -46,7 +46,11 @@ export function MobileBottomNav() {
   const isActive = (href: string) => {
     const basePath = href.split('?')[0];
     if (basePath === '/tasks') {
-      return pathname === '/tasks' || pathname.startsWith('/tasks/');
+      // Tasks is active for /tasks and /tasks/[id] but NOT /upload
+      return (pathname === '/tasks' || pathname.startsWith('/tasks/')) && pathname !== '/upload';
+    }
+    if (basePath === '/upload') {
+      return pathname === '/upload';
     }
     return pathname === basePath || pathname.startsWith(basePath + '/');
   };
