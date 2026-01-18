@@ -128,7 +128,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/jpeg,image/png,image/gif,image/webp"
+            accept="image/*,.heic,.heif"
             onChange={handleFileChange}
             className="hidden"
           />
