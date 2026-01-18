@@ -102,12 +102,12 @@ export default function LoginPage() {
             <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">
               {branding.app_name}
             </h1>
-            <p className="text-zinc-600 dark:text-zinc-400 mt-2">
+            <p className="text-zinc-600 dark:text-zinc-400 mt-3">
               Sign in to your account
             </p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form onSubmit={handleLogin} className="space-y-5">
             {error && (
               <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-md text-sm">
                 {error}
@@ -152,13 +152,13 @@ export default function LoginPage() {
               />
             </div>
 
-            <div className="flex items-center touch-target">
+            <div className="flex items-center touch-target pt-1">
               <input
                 id="remember-me"
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="h-6 w-6 text-blue-600 focus:ring-blue-500 border-zinc-300 dark:border-zinc-600 rounded cursor-pointer"
+                className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-zinc-300 dark:border-zinc-600 rounded cursor-pointer"
               />
               <label
                 htmlFor="remember-me"
@@ -171,7 +171,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-4 text-white font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-zinc-800 text-base touch-target disabled:opacity-50"
+              className="w-full py-3.5 px-4 text-white font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-zinc-800 text-base touch-target disabled:opacity-50 mt-2"
               style={{
                 backgroundColor: branding.primary_color,
                 color: getContrastColor(branding.primary_color)
