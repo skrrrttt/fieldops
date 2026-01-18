@@ -74,45 +74,42 @@ export function TaskList({ tasks, statuses, divisions }: TaskListProps) {
 
   return (
     <div className="space-y-4">
-      {/* Filter Section */}
-      <div className="space-y-3">
-        {/* Status Filter Buttons */}
-        <div className="flex flex-wrap gap-2">
+      {/* Status Filter - Horizontal Scrollable Tabs */}
+      <div className="-mx-4 px-4">
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
           {statusFilterButtons.map((btn) => (
             <button
               key={btn.key}
               onClick={() => setStatusFilter(btn.key)}
-              className={`px-4 py-2 rounded-lg text-base font-medium transition-colors touch-target ${
+              className={`px-4 py-2.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
                 statusFilter === btn.key
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-zinc-100 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 active:bg-zinc-200 dark:active:bg-zinc-600'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 active:bg-zinc-50 dark:active:bg-zinc-700'
               }`}
             >
               {btn.label}
             </button>
           ))}
         </div>
-
-        {/* Division Filter Dropdown */}
-        <div>
-          <select
-            value={divisionFilter}
-            onChange={(e) => setDivisionFilter(e.target.value)}
-            className="w-full sm:w-auto px-4 py-2 touch-target rounded-lg border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white text-base focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="all">All Divisions</option>
-            {divisions.map((division) => (
-              <option key={division.id} value={division.id}>
-                {division.icon ? `${division.icon} ` : ''}{division.name}
-              </option>
-            ))}
-          </select>
-        </div>
       </div>
 
-      {/* Task Count */}
-      <div className="text-sm text-zinc-500 dark:text-zinc-400">
-        {filteredTasks.length} {filteredTasks.length === 1 ? 'task' : 'tasks'}
+      {/* Division Filter & Task Count Row */}
+      <div className="flex items-center justify-between gap-3">
+        <select
+          value={divisionFilter}
+          onChange={(e) => setDivisionFilter(e.target.value)}
+          className="flex-1 min-w-0 px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+          <option value="all">All Divisions</option>
+          {divisions.map((division) => (
+            <option key={division.id} value={division.id}>
+              {division.icon ? `${division.icon} ` : ''}{division.name}
+            </option>
+          ))}
+        </select>
+        <span className="text-sm text-zinc-500 dark:text-zinc-400 whitespace-nowrap">
+          {filteredTasks.length} {filteredTasks.length === 1 ? 'task' : 'tasks'}
+        </span>
       </div>
 
       {/* Task Cards */}

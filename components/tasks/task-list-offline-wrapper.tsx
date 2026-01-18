@@ -129,13 +129,11 @@ export function TaskListOfflineWrapper({
         lastSyncedAt={state.lastSyncedAt}
       />
 
-      {/* Sync Now button row */}
-      <div className="mb-4 flex items-center justify-between">
-        <div className="text-sm text-zinc-500 dark:text-zinc-400">
-          {state.lastSyncedAt && (
-            <>Last synced: {formatRelativeTime(state.lastSyncedAt)}</>
-          )}
-        </div>
+      {/* Compact Sync Row */}
+      <div className="mb-3 flex items-center justify-between text-xs text-zinc-400 dark:text-zinc-500">
+        <span>
+          {state.lastSyncedAt && `Synced ${formatRelativeTime(state.lastSyncedAt)}`}
+        </span>
         <SyncNowButton
           onSync={handleSyncClick}
           isSyncing={isRefreshing || state.isSyncing}
