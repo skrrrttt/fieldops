@@ -3,8 +3,9 @@
 import { useState, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import type { TaskWithRelations } from '@/lib/tasks/actions';
-import type { Status, Division, User, CustomFieldDefinition, TaskTemplate } from '@/lib/database.types';
+import type { Status, Division, User, CustomFieldDefinition, TaskTemplate, ChecklistWithItems } from '@/lib/database.types';
 import { createTask, updateTask, deleteTask } from '@/lib/tasks/actions';
+import { syncTaskChecklists } from '@/lib/checklists/actions';
 import {
   Dialog,
   DialogContent,
@@ -50,6 +51,8 @@ interface TaskModalProps {
   defaultStatusId: string | null;
   customFields: CustomFieldDefinition[];
   templates?: TaskTemplate[];
+  checklists?: ChecklistWithItems[];
+  initialChecklistIds?: string[];
 }
 
 export function TaskModal({
@@ -62,6 +65,8 @@ export function TaskModal({
   defaultStatusId,
   customFields,
   templates = [],
+  checklists = [],
+  initialChecklistIds = [],
 }: TaskModalProps) {
   const router = useRouter();
   const [, startTransition] = useTransition();
@@ -92,6 +97,9 @@ export function TaskModal({
 
   // Custom fields form state - keyed by field ID
   const [customFieldValues, setCustomFieldValues] = useState<Record<string, unknown>>({});
+
+  // Selected checklists to attach to the task
+  const [selectedChecklistIds, setSelectedChecklistIds] = useState<string[]>([]);
 
   // Get only the custom fields that are assigned to this task
   const assignedCustomFields = customFields.filter(f => assignedFieldIds.includes(f.id));
@@ -234,8 +242,10 @@ export function TaskModal({
     setShowDeleteConfirm(false);
     setCustomFieldErrors({});
     setSelectedTemplateId('');
+    // Initialize selected checklists
+    setSelectedChecklistIds(task ? initialChecklistIds : []);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [task, isOpen, defaultStatusId, statuses, customFields]);
+  }, [task, isOpen, defaultStatusId, statuses, customFields, initialChecklistIds]);
 
   // Validate required custom fields (only for assigned fields)
   const validateCustomFields = (): boolean => {
@@ -330,6 +340,16 @@ export function TaskModal({
       if (!result.success) {
         setError(result.error || 'An error occurred');
         return;
+      }
+
+      // Sync checklists if there are any to sync
+      if (result.data && checklists.length > 0) {
+        const taskId = result.data.id;
+        const syncResult = await syncTaskChecklists(taskId, selectedChecklistIds);
+        if (!syncResult.success) {
+          // Log error but don't fail the whole operation
+          console.error('Failed to sync checklists:', syncResult.error);
+        }
       }
 
       // Use startTransition for non-blocking refresh
@@ -710,6 +730,45 @@ export function TaskModal({
                       </div>
                     </>
                   )}
+                </div>
+              )}
+
+              {/* Checklists section */}
+              {checklists.length > 0 && (
+                <div className="pt-4">
+                  <Separator className="mb-4" />
+                  <h3 className="text-sm font-medium mb-3">Assign Checklists</h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Select checklists to attach to this task. Field users can check off items as they complete them.
+                  </p>
+                  <div className="space-y-2">
+                    {checklists.map((checklist) => (
+                      <label
+                        key={checklist.id}
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer"
+                      >
+                        <Checkbox
+                          checked={selectedChecklistIds.includes(checklist.id)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setSelectedChecklistIds(prev => [...prev, checklist.id]);
+                            } else {
+                              setSelectedChecklistIds(prev => prev.filter(id => id !== checklist.id));
+                            }
+                          }}
+                        />
+                        <div className="flex-1">
+                          <span className="text-sm font-medium">{checklist.name}</span>
+                          {checklist.description && (
+                            <p className="text-xs text-muted-foreground">{checklist.description}</p>
+                          )}
+                          <p className="text-xs text-muted-foreground">
+                            {checklist.items.length} {checklist.items.length === 1 ? 'item' : 'items'}
+                          </p>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
                 </div>
               )}
 

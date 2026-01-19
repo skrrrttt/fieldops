@@ -4,6 +4,7 @@ import { getTaskPhotos } from '@/lib/photos/actions';
 import { getTaskFiles } from '@/lib/files/actions';
 import { getTaskComments } from '@/lib/comments/actions';
 import { getCustomFields } from '@/lib/custom-fields/actions';
+import { getTaskChecklists } from '@/lib/checklists/actions';
 import { TaskDetailOfflineWrapper } from '@/components/tasks/task-detail-offline-wrapper';
 import { DetailHeader } from '@/components/layout/app-header';
 import { MobileBottomNav, MobileBottomNavSpacer } from '@/components/layout/mobile-bottom-nav';
@@ -22,14 +23,15 @@ export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
     getCustomFields(),
   ]);
 
-  // Parallelize photos, files, and comments fetches for better performance
-  const [photos, files, comments] = task
+  // Parallelize photos, files, comments, and checklists fetches for better performance
+  const [photos, files, comments, taskChecklists] = task
     ? await Promise.all([
         getTaskPhotos(id),
         getTaskFiles(id),
         getTaskComments(id),
+        getTaskChecklists(id),
       ])
-    : [[], [], []];
+    : [[], [], [], []];
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900 pb-24">
@@ -45,6 +47,7 @@ export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
           files={files}
           comments={comments}
           customFields={customFields}
+          taskChecklists={taskChecklists}
         />
       </main>
 
