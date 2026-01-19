@@ -1,17 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import type { TaskTemplate, Division, CustomFieldDefinition } from '@/lib/database.types';
-import { TemplateForm } from './template-form';
+import type { TaskTemplate, Division, CustomFieldDefinition, User, RecurrenceRule } from '@/lib/database.types';
+import { TemplateForm, type TemplateFormData } from './template-form';
 import { updateTemplate, deleteTemplate } from '@/lib/templates/actions';
-
-interface TemplateFormData {
-  name: string;
-  default_title: string | null;
-  default_description: string | null;
-  default_division_id: string | null;
-  default_custom_fields: Record<string, unknown> | null;
-}
+import { activateRecurringTemplate, deactivateRecurringTemplate } from '@/lib/templates/recurring';
 
 interface TemplateWithDivision extends TaskTemplate {
   division: { id: string; name: string; color: string } | null;
@@ -21,9 +14,10 @@ interface TemplateListProps {
   templates: TemplateWithDivision[];
   divisions: Division[];
   customFields: CustomFieldDefinition[];
+  users: User[];
 }
 
-export function TemplateList({ templates: initialTemplates, divisions, customFields }: TemplateListProps) {
+export function TemplateList({ templates: initialTemplates, divisions, customFields, users }: TemplateListProps) {
   const [templates, setTemplates] = useState(initialTemplates);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -36,15 +30,39 @@ export function TemplateList({ templates: initialTemplates, divisions, customFie
     setIsLoading(true);
     setError(null);
 
-    const result = await updateTemplate(editingId, data);
+    // Update the base template data
+    const result = await updateTemplate(editingId, {
+      name: data.name,
+      default_title: data.default_title,
+      default_description: data.default_description,
+      default_division_id: data.default_division_id,
+      default_custom_fields: data.default_custom_fields,
+    });
+
+    if (!result.success) {
+      setIsLoading(false);
+      setError(result.error || 'Failed to update template');
+      return;
+    }
+
+    // Handle recurrence rule changes
+    if (data.recurrence_rule) {
+      const recurResult = await activateRecurringTemplate(editingId, data.recurrence_rule);
+      if (!recurResult.success) {
+        setIsLoading(false);
+        setError(recurResult.error || 'Template updated but failed to set up recurrence');
+        return;
+      }
+    } else {
+      // Deactivate if recurrence was removed
+      const currentTemplate = templates.find(t => t.id === editingId);
+      if (currentTemplate?.recurrence_rule) {
+        await deactivateRecurringTemplate(editingId);
+      }
+    }
 
     setIsLoading(false);
-
-    if (result.success) {
-      setEditingId(null);
-    } else {
-      setError(result.error || 'Failed to update template');
-    }
+    setEditingId(null);
   };
 
   const handleDelete = async () => {
@@ -112,6 +130,7 @@ export function TemplateList({ templates: initialTemplates, divisions, customFie
                 template={editingTemplate}
                 divisions={divisions}
                 customFields={customFields}
+                users={users}
                 onSubmit={handleEdit}
                 onCancel={() => setEditingId(null)}
                 isLoading={isLoading}
@@ -121,19 +140,32 @@ export function TemplateList({ templates: initialTemplates, divisions, customFie
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     {/* Template icon */}
-                    <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400 flex-shrink-0">
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                        />
-                      </svg>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                      template.recurrence_rule
+                        ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+                        : 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400'
+                    }`}>
+                      {template.recurrence_rule ? (
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                      ) : (
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                      )}
                     </div>
                     <span className="font-medium text-zinc-900 dark:text-white truncate">
                       {template.name}
                     </span>
+                    {template.recurrence_rule && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {template.recurrence_rule.frequency}
+                      </span>
+                    )}
                   </div>
 
                   {/* Template details */}
@@ -177,6 +209,22 @@ export function TemplateList({ templates: initialTemplates, divisions, customFie
                           </span>
                         </div>
                       )}
+                    {template.recurrence_rule && template.next_generation_at && (
+                      <div className="text-sm text-blue-600 dark:text-blue-400 flex items-center gap-1">
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>
+                          Next: {new Date(template.next_generation_at).toLocaleDateString(undefined, {
+                            weekday: 'short',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit',
+                          })}
+                        </span>
+                      </div>
+                    )}
                     <div className="text-xs text-zinc-400 dark:text-zinc-500">
                       {countDefaultFields(template)} default{' '}
                       {countDefaultFields(template) === 1 ? 'value' : 'values'} configured

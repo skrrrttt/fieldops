@@ -7,6 +7,20 @@ export type UserRole = 'admin' | 'field_user';
 
 export type FieldType = 'text' | 'number' | 'date' | 'dropdown' | 'checkbox';
 
+export type RecurrenceFrequency = 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'custom';
+
+export interface RecurrenceRule {
+  frequency: RecurrenceFrequency;
+  interval?: number;           // Every X days/weeks/months
+  daysOfWeek?: number[];       // 0-6 for weekly (0=Sunday)
+  dayOfMonth?: number;         // 1-31 for monthly
+  time?: string;               // "09:00" - when to generate
+  assignTo?: 'rotate' | 'fixed' | 'unassigned';
+  rotationUserIds?: string[];  // For rotation assignment
+  fixedUserId?: string;        // For fixed assignment
+  autoActivate?: boolean;      // Auto-set to default status
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -105,6 +119,7 @@ export interface Database {
           specifications: string | null;
           status_id: string;
           division_id: string | null;
+          template_id: string | null;
           location_lat: number | null;
           location_lng: number | null;
           address: string | null;
@@ -123,6 +138,7 @@ export interface Database {
           specifications?: string | null;
           status_id: string;
           division_id?: string | null;
+          template_id?: string | null;
           location_lat?: number | null;
           location_lng?: number | null;
           address?: string | null;
@@ -141,6 +157,7 @@ export interface Database {
           specifications?: string | null;
           status_id?: string;
           division_id?: string | null;
+          template_id?: string | null;
           location_lat?: number | null;
           location_lng?: number | null;
           address?: string | null;
@@ -274,6 +291,10 @@ export interface Database {
           default_description: string | null;
           default_division_id: string | null;
           default_custom_fields: Record<string, unknown> | null;
+          recurrence_rule: RecurrenceRule | null;
+          is_active: boolean;
+          last_generated_at: string | null;
+          next_generation_at: string | null;
           created_at: string;
         };
         Insert: {
@@ -283,6 +304,10 @@ export interface Database {
           default_description?: string | null;
           default_division_id?: string | null;
           default_custom_fields?: Record<string, unknown> | null;
+          recurrence_rule?: RecurrenceRule | null;
+          is_active?: boolean;
+          last_generated_at?: string | null;
+          next_generation_at?: string | null;
           created_at?: string;
         };
         Update: {
@@ -292,6 +317,10 @@ export interface Database {
           default_description?: string | null;
           default_division_id?: string | null;
           default_custom_fields?: Record<string, unknown> | null;
+          recurrence_rule?: RecurrenceRule | null;
+          is_active?: boolean;
+          last_generated_at?: string | null;
+          next_generation_at?: string | null;
           created_at?: string;
         };
       };
@@ -321,6 +350,89 @@ export interface Database {
           created_at?: string;
         };
       };
+      task_history: {
+        Row: {
+          id: string;
+          original_task_id: string;
+          template_id: string | null;
+          title: string;
+          description: string | null;
+          specifications: string | null;
+          status_name: string;
+          status_color: string | null;
+          division_name: string | null;
+          division_color: string | null;
+          assigned_user_id: string | null;
+          assigned_user_email: string | null;
+          location_lat: number | null;
+          location_lng: number | null;
+          address: string | null;
+          custom_fields: Record<string, unknown> | null;
+          due_date: string | null;
+          task_created_at: string;
+          completed_at: string;
+          completed_by: string | null;
+          duration_minutes: number | null;
+          photos_count: number;
+          comments_count: number;
+          files_count: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          original_task_id: string;
+          template_id?: string | null;
+          title: string;
+          description?: string | null;
+          specifications?: string | null;
+          status_name: string;
+          status_color?: string | null;
+          division_name?: string | null;
+          division_color?: string | null;
+          assigned_user_id?: string | null;
+          assigned_user_email?: string | null;
+          location_lat?: number | null;
+          location_lng?: number | null;
+          address?: string | null;
+          custom_fields?: Record<string, unknown> | null;
+          due_date?: string | null;
+          task_created_at: string;
+          completed_at?: string;
+          completed_by?: string | null;
+          duration_minutes?: number | null;
+          photos_count?: number;
+          comments_count?: number;
+          files_count?: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          original_task_id?: string;
+          template_id?: string | null;
+          title?: string;
+          description?: string | null;
+          specifications?: string | null;
+          status_name?: string;
+          status_color?: string | null;
+          division_name?: string | null;
+          division_color?: string | null;
+          assigned_user_id?: string | null;
+          assigned_user_email?: string | null;
+          location_lat?: number | null;
+          location_lng?: number | null;
+          address?: string | null;
+          custom_fields?: Record<string, unknown> | null;
+          due_date?: string | null;
+          task_created_at?: string;
+          completed_at?: string;
+          completed_by?: string | null;
+          duration_minutes?: number | null;
+          photos_count?: number;
+          comments_count?: number;
+          files_count?: number;
+          created_at?: string;
+        };
+      };
     };
   };
 }
@@ -336,6 +448,7 @@ export type File = Database['public']['Tables']['files']['Row'];
 export type CustomFieldDefinition = Database['public']['Tables']['custom_field_definitions']['Row'];
 export type TaskTemplate = Database['public']['Tables']['task_templates']['Row'];
 export type Branding = Database['public']['Tables']['branding']['Row'];
+export type TaskHistory = Database['public']['Tables']['task_history']['Row'];
 
 // Insert types
 export type UserInsert = Database['public']['Tables']['users']['Insert'];
@@ -348,6 +461,7 @@ export type FileInsert = Database['public']['Tables']['files']['Insert'];
 export type CustomFieldDefinitionInsert = Database['public']['Tables']['custom_field_definitions']['Insert'];
 export type TaskTemplateInsert = Database['public']['Tables']['task_templates']['Insert'];
 export type BrandingInsert = Database['public']['Tables']['branding']['Insert'];
+export type TaskHistoryInsert = Database['public']['Tables']['task_history']['Insert'];
 
 // Update types
 export type UserUpdate = Database['public']['Tables']['users']['Update'];
@@ -360,3 +474,4 @@ export type FileUpdate = Database['public']['Tables']['files']['Update'];
 export type CustomFieldDefinitionUpdate = Database['public']['Tables']['custom_field_definitions']['Update'];
 export type TaskTemplateUpdate = Database['public']['Tables']['task_templates']['Update'];
 export type BrandingUpdate = Database['public']['Tables']['branding']['Update'];
+export type TaskHistoryUpdate = Database['public']['Tables']['task_history']['Update'];
