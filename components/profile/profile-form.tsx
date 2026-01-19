@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ interface ProfileFormProps {
 
 export function ProfileForm({ user }: ProfileFormProps) {
   const router = useRouter();
+  const [, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [displayName, setDisplayName] = useState(user.display_name || '');
@@ -43,7 +44,9 @@ export function ProfileForm({ user }: ProfileFormProps) {
     if (result.success) {
       setSuccess('Name updated successfully');
       setIsEditingName(false);
-      router.refresh();
+      startTransition(() => {
+        router.refresh();
+      });
     } else {
       setError(result.error || 'Failed to update name');
     }
@@ -70,7 +73,9 @@ export function ProfileForm({ user }: ProfileFormProps) {
 
     if (result.success) {
       setSuccess('Profile picture updated');
-      router.refresh();
+      startTransition(() => {
+        router.refresh();
+      });
     } else {
       setError(result.error || 'Failed to upload picture');
     }
@@ -89,7 +94,9 @@ export function ProfileForm({ user }: ProfileFormProps) {
 
     if (result.success) {
       setSuccess('Profile picture removed');
-      router.refresh();
+      startTransition(() => {
+        router.refresh();
+      });
     } else {
       setError(result.error || 'Failed to remove picture');
     }

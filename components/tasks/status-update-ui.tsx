@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Status } from '@/lib/database.types';
 import { updateTaskStatus } from '@/lib/tasks/actions';
@@ -20,6 +20,7 @@ export function StatusUpdateUI({
 }: StatusUpdateUIProps) {
   const router = useRouter();
   const isOnline = useOnlineStatus();
+  const [isPending, startTransition] = useTransition();
   const [selectedStatusId, setSelectedStatusId] = useState(currentStatusId);
   const [isUpdating, setIsUpdating] = useState(false);
   const [toast, setToast] = useState<{
@@ -71,11 +72,10 @@ export function StatusUpdateUI({
           'info'
         );
 
-        // Navigate back after a short delay to show the toast
-        setTimeout(() => {
+        // Navigate back immediately using startTransition for smooth UX
+        startTransition(() => {
           router.push(`/tasks/${taskId}`);
-          router.refresh();
-        }, 1000);
+        });
       } catch {
         // Revert on error
         setSelectedStatusId(previousStatusId);
@@ -99,11 +99,11 @@ export function StatusUpdateUI({
           `Status updated to "${newStatus?.name || 'new status'}"`,
           'success'
         );
-        // Navigate back after a short delay to show the toast
-        setTimeout(() => {
+        // Navigate back immediately - startTransition keeps UI responsive
+        startTransition(() => {
           router.push(`/tasks/${taskId}`);
           router.refresh();
-        }, 1000);
+        });
       } else {
         // Revert on error
         setSelectedStatusId(previousStatusId);
@@ -148,11 +148,11 @@ export function StatusUpdateUI({
             <button
               key={status.id}
               onClick={() => handleStatusSelect(status.id)}
-              disabled={isUpdating}
+              disabled={isUpdating || isPending}
               className={`
                 relative w-full min-h-[64px] px-6 py-4 rounded-lg font-semibold text-lg
                 transition-all duration-200
-                ${isUpdating ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                ${isUpdating || isPending ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
                 ${
                   isSelected
                     ? 'ring-4 ring-offset-2 ring-zinc-900 dark:ring-white dark:ring-offset-zinc-900 scale-[1.02]'
@@ -197,7 +197,7 @@ export function StatusUpdateUI({
               </span>
 
               {/* Loading indicator overlay */}
-              {isUpdating && isSelected && (
+              {(isUpdating || isPending) && isSelected && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-lg">
                   <svg
                     className="animate-spin h-6 w-6"

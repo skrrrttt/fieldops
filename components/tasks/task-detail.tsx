@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { TaskWithRelations } from '@/lib/tasks/actions';
@@ -30,6 +30,7 @@ interface TaskDetailProps {
 
 export function TaskDetail({ task, photos, files, comments: initialComments, customFields }: TaskDetailProps) {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const [refreshKey, setRefreshKey] = useState(0);
   const [comments, setComments] = useState<CommentWithUser[]>(initialComments);
 
@@ -42,13 +43,19 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
   const handlePhotoUploadComplete = useCallback(() => {
     setRefreshKey(prev => prev + 1);
     setShowPhotoUpload(false);
-    router.refresh();
+    // Use startTransition for non-blocking refresh
+    startTransition(() => {
+      router.refresh();
+    });
   }, [router]);
 
   const handleFileUploadComplete = useCallback(() => {
     setRefreshKey(prev => prev + 1);
     setShowFileUpload(false);
-    router.refresh();
+    // Use startTransition for non-blocking refresh
+    startTransition(() => {
+      router.refresh();
+    });
   }, [router]);
 
   const handleCommentAdded = useCallback((newComment: CommentWithUser) => {

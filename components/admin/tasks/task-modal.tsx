@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import type { TaskWithRelations } from '@/lib/tasks/actions';
 import type { Status, Division, User, CustomFieldDefinition, TaskTemplate } from '@/lib/database.types';
@@ -64,6 +64,7 @@ export function TaskModal({
   templates = [],
 }: TaskModalProps) {
   const router = useRouter();
+  const [, startTransition] = useTransition();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -331,7 +332,10 @@ export function TaskModal({
         return;
       }
 
-      router.refresh();
+      // Use startTransition for non-blocking refresh
+      startTransition(() => {
+        router.refresh();
+      });
       onClose();
     } catch {
       setError('An unexpected error occurred');
@@ -353,7 +357,10 @@ export function TaskModal({
         return;
       }
 
-      router.refresh();
+      // Use startTransition for non-blocking refresh
+      startTransition(() => {
+        router.refresh();
+      });
       onClose();
     } catch {
       setError('An unexpected error occurred');

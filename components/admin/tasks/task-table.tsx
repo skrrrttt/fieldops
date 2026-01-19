@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useTransition } from 'react';
 import type { TaskWithRelations } from '@/lib/tasks/actions';
 import type { Status, Division, User, CustomFieldDefinition, TaskTemplate } from '@/lib/database.types';
 import { TaskModal } from './task-modal';
@@ -47,6 +47,7 @@ export function TaskTable({
 }: TaskTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [, startTransition] = useTransition();
   const [searchInput, setSearchInput] = useState(currentFilters.search);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<TaskWithRelations | null>(null);
@@ -116,7 +117,10 @@ export function TaskTable({
   const handleBulkActionComplete = () => {
     setSelectedTaskIds(new Set());
     lastSelectedIndexRef.current = null;
-    router.refresh();
+    // Use startTransition for non-blocking refresh
+    startTransition(() => {
+      router.refresh();
+    });
   };
 
   const isAllSelected = tasks.length > 0 && selectedTaskIds.size === tasks.length;
