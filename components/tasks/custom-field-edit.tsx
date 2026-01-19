@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import type { CustomFieldDefinition } from '@/lib/database.types';
 import { updateTaskCustomFields } from '@/lib/tasks/actions';
@@ -13,6 +13,7 @@ interface CustomFieldEditProps {
 
 export function CustomFieldEdit({ taskId, customFields, initialValues }: CustomFieldEditProps) {
   const router = useRouter();
+  const [, startTransition] = useTransition();
   const [values, setValues] = useState<Record<string, unknown>>(initialValues || {});
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +34,10 @@ export function CustomFieldEdit({ taskId, customFields, initialValues }: CustomF
       const result = await updateTaskCustomFields(taskId, values);
       if (result.success) {
         setSuccess(true);
-        router.refresh();
+        // Use startTransition for non-blocking refresh
+        startTransition(() => {
+          router.refresh();
+        });
       } else {
         setError(result.error || 'Failed to save');
       }
