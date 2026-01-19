@@ -469,3 +469,44 @@ export async function updateTaskCustomFields(
 
   return { success: true, data: task as Task };
 }
+
+/**
+ * Refresh task list - returns fresh data for pull-to-refresh
+ * Bypasses any caching to ensure fresh data
+ */
+export async function refreshTaskList(): Promise<{
+  tasks: TaskWithRelations[];
+  statuses: Status[];
+  divisions: Division[];
+}> {
+  const supabase = await createClient();
+
+  // Fetch all data in parallel
+  const [tasksResult, statusesResult, divisionsResult] = await Promise.all([
+    supabase
+      .from('tasks')
+      .select(`
+        *,
+        status:statuses(*),
+        division:divisions(*),
+        assigned_user:users(*)
+      `)
+      .is('deleted_at', null)
+      .order('created_at', { ascending: false })
+      .limit(100),
+    supabase
+      .from('statuses')
+      .select('*')
+      .order('order'),
+    supabase
+      .from('divisions')
+      .select('*')
+      .order('name'),
+  ]);
+
+  return {
+    tasks: (tasksResult.data as TaskWithRelations[]) || [],
+    statuses: (statusesResult.data as Status[]) || [],
+    divisions: (divisionsResult.data as Division[]) || [],
+  };
+}

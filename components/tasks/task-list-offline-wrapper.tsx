@@ -7,9 +7,8 @@
  */
 
 import { useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import { useOfflineSync, useOnlineStatus, type LocalTask } from '@/lib/offline';
-import type { TaskWithRelations } from '@/lib/tasks/actions';
+import { refreshTaskList, type TaskWithRelations } from '@/lib/tasks/actions';
 import type { Status, Division, User } from '@/lib/database.types';
 import { TaskList } from './task-list';
 import { OfflineIndicator } from '../offline/offline-indicator';
@@ -29,13 +28,17 @@ export function TaskListOfflineWrapper({
   statuses: serverStatuses,
   divisions: serverDivisions,
 }: TaskListOfflineWrapperProps) {
-  const router = useRouter();
   const isOnline = useOnlineStatus();
   const { toast, showSuccess, showError, dismissToast } = useSyncToast();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  // Local state for refreshed data
+  const [currentTasks, setCurrentTasks] = useState<TaskWithRelations[]>(serverTasks);
+  const [currentStatuses, setCurrentStatuses] = useState<Status[]>(serverStatuses);
+  const [currentDivisions, setCurrentDivisions] = useState<Division[]>(serverDivisions);
+
   // Convert server tasks to LocalTask format (add denormalized relations)
-  const localTasks: LocalTask[] = serverTasks.map(task => ({
+  const localTasks: LocalTask[] = currentTasks.map(task => ({
     ...task,
     status: task.status ?? undefined,
     division: task.division ?? undefined,
@@ -51,8 +54,8 @@ export function TaskListOfflineWrapper({
   // Use offline sync hook
   const { tasks, statuses, divisions, isFromCache, state, syncNow } = useOfflineSync({
     serverTasks: localTasks,
-    serverStatuses: serverStatuses,
-    serverDivisions: serverDivisions,
+    serverStatuses: currentStatuses,
+    serverDivisions: currentDivisions,
   });
 
   // Convert LocalTask back to TaskWithRelations format for TaskList
@@ -74,25 +77,25 @@ export function TaskListOfflineWrapper({
     setIsRefreshing(true);
 
     try {
-      // Use router.refresh() to trigger a server-side re-render
-      // This fetches fresh data from the server
-      router.refresh();
+      // Fetch fresh data from server
+      const freshData = await refreshTaskList();
+
+      // Update local state with fresh data
+      setCurrentTasks(freshData.tasks);
+      setCurrentStatuses(freshData.statuses);
+      setCurrentDivisions(freshData.divisions);
 
       // Also sync any pending mutations
       await syncNow();
 
-      showSuccess('Data refreshed successfully');
+      showSuccess('Tasks refreshed');
     } catch (error) {
       console.error('Refresh failed:', error);
-      showError('Failed to refresh data');
+      showError('Failed to refresh');
     } finally {
-      // Small delay before stopping refresh indicator
-      // to allow the server data to propagate
-      setTimeout(() => {
-        setIsRefreshing(false);
-      }, 500);
+      setIsRefreshing(false);
     }
-  }, [isOnline, router, syncNow, showSuccess, showError]);
+  }, [isOnline, syncNow, showSuccess, showError]);
 
   // Handle sync button click
   const handleSyncClick = useCallback(async () => {
@@ -104,22 +107,25 @@ export function TaskListOfflineWrapper({
     setIsRefreshing(true);
 
     try {
-      // Refresh from server
-      router.refresh();
+      // Fetch fresh data from server
+      const freshData = await refreshTaskList();
+
+      // Update local state with fresh data
+      setCurrentTasks(freshData.tasks);
+      setCurrentStatuses(freshData.statuses);
+      setCurrentDivisions(freshData.divisions);
 
       // Sync any pending mutations
       await syncNow();
 
-      showSuccess('Synced successfully');
+      showSuccess('Synced');
     } catch (error) {
       console.error('Sync failed:', error);
       showError('Sync failed');
     } finally {
-      setTimeout(() => {
-        setIsRefreshing(false);
-      }, 500);
+      setIsRefreshing(false);
     }
-  }, [isOnline, router, syncNow, showSuccess, showError]);
+  }, [isOnline, syncNow, showSuccess, showError]);
 
   return (
     <>
