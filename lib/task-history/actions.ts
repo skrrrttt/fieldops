@@ -83,7 +83,9 @@ export async function getTaskHistory(
     query = query.lte('completed_at', dateTo);
   }
   if (search) {
-    query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
+    // Escape special LIKE pattern characters to prevent pattern injection
+    const escapedSearch = search.replace(/[%_\\]/g, '\\$&');
+    query = query.or(`title.ilike.%${escapedSearch}%,description.ilike.%${escapedSearch}%`);
   }
 
   // Apply sorting and pagination
@@ -95,7 +97,7 @@ export async function getTaskHistory(
 
   if (error) {
     console.error('Error fetching task history:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   const total = count || 0;
@@ -128,7 +130,7 @@ export async function getTaskHistoryById(
 
   if (error) {
     console.error('Error fetching task history record:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   return { success: true, data: data as TaskHistory };
@@ -152,7 +154,7 @@ export async function getTemplateHistory(
 
   if (error) {
     console.error('Error fetching template history:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   return { success: true, data: (data as TaskHistory[]) || [] };
@@ -176,7 +178,7 @@ export async function getTaskHistoryStats(
 
   if (error) {
     console.error('Error fetching task history stats:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   const history = (allHistory as TaskHistory[]) || [];
@@ -251,7 +253,7 @@ export async function getHistoryDivisions(): Promise<ActionResult<string[]>> {
 
   if (error) {
     console.error('Error fetching history divisions:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   const records = data as { division_name: string | null }[] | null;
@@ -274,7 +276,7 @@ export async function deleteTaskHistory(
 
   if (error) {
     console.error('Error deleting task history:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   return { success: true };
@@ -299,7 +301,7 @@ export async function cleanupOldHistory(
 
   if (error) {
     console.error('Error cleaning up old history:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   return { success: true, data: data?.length || 0 };

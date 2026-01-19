@@ -107,7 +107,7 @@ export async function createCustomField(
 
   if (error) {
     console.error('Error creating custom field:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   revalidatePath('/admin/custom-fields');
@@ -138,7 +138,7 @@ export async function updateCustomField(
 
   if (error) {
     console.error('Error updating custom field:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   revalidatePath('/admin/custom-fields');
@@ -158,7 +158,7 @@ export async function deleteCustomField(id: string): Promise<ActionResult> {
 
   if (error) {
     console.error('Error deleting custom field:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   revalidatePath('/admin/custom-fields');

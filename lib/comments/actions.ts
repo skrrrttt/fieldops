@@ -72,7 +72,7 @@ export async function createComment(data: CreateCommentData): Promise<ActionResu
 
   if (error) {
     console.error('Error creating comment:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   return { success: true, data: comment as CommentWithUser };
@@ -111,7 +111,7 @@ export async function deleteComment(commentId: string): Promise<ActionResult> {
 
   if (error) {
     console.error('Error deleting comment:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   return { success: true };

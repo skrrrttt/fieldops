@@ -106,7 +106,7 @@ export async function createTemplate(
 
   if (error) {
     console.error('Error creating template:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   revalidatePath('/admin/templates');
@@ -137,7 +137,7 @@ export async function updateTemplate(
 
   if (error) {
     console.error('Error updating template:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   revalidatePath('/admin/templates');
@@ -157,7 +157,7 @@ export async function deleteTemplate(id: string): Promise<ActionResult> {
 
   if (error) {
     console.error('Error deleting template:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   revalidatePath('/admin/templates');

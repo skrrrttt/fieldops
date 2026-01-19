@@ -113,7 +113,7 @@ export async function updateUserRole(
 
   if (error) {
     console.error('Error updating user role:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   revalidatePath('/admin/users');
@@ -136,7 +136,7 @@ export async function deactivateUser(userId: string): Promise<ActionResult<User>
 
   if (error) {
     console.error('Error deactivating user:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   revalidatePath('/admin/users');
@@ -158,7 +158,7 @@ export async function reactivateUser(userId: string): Promise<ActionResult<User>
 
   if (error) {
     console.error('Error reactivating user:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   revalidatePath('/admin/users');
@@ -178,7 +178,7 @@ export async function updateLastActive(userId: string): Promise<ActionResult> {
 
   if (error) {
     console.error('Error updating last active:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   return { success: true };

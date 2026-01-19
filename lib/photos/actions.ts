@@ -217,7 +217,7 @@ export async function createPhotoRecord(data: CreatePhotoData): Promise<ActionRe
 
   if (error) {
     console.error('Error creating photo record:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   return { success: true, data: photo as Photo };
@@ -228,16 +228,26 @@ export async function createPhotoRecord(data: CreatePhotoData): Promise<ActionRe
  */
 export async function deletePhoto(photoId: string): Promise<ActionResult> {
   const supabase = await createClient();
+  const user = await getCurrentUser();
 
-  // First get the photo to find the storage path
+  if (!user) {
+    return { success: false, error: 'Not authenticated' };
+  }
+
+  // First get the photo to find the storage path and verify ownership
   const { data: photo, error: fetchError } = await supabase
     .from('photos')
-    .select('storage_path')
+    .select('storage_path, user_id')
     .eq('id', photoId)
-    .single<{ storage_path: string }>();
+    .single<{ storage_path: string; user_id: string }>();
 
   if (fetchError || !photo) {
     return { success: false, error: 'Photo not found' };
+  }
+
+  // Only allow deletion by the photo owner or admins
+  if (photo.user_id !== user.id && user.role !== 'admin') {
+    return { success: false, error: 'Not authorized to delete this photo' };
   }
 
   // Delete from storage
@@ -258,7 +268,7 @@ export async function deletePhoto(photoId: string): Promise<ActionResult> {
 
   if (error) {
     console.error('Error deleting photo record:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   return { success: true };

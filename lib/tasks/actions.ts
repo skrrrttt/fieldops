@@ -239,7 +239,7 @@ export async function createTask(data: CreateTaskData): Promise<ActionResult<Tas
 
   if (error) {
     console.error('Error creating task:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   return { success: true, data: task as Task };
@@ -293,7 +293,7 @@ export async function updateTask(data: UpdateTaskData): Promise<ActionResult<Tas
 
   if (error) {
     console.error('Error updating task:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   return { success: true, data: task as Task };
@@ -315,7 +315,7 @@ export async function deleteTask(id: string): Promise<ActionResult> {
 
   if (error) {
     console.error('Error deleting task:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   return { success: true };
@@ -342,7 +342,7 @@ export async function updateTaskStatus(
 
   if (error) {
     console.error('Error updating task status:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   return { success: true, data: task as Task };
@@ -368,7 +368,7 @@ export async function bulkAssignTasks(
 
   if (error) {
     console.error('Error bulk assigning tasks:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   return { success: true, data: { updated: count || taskIds.length } };
@@ -394,7 +394,7 @@ export async function bulkChangeStatus(
 
   if (error) {
     console.error('Error bulk changing task status:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   return { success: true, data: { updated: count || taskIds.length } };
@@ -419,7 +419,7 @@ export async function bulkDeleteTasks(
 
   if (error) {
     console.error('Error bulk deleting tasks:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   return { success: true, data: { deleted: count || taskIds.length } };
@@ -464,7 +464,7 @@ export async function updateTaskCustomFields(
 
   if (error) {
     console.error('Error updating task custom fields:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   return { success: true, data: task as Task };

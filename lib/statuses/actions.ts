@@ -115,7 +115,7 @@ export async function createStatus(
 
   if (error) {
     console.error('Error creating status:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   revalidatePath('/admin/statuses');
@@ -155,7 +155,7 @@ export async function updateStatus(
 
   if (error) {
     console.error('Error updating status:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   revalidatePath('/admin/statuses');
@@ -175,7 +175,7 @@ export async function deleteStatus(id: string): Promise<ActionResult> {
 
   if (error) {
     console.error('Error deleting status:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   revalidatePath('/admin/statuses');
