@@ -176,8 +176,7 @@ export function PhotoUpload({ taskId, onUploadComplete }: PhotoUploadProps) {
 
           // Clean up preview URL
           URL.revokeObjectURL(photo.preview);
-        } catch (err) {
-          console.error('Queue error:', err);
+        } catch {
           failCount++;
           setUploadProgress(prev => ({ ...prev, [photo.id]: -1 }));
         }
@@ -233,7 +232,6 @@ export function PhotoUpload({ taskId, onUploadComplete }: PhotoUploadProps) {
           });
 
         if (uploadError) {
-          console.error('Upload error:', uploadError);
           failCount++;
           setUploadProgress(prev => ({ ...prev, [photo.id]: -1 }));
           continue;
@@ -252,7 +250,6 @@ export function PhotoUpload({ taskId, onUploadComplete }: PhotoUploadProps) {
         });
 
         if (!result.success) {
-          console.error('Record creation error:', result.error);
           failCount++;
           setUploadProgress(prev => ({ ...prev, [photo.id]: -1 }));
           continue;
@@ -264,8 +261,7 @@ export function PhotoUpload({ taskId, onUploadComplete }: PhotoUploadProps) {
 
         // Clean up preview URL
         URL.revokeObjectURL(photo.preview);
-      } catch (err) {
-        console.error('Upload error:', err);
+      } catch {
         failCount++;
         setUploadProgress(prev => ({ ...prev, [photo.id]: -1 }));
       }

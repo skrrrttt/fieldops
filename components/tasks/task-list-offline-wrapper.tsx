@@ -89,8 +89,7 @@ export function TaskListOfflineWrapper({
       await syncNow();
 
       showSuccess('Tasks refreshed');
-    } catch (error) {
-      console.error('Refresh failed:', error);
+    } catch {
       showError('Failed to refresh');
     } finally {
       setIsRefreshing(false);
@@ -119,8 +118,7 @@ export function TaskListOfflineWrapper({
       await syncNow();
 
       showSuccess('Synced');
-    } catch (error) {
-      console.error('Sync failed:', error);
+    } catch {
       showError('Sync failed');
     } finally {
       setIsRefreshing(false);

@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, updateTag, unstable_cache } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import type { Status } from '@/lib/database.types';
 
@@ -27,23 +27,27 @@ export interface UpdateStatusInput {
 }
 
 /**
- * Get all statuses ordered by order field
+ * Get all statuses ordered by order field (cached for 60 seconds)
  */
-export async function getStatuses(): Promise<Status[]> {
-  const supabase = await createClient();
+export const getStatuses = unstable_cache(
+  async (): Promise<Status[]> => {
+    const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from('statuses')
-    .select('*')
-    .order('order');
+    const { data, error } = await supabase
+      .from('statuses')
+      .select('*')
+      .order('order');
 
-  if (error) {
-    console.error('Error fetching statuses:', error);
-    return [];
-  }
+    if (error) {
+      console.error('Error fetching statuses:', error);
+      return [];
+    }
 
-  return data as Status[] || [];
-}
+    return data as Status[] || [];
+  },
+  ['statuses'],
+  { revalidate: 60, tags: ['statuses'] }
+);
 
 /**
  * Get a single status by ID
@@ -118,7 +122,8 @@ export async function createStatus(
     return { success: false, error: 'Unable to complete this operation' };
   }
 
-  revalidatePath('/admin/statuses');
+  updateTag('statuses');
+revalidatePath('/admin/statuses');
   return { success: true, data };
 }
 
@@ -158,7 +163,8 @@ export async function updateStatus(
     return { success: false, error: 'Unable to complete this operation' };
   }
 
-  revalidatePath('/admin/statuses');
+  updateTag('statuses');
+revalidatePath('/admin/statuses');
   return { success: true, data };
 }
 
@@ -178,7 +184,8 @@ export async function deleteStatus(id: string): Promise<ActionResult> {
     return { success: false, error: 'Unable to complete this operation' };
   }
 
-  revalidatePath('/admin/statuses');
+  updateTag('statuses');
+revalidatePath('/admin/statuses');
   return { success: true };
 }
 
@@ -206,6 +213,7 @@ export async function reorderStatuses(
     return { success: false, error: failedUpdate.error.message };
   }
 
-  revalidatePath('/admin/statuses');
+  updateTag('statuses');
+revalidatePath('/admin/statuses');
   return { success: true };
 }

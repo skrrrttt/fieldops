@@ -211,8 +211,7 @@ export function MediaGallery({
       a.click();
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error downloading photo:', error);
+    } catch {
       alert('Failed to download photo');
     }
   }, []);
@@ -240,8 +239,8 @@ export function MediaGallery({
           const taskTitle = photo.task?.title?.replace(/[^a-z0-9]/gi, '_') || 'task';
           const filename = `${taskTitle}_${index + 1}.jpg`;
           zip.file(filename, blob);
-        } catch (error) {
-          console.error(`Error downloading photo ${photo.id}:`, error);
+        } catch {
+          // Skip failed download
         }
       });
 
@@ -260,8 +259,7 @@ export function MediaGallery({
 
       // Clear selection after download
       setSelectedIds(new Set());
-    } catch (error) {
-      console.error('Error creating zip:', error);
+    } catch {
       alert('Failed to create zip file');
     } finally {
       setIsDownloading(false);

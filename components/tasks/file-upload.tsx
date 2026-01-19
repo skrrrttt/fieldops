@@ -228,8 +228,7 @@ export function FileUpload({ taskId, onUploadComplete }: FileUploadProps) {
 
           setUploadProgress(prev => ({ ...prev, [selectedFile.id]: 100 }));
           successCount++;
-        } catch (err) {
-          console.error('Queue error:', err);
+        } catch {
           failCount++;
           setUploadProgress(prev => ({ ...prev, [selectedFile.id]: -1 }));
         }
@@ -272,7 +271,6 @@ export function FileUpload({ taskId, onUploadComplete }: FileUploadProps) {
           });
 
         if (uploadError) {
-          console.error('Upload error:', uploadError);
           failCount++;
           setUploadProgress(prev => ({ ...prev, [selectedFile.id]: -1 }));
           continue;
@@ -290,7 +288,6 @@ export function FileUpload({ taskId, onUploadComplete }: FileUploadProps) {
         });
 
         if (!result.success) {
-          console.error('Record creation error:', result.error);
           failCount++;
           setUploadProgress(prev => ({ ...prev, [selectedFile.id]: -1 }));
           continue;
@@ -299,8 +296,7 @@ export function FileUpload({ taskId, onUploadComplete }: FileUploadProps) {
         // Update progress to complete
         setUploadProgress(prev => ({ ...prev, [selectedFile.id]: 100 }));
         successCount++;
-      } catch (err) {
-        console.error('Upload error:', err);
+      } catch {
         failCount++;
         setUploadProgress(prev => ({ ...prev, [selectedFile.id]: -1 }));
       }

@@ -112,7 +112,6 @@ export function CommentInput({ taskId, onCommentAdded }: CommentInputProps) {
     };
 
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-      console.error('Speech recognition error:', event.error);
       setIsRecording(false);
 
       if (event.error === 'no-speech') {
@@ -131,8 +130,7 @@ export function CommentInput({ taskId, onCommentAdded }: CommentInputProps) {
 
     try {
       recognition.start();
-    } catch (error) {
-      console.error('Failed to start speech recognition:', error);
+    } catch {
       showToast('error', 'Failed to start speech recognition');
       setIsRecording(false);
     }
