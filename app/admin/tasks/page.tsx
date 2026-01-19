@@ -4,6 +4,7 @@ import { getStatuses } from '@/lib/statuses/actions';
 import { getDivisions } from '@/lib/divisions/actions';
 import { getCustomFields } from '@/lib/custom-fields/actions';
 import { getTemplates } from '@/lib/templates/actions';
+import { getChecklistsWithItems } from '@/lib/checklists/actions';
 import { TaskTable } from '@/components/admin/tasks/task-table';
 import { AdminLayout } from '@/components/admin/admin-layout';
 
@@ -33,7 +34,7 @@ export default async function AdminTasksPage({ searchParams }: PageProps) {
   const search = params.search || '';
 
   // Fetch data in parallel
-  const [tasksResult, statuses, divisions, users, defaultStatusId, customFields, templates] = await Promise.all([
+  const [tasksResult, statuses, divisions, users, defaultStatusId, customFields, templates, checklists] = await Promise.all([
     getTasks({
       page,
       pageSize: 25,
@@ -50,6 +51,7 @@ export default async function AdminTasksPage({ searchParams }: PageProps) {
     getDefaultStatus(),
     getCustomFields(),
     getTemplates(),
+    getChecklistsWithItems(),
   ]);
 
   return (
@@ -85,6 +87,7 @@ export default async function AdminTasksPage({ searchParams }: PageProps) {
             defaultStatusId={defaultStatusId}
             customFields={customFields}
             templates={templates}
+            checklists={checklists}
           />
         </div>
       </div>

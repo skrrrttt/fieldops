@@ -433,6 +433,78 @@ export interface Database {
           created_at?: string;
         };
       };
+      checklists: {
+        Row: {
+          id: string;
+          name: string;
+          description: string | null;
+          order: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          description?: string | null;
+          order?: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          description?: string | null;
+          order?: number;
+          created_at?: string;
+        };
+      };
+      checklist_items: {
+        Row: {
+          id: string;
+          checklist_id: string;
+          title: string;
+          order: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          checklist_id: string;
+          title: string;
+          order?: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          checklist_id?: string;
+          title?: string;
+          order?: number;
+          created_at?: string;
+        };
+      };
+      task_checklists: {
+        Row: {
+          id: string;
+          task_id: string;
+          checklist_id: string;
+          item_completions: Record<string, boolean>;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          task_id: string;
+          checklist_id: string;
+          item_completions?: Record<string, boolean>;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          task_id?: string;
+          checklist_id?: string;
+          item_completions?: Record<string, boolean>;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
     };
   };
 }
@@ -449,6 +521,18 @@ export type CustomFieldDefinition = Database['public']['Tables']['custom_field_d
 export type TaskTemplate = Database['public']['Tables']['task_templates']['Row'];
 export type Branding = Database['public']['Tables']['branding']['Row'];
 export type TaskHistory = Database['public']['Tables']['task_history']['Row'];
+export type Checklist = Database['public']['Tables']['checklists']['Row'];
+export type ChecklistItem = Database['public']['Tables']['checklist_items']['Row'];
+export type TaskChecklist = Database['public']['Tables']['task_checklists']['Row'];
+
+// Extended types with relations
+export interface ChecklistWithItems extends Checklist {
+  items: ChecklistItem[];
+}
+
+export interface TaskChecklistWithDetails extends TaskChecklist {
+  checklist: ChecklistWithItems;
+}
 
 // Insert types
 export type UserInsert = Database['public']['Tables']['users']['Insert'];
@@ -462,6 +546,9 @@ export type CustomFieldDefinitionInsert = Database['public']['Tables']['custom_f
 export type TaskTemplateInsert = Database['public']['Tables']['task_templates']['Insert'];
 export type BrandingInsert = Database['public']['Tables']['branding']['Insert'];
 export type TaskHistoryInsert = Database['public']['Tables']['task_history']['Insert'];
+export type ChecklistInsert = Database['public']['Tables']['checklists']['Insert'];
+export type ChecklistItemInsert = Database['public']['Tables']['checklist_items']['Insert'];
+export type TaskChecklistInsert = Database['public']['Tables']['task_checklists']['Insert'];
 
 // Update types
 export type UserUpdate = Database['public']['Tables']['users']['Update'];
@@ -475,3 +562,6 @@ export type CustomFieldDefinitionUpdate = Database['public']['Tables']['custom_f
 export type TaskTemplateUpdate = Database['public']['Tables']['task_templates']['Update'];
 export type BrandingUpdate = Database['public']['Tables']['branding']['Update'];
 export type TaskHistoryUpdate = Database['public']['Tables']['task_history']['Update'];
+export type ChecklistUpdate = Database['public']['Tables']['checklists']['Update'];
+export type ChecklistItemUpdate = Database['public']['Tables']['checklist_items']['Update'];
+export type TaskChecklistUpdate = Database['public']['Tables']['task_checklists']['Update'];

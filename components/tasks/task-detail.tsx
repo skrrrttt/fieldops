@@ -8,10 +8,11 @@ import type { TaskWithRelations } from '@/lib/tasks/actions';
 import type { PhotoWithUser } from '@/lib/photos/actions';
 import type { FileWithUser } from '@/lib/files/actions';
 import type { CommentWithUser } from '@/lib/comments/actions';
-import type { CustomFieldDefinition } from '@/lib/database.types';
+import type { CustomFieldDefinition, TaskChecklistWithDetails } from '@/lib/database.types';
 import { PhotoUpload } from '@/components/tasks/photo-upload';
 import { FileUpload } from '@/components/tasks/file-upload';
 import { CustomFieldEdit } from '@/components/tasks/custom-field-edit';
+import { TaskChecklist } from '@/components/tasks/task-checklist';
 // ProStreet brand constants
 const PRIMARY_COLOR = '#f97316';
 const ACCENT_COLOR = '#64748b';
@@ -23,9 +24,10 @@ interface TaskDetailProps {
   files: FileWithUser[];
   comments: CommentWithUser[];
   customFields: CustomFieldDefinition[];
+  taskChecklists: TaskChecklistWithDetails[];
 }
 
-export function TaskDetail({ task, photos, files, comments: initialComments, customFields }: TaskDetailProps) {
+export function TaskDetail({ task, photos, files, comments: initialComments, customFields, taskChecklists }: TaskDetailProps) {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [refreshKey, setRefreshKey] = useState(0);
@@ -164,6 +166,11 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
             {task.specifications}
           </div>
         </section>
+      )}
+
+      {/* Checklists Section */}
+      {taskChecklists.length > 0 && (
+        <TaskChecklist taskChecklists={taskChecklists} />
       )}
 
       {/* Location Section - Compact */}

@@ -10,7 +10,7 @@ import type { TaskWithRelations } from '@/lib/tasks/actions';
 import type { PhotoWithUser } from '@/lib/photos/actions';
 import type { FileWithUser } from '@/lib/files/actions';
 import type { CommentWithUser } from '@/lib/comments/actions';
-import type { CustomFieldDefinition } from '@/lib/database.types';
+import type { CustomFieldDefinition, TaskChecklistWithDetails } from '@/lib/database.types';
 import { TaskDetail } from './task-detail';
 import { OfflineIndicator } from '../offline/offline-indicator';
 
@@ -23,6 +23,7 @@ interface TaskDetailOfflineWrapperProps {
   files: FileWithUser[];
   comments: CommentWithUser[];
   customFields: CustomFieldDefinition[];
+  taskChecklists: TaskChecklistWithDetails[];
 }
 
 export function TaskDetailOfflineWrapper({
@@ -32,6 +33,7 @@ export function TaskDetailOfflineWrapper({
   files: serverFiles,
   comments: serverComments,
   customFields,
+  taskChecklists,
 }: TaskDetailOfflineWrapperProps) {
   // Use offline hook for task data
   const {
@@ -96,6 +98,7 @@ export function TaskDetailOfflineWrapper({
         files={files}
         comments={comments}
         customFields={customFields}
+        taskChecklists={taskChecklists}
       />
     </>
   );

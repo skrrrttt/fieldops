@@ -3,9 +3,10 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useCallback, useRef, useTransition } from 'react';
 import type { TaskWithRelations } from '@/lib/tasks/actions';
-import type { Status, Division, User, CustomFieldDefinition, TaskTemplate } from '@/lib/database.types';
+import type { Status, Division, User, CustomFieldDefinition, TaskTemplate, ChecklistWithItems } from '@/lib/database.types';
 import { TaskModal } from './task-modal';
 import { BulkActionBar } from './bulk-action-bar';
+import { getTaskChecklistIds } from '@/lib/checklists/actions';
 
 interface TaskTableProps {
   tasks: TaskWithRelations[];
@@ -27,6 +28,7 @@ interface TaskTableProps {
   defaultStatusId: string | null;
   customFields: CustomFieldDefinition[];
   templates: TaskTemplate[];
+  checklists: ChecklistWithItems[];
 }
 
 export function TaskTable({
@@ -44,6 +46,7 @@ export function TaskTable({
   defaultStatusId,
   customFields,
   templates,
+  checklists,
 }: TaskTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -51,6 +54,7 @@ export function TaskTable({
   const [searchInput, setSearchInput] = useState(currentFilters.search);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<TaskWithRelations | null>(null);
+  const [editingTaskChecklistIds, setEditingTaskChecklistIds] = useState<string[]>([]);
 
   // Bulk selection state
   const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(new Set());
@@ -58,17 +62,22 @@ export function TaskTable({
 
   const handleCreateClick = () => {
     setEditingTask(null);
+    setEditingTaskChecklistIds([]);
     setIsModalOpen(true);
   };
 
-  const handleEditClick = (task: TaskWithRelations) => {
+  const handleEditClick = async (task: TaskWithRelations) => {
     setEditingTask(task);
+    // Fetch the checklist IDs for this task
+    const checklistIds = await getTaskChecklistIds(task.id);
+    setEditingTaskChecklistIds(checklistIds);
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingTask(null);
+    setEditingTaskChecklistIds([]);
   };
 
   // Selection handlers
@@ -266,6 +275,8 @@ export function TaskTable({
         defaultStatusId={defaultStatusId}
         customFields={customFields}
         templates={templates}
+        checklists={checklists}
+        initialChecklistIds={editingTaskChecklistIds}
       />
 
       {/* Header with Create Button and Export */}

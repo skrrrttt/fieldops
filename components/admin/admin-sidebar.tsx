@@ -22,6 +22,7 @@ import {
   Layers,
   MessageSquareText,
   Archive,
+  ListChecks,
 } from 'lucide-react';
 
 // ProStreet brand constants
@@ -85,6 +86,11 @@ const navItems: NavItem[] = [
         label: 'Custom Fields',
         href: '/admin/custom-fields',
         icon: <Layers className="w-4 h-4" />,
+      },
+      {
+        label: 'Checklists',
+        href: '/admin/checklists',
+        icon: <ListChecks className="w-4 h-4" />,
       },
       {
         label: 'Templates',
