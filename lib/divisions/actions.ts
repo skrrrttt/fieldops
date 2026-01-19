@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidatePath, updateTag, unstable_cache } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import type { Division } from '@/lib/database.types';
 
@@ -23,27 +23,23 @@ export interface UpdateDivisionInput {
 }
 
 /**
- * Get all divisions ordered by name (cached for 60 seconds)
+ * Get all divisions ordered by name
  */
-export const getDivisions = unstable_cache(
-  async (): Promise<Division[]> => {
-    const supabase = await createClient();
+export async function getDivisions(): Promise<Division[]> {
+  const supabase = await createClient();
 
-    const { data, error } = await supabase
-      .from('divisions')
-      .select('*')
-      .order('name');
+  const { data, error } = await supabase
+    .from('divisions')
+    .select('*')
+    .order('name');
 
-    if (error) {
-      console.error('Error fetching divisions:', error);
-      return [];
-    }
+  if (error) {
+    console.error('Error fetching divisions:', error);
+    return [];
+  }
 
-    return data as Division[] || [];
-  },
-  ['divisions'],
-  { revalidate: 60, tags: ['divisions'] }
-);
+  return data as Division[] || [];
+}
 
 /**
  * Get a single division by ID
@@ -88,8 +84,7 @@ export async function createDivision(
     return { success: false, error: 'Unable to complete this operation' };
   }
 
-  updateTag('divisions');
-revalidatePath('/admin/divisions');
+  revalidatePath('/admin/divisions');
   return { success: true, data };
 }
 
@@ -118,8 +113,7 @@ export async function updateDivision(
     return { success: false, error: 'Unable to complete this operation' };
   }
 
-  updateTag('divisions');
-revalidatePath('/admin/divisions');
+  revalidatePath('/admin/divisions');
   return { success: true, data };
 }
 
@@ -139,7 +133,6 @@ export async function deleteDivision(id: string): Promise<ActionResult> {
     return { success: false, error: 'Unable to complete this operation' };
   }
 
-  updateTag('divisions');
-revalidatePath('/admin/divisions');
+  revalidatePath('/admin/divisions');
   return { success: true };
 }
