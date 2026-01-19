@@ -21,6 +21,7 @@ import {
   ChevronDown,
   Layers,
   MessageSquareText,
+  Archive,
 } from 'lucide-react';
 
 // ProStreet brand constants
@@ -45,6 +46,11 @@ const navItems: NavItem[] = [
     label: 'Tasks',
     href: '/admin/tasks',
     icon: <ClipboardList className="w-5 h-5" />,
+  },
+  {
+    label: 'Archive',
+    href: '/admin/archive',
+    icon: <Archive className="w-5 h-5" />,
   },
   {
     label: 'Media',
