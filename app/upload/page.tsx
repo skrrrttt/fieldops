@@ -81,8 +81,7 @@ export default function UploadPage() {
 
       if (error) throw error;
       setTasks(data || []);
-    } catch (err) {
-      console.error('Error fetching tasks:', err);
+    } catch {
       setError('Failed to load tasks');
     } finally {
       setIsLoadingTasks(false);
@@ -196,8 +195,7 @@ export default function UploadPage() {
 
       // Clean up preview URL
       URL.revokeObjectURL(capturedPhoto.preview);
-    } catch (err) {
-      console.error('Upload error:', err);
+    } catch {
       setError('Failed to upload photo. Please try again.');
       setStep('select-task');
     }

@@ -30,8 +30,8 @@ export function ConflictResolution({ onResolved }: ConflictResolutionProps) {
     try {
       const conflictingMutations = await getConflictingMutations();
       setConflicts(conflictingMutations);
-    } catch (err) {
-      console.error('Failed to load conflicts:', err);
+    } catch {
+      // Conflicts failed to load
     } finally {
       setLoading(false);
     }
@@ -48,8 +48,8 @@ export function ConflictResolution({ onResolved }: ConflictResolutionProps) {
       // Reload conflicts
       await loadConflicts();
       onResolved?.();
-    } catch (err) {
-      console.error('Failed to resolve conflict:', err);
+    } catch {
+      // Conflict resolution failed
     } finally {
       setResolving(null);
     }

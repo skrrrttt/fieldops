@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import type { PhotoWithUser } from '@/lib/photos/actions';
 
@@ -199,11 +200,12 @@ export function PhotoGallery({ photos }: PhotoGalleryProps) {
               onClick={() => openLightbox(index)}
               className="relative aspect-square group cursor-pointer rounded-lg overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={photo.url}
                 alt={`Photo ${index + 1}`}
-                className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                fill
+                sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, 20vw"
+                className="object-cover transition-transform group-hover:scale-105"
               />
               {/* Hover overlay */}
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
@@ -289,12 +291,16 @@ export function PhotoGallery({ photos }: PhotoGalleryProps) {
             )}
 
             {/* Image */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={currentPhoto.url}
-              alt={`Photo ${lightboxIndex + 1}`}
-              className="max-h-[calc(100vh-200px)] max-w-full object-contain"
-            />
+            <div className="relative w-full h-[calc(100vh-200px)]">
+              <Image
+                src={currentPhoto.url}
+                alt={`Photo ${lightboxIndex + 1}`}
+                fill
+                sizes="100vw"
+                className="object-contain"
+                priority
+              />
+            </div>
 
             {/* Next button */}
             {photosWithUrls.length > 1 && (

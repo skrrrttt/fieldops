@@ -41,9 +41,8 @@ export function CustomFieldEdit({ taskId, customFields, initialValues }: CustomF
       } else {
         setError(result.error || 'Failed to save');
       }
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred');
-      console.error(err);
     } finally {
       setIsSaving(false);
     }

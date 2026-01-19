@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect, useTransition, memo } from 'react';
+import { useState, useCallback, useEffect, useTransition, memo } from 'react';
 import Link from 'next/link';
+import NextImage from 'next/image';
 import { useRouter } from 'next/navigation';
 import type { TaskWithRelations } from '@/lib/tasks/actions';
 import type { PhotoWithUser } from '@/lib/photos/actions';
@@ -9,16 +10,12 @@ import type { FileWithUser } from '@/lib/files/actions';
 import type { CommentWithUser } from '@/lib/comments/actions';
 import type { CustomFieldDefinition } from '@/lib/database.types';
 import { PhotoUpload } from '@/components/tasks/photo-upload';
-import { PhotoGallery } from '@/components/tasks/photo-gallery';
 import { FileUpload } from '@/components/tasks/file-upload';
-import { FileList } from '@/components/tasks/file-list';
-import { CommentInput } from '@/components/tasks/comment-input';
-import { CommentList } from '@/components/tasks/comment-list';
 import { CustomFieldEdit } from '@/components/tasks/custom-field-edit';
 // ProStreet brand constants
 const PRIMARY_COLOR = '#f97316';
 const ACCENT_COLOR = '#64748b';
-import { ChevronDown, ChevronRight, Plus, Camera, Image, FileText, MessageCircle, MapPin, Calendar, User, X, ClipboardList } from 'lucide-react';
+import { ChevronDown, ChevronRight, Plus, Camera, FileText, MessageCircle, MapPin, Calendar, User, X, ClipboardList } from 'lucide-react';
 
 interface TaskDetailProps {
   task: TaskWithRelations;
@@ -30,7 +27,7 @@ interface TaskDetailProps {
 
 export function TaskDetail({ task, photos, files, comments: initialComments, customFields }: TaskDetailProps) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
   const [refreshKey, setRefreshKey] = useState(0);
   const [comments, setComments] = useState<CommentWithUser[]>(initialComments);
 
@@ -410,11 +407,12 @@ const PhotoGalleryInline = memo(function PhotoGalleryInline({ photos }: { photos
             onClick={() => setLightboxIndex(index)}
             className="relative aspect-square rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-700"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <NextImage
               src={photo.url}
               alt={`Photo ${index + 1}`}
-              className="w-full h-full object-cover"
+              fill
+              sizes="25vw"
+              className="object-cover"
             />
             {index === 7 && photosWithUrls.length > 8 && (
               <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white font-semibold">
@@ -446,13 +444,19 @@ const PhotoGalleryInline = memo(function PhotoGalleryInline({ photos }: { photos
           >
             <ChevronRight className="w-10 h-10 rotate-180" />
           </button>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={photosWithUrls[lightboxIndex]?.url}
-            alt=""
-            className="max-h-[80vh] max-w-[90vw] object-contain"
+          <div
+            className="relative w-[90vw] h-[80vh]"
             onClick={(e) => e.stopPropagation()}
-          />
+          >
+            <NextImage
+              src={photosWithUrls[lightboxIndex]?.url}
+              alt=""
+              fill
+              sizes="90vw"
+              className="object-contain"
+              priority
+            />
+          </div>
           <button
             className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-white/80 hover:text-white"
             onClick={(e) => {

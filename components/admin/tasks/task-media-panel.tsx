@@ -108,7 +108,6 @@ export function TaskMediaPanel({ taskId }: TaskMediaPanelProps) {
       });
 
     if (uploadError) {
-      console.error('Upload error:', uploadError);
       setIsUploadingPhoto(false);
       e.target.value = '';
       return;
@@ -158,7 +157,6 @@ export function TaskMediaPanel({ taskId }: TaskMediaPanelProps) {
       });
 
     if (uploadError) {
-      console.error('Upload error:', uploadError);
       setIsUploadingFile(false);
       e.target.value = '';
       return;

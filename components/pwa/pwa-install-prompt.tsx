@@ -145,8 +145,8 @@ export function PWAInstallPrompt() {
         setInstallDismissed();
         setShowBanner(false);
       }
-    } catch (error) {
-      console.error('[PWA] Install error:', error);
+    } catch {
+      // Install failed or was cancelled
     } finally {
       setDeferredPrompt(null);
       setIsInstalling(false);
