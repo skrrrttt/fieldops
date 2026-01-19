@@ -2,15 +2,19 @@ import { requireAdmin } from '@/lib/auth/actions';
 import { getTemplatesWithDivision } from '@/lib/templates/actions';
 import { getDivisions } from '@/lib/divisions/actions';
 import { getCustomFields } from '@/lib/custom-fields/actions';
+import { getUsers } from '@/lib/users/actions';
 import { CreateTemplateForm } from '@/components/admin/templates/create-template-form';
 import { TemplateList } from '@/components/admin/templates/template-list';
 import { AdminLayout } from '@/components/admin/admin-layout';
 
 export default async function AdminTemplatesPage() {
   const user = await requireAdmin();
-  const templates = await getTemplatesWithDivision();
-  const divisions = await getDivisions();
-  const customFields = await getCustomFields();
+  const [templates, divisions, customFields, users] = await Promise.all([
+    getTemplatesWithDivision(),
+    getDivisions(),
+    getCustomFields(),
+    getUsers(),
+  ]);
 
   return (
     <AdminLayout user={user}>
@@ -30,7 +34,7 @@ export default async function AdminTemplatesPage() {
           <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4">
             Create New Template
           </h3>
-          <CreateTemplateForm divisions={divisions} customFields={customFields} />
+          <CreateTemplateForm divisions={divisions} customFields={customFields} users={users} />
         </div>
 
         {/* Existing Templates List */}
@@ -38,7 +42,7 @@ export default async function AdminTemplatesPage() {
           <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4">
             Existing Templates ({templates.length})
           </h3>
-          <TemplateList templates={templates} divisions={divisions} customFields={customFields} />
+          <TemplateList templates={templates} divisions={divisions} customFields={customFields} users={users} />
         </div>
       </div>
     </AdminLayout>

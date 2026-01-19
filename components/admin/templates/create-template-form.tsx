@@ -1,24 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import { TemplateForm } from './template-form';
+import { TemplateForm, type TemplateFormData } from './template-form';
 import { createTemplate } from '@/lib/templates/actions';
-import type { Division, CustomFieldDefinition } from '@/lib/database.types';
-
-interface TemplateFormData {
-  name: string;
-  default_title: string | null;
-  default_description: string | null;
-  default_division_id: string | null;
-  default_custom_fields: Record<string, unknown> | null;
-}
+import { activateRecurringTemplate } from '@/lib/templates/recurring';
+import type { Division, CustomFieldDefinition, User } from '@/lib/database.types';
 
 interface CreateTemplateFormProps {
   divisions: Division[];
   customFields: CustomFieldDefinition[];
+  users: User[];
 }
 
-export function CreateTemplateForm({ divisions, customFields }: CreateTemplateFormProps) {
+export function CreateTemplateForm({ divisions, customFields, users }: CreateTemplateFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -29,17 +23,35 @@ export function CreateTemplateForm({ divisions, customFields }: CreateTemplateFo
     setError(null);
     setSuccess(false);
 
-    const result = await createTemplate(data);
+    // Create the template first
+    const result = await createTemplate({
+      name: data.name,
+      default_title: data.default_title,
+      default_description: data.default_description,
+      default_division_id: data.default_division_id,
+      default_custom_fields: data.default_custom_fields,
+    });
+
+    if (!result.success) {
+      setIsLoading(false);
+      setError(result.error || 'Failed to create template');
+      return;
+    }
+
+    // If recurrence rule is set, activate it
+    if (data.recurrence_rule && result.data) {
+      const recurResult = await activateRecurringTemplate(result.data.id, data.recurrence_rule);
+      if (!recurResult.success) {
+        setIsLoading(false);
+        setError(recurResult.error || 'Template created but failed to set up recurrence');
+        return;
+      }
+    }
 
     setIsLoading(false);
-
-    if (result.success) {
-      setSuccess(true);
-      setFormKey((prev) => prev + 1); // Force form remount to reset
-      setTimeout(() => setSuccess(false), 3000);
-    } else {
-      setError(result.error || 'Failed to create template');
-    }
+    setSuccess(true);
+    setFormKey((prev) => prev + 1); // Force form remount to reset
+    setTimeout(() => setSuccess(false), 3000);
   };
 
   return (
@@ -58,6 +70,7 @@ export function CreateTemplateForm({ divisions, customFields }: CreateTemplateFo
         key={formKey}
         divisions={divisions}
         customFields={customFields}
+        users={users}
         onSubmit={handleSubmit}
         isLoading={isLoading}
       />

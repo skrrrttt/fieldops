@@ -1,20 +1,23 @@
 'use client';
 
-import { useState } from 'react';
-import type { TaskTemplate, Division, CustomFieldDefinition, FieldType } from '@/lib/database.types';
+import { useState, useCallback } from 'react';
+import type { TaskTemplate, Division, CustomFieldDefinition, FieldType, RecurrenceRule, User } from '@/lib/database.types';
+import { RecurrenceRuleEditor } from './recurrence-rule-editor';
 
-interface TemplateFormData {
+export interface TemplateFormData {
   name: string;
   default_title: string | null;
   default_description: string | null;
   default_division_id: string | null;
   default_custom_fields: Record<string, unknown> | null;
+  recurrence_rule: RecurrenceRule | null;
 }
 
 interface TemplateFormProps {
   template?: TaskTemplate | null;
   divisions: Division[];
   customFields: CustomFieldDefinition[];
+  users?: User[];
   onSubmit: (data: TemplateFormData) => Promise<void>;
   onCancel?: () => void;
   isLoading?: boolean;
@@ -24,6 +27,7 @@ export function TemplateForm({
   template,
   divisions,
   customFields,
+  users = [],
   onSubmit,
   onCancel,
   isLoading,
@@ -35,6 +39,13 @@ export function TemplateForm({
   const [customFieldValues, setCustomFieldValues] = useState<Record<string, unknown>>(
     (template?.default_custom_fields as Record<string, unknown>) || {}
   );
+  const [recurrenceRule, setRecurrenceRule] = useState<RecurrenceRule | null>(
+    template?.recurrence_rule || null
+  );
+
+  const handleRecurrenceChange = useCallback((rule: RecurrenceRule | null) => {
+    setRecurrenceRule(rule);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,6 +64,7 @@ export function TemplateForm({
       default_description: defaultDescription.trim() || null,
       default_division_id: defaultDivisionId || null,
       default_custom_fields: Object.keys(filteredCustomFields).length > 0 ? filteredCustomFields : null,
+      recurrence_rule: recurrenceRule,
     });
 
     if (!template) {
@@ -62,6 +74,7 @@ export function TemplateForm({
       setDefaultDescription('');
       setDefaultDivisionId('');
       setCustomFieldValues({});
+      setRecurrenceRule(null);
     }
   };
 
@@ -306,6 +319,16 @@ export function TemplateForm({
           </div>
         </div>
       )}
+
+      {/* Recurrence Settings */}
+      <div className="border-t border-zinc-200 dark:border-zinc-700 pt-6">
+        <RecurrenceRuleEditor
+          value={recurrenceRule}
+          onChange={handleRecurrenceChange}
+          users={users}
+          disabled={isLoading}
+        />
+      </div>
 
       {/* Submit Buttons */}
       <div className="flex gap-3 pt-2">
