@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect, useTransition } from 'react';
+import { useState, useCallback, useRef, useEffect, useTransition, memo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { TaskWithRelations } from '@/lib/tasks/actions';
@@ -382,7 +382,7 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
 }
 
 // Inline Photo Gallery (simplified, without outer section wrapper)
-function PhotoGalleryInline({ photos }: { photos: PhotoWithUser[] }) {
+const PhotoGalleryInline = memo(function PhotoGalleryInline({ photos }: { photos: PhotoWithUser[] }) {
   const [photosWithUrls, setPhotosWithUrls] = useState<Array<PhotoWithUser & { url: string }>>([]);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
@@ -469,10 +469,10 @@ function PhotoGalleryInline({ photos }: { photos: PhotoWithUser[] }) {
       )}
     </>
   );
-}
+});
 
 // Inline File List (simplified, without outer section wrapper)
-function FileListInline({ files }: { files: FileWithUser[] }) {
+const FileListInline = memo(function FileListInline({ files }: { files: FileWithUser[] }) {
   const getFileUrl = (storagePath: string): string => {
     const { createClient } = require('@/lib/supabase/client');
     const supabase = createClient();
@@ -518,10 +518,10 @@ function FileListInline({ files }: { files: FileWithUser[] }) {
       ))}
     </div>
   );
-}
+});
 
 // Inline Comment Input (simplified)
-function CommentInputInline({ taskId, onCommentAdded }: { taskId: string; onCommentAdded: (comment: CommentWithUser) => void }) {
+const CommentInputInline = memo(function CommentInputInline({ taskId, onCommentAdded }: { taskId: string; onCommentAdded: (comment: CommentWithUser) => void }) {
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -561,10 +561,10 @@ function CommentInputInline({ taskId, onCommentAdded }: { taskId: string; onComm
       </button>
     </form>
   );
-}
+});
 
 // Inline Comment List (simplified)
-function CommentListInline({ comments }: { comments: CommentWithUser[] }) {
+const CommentListInline = memo(function CommentListInline({ comments }: { comments: CommentWithUser[] }) {
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -619,4 +619,4 @@ function CommentListInline({ comments }: { comments: CommentWithUser[] }) {
       ))}
     </div>
   );
-}
+});

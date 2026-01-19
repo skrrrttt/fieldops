@@ -31,7 +31,7 @@ export async function updateProfile(data: {
 
   if (error) {
     console.error('Error updating profile:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   // Revalidate all pages that display user info
@@ -168,7 +168,7 @@ export async function removeAvatar(): Promise<UpdateProfileResult> {
 
   if (error) {
     console.error('Error removing avatar:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   // Revalidate all pages that display user info

@@ -69,7 +69,7 @@ export async function createFileRecord(data: CreateFileData): Promise<ActionResu
 
   if (error) {
     console.error('Error creating file record:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   return { success: true, data: file as FileRecord };
@@ -80,16 +80,26 @@ export async function createFileRecord(data: CreateFileData): Promise<ActionResu
  */
 export async function deleteFile(fileId: string): Promise<ActionResult> {
   const supabase = await createClient();
+  const user = await getCurrentUser();
 
-  // First get the file to find the storage path
+  if (!user) {
+    return { success: false, error: 'Not authenticated' };
+  }
+
+  // First get the file to find the storage path and verify ownership
   const { data: file, error: fetchError } = await supabase
     .from('files')
-    .select('storage_path')
+    .select('storage_path, user_id')
     .eq('id', fileId)
-    .single<{ storage_path: string }>();
+    .single<{ storage_path: string; user_id: string }>();
 
   if (fetchError || !file) {
     return { success: false, error: 'File not found' };
+  }
+
+  // Only allow deletion by the file owner or admins
+  if (file.user_id !== user.id && user.role !== 'admin') {
+    return { success: false, error: 'Not authorized to delete this file' };
   }
 
   // Delete from storage
@@ -110,7 +120,7 @@ export async function deleteFile(fileId: string): Promise<ActionResult> {
 
   if (error) {
     console.error('Error deleting file record:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   return { success: true };

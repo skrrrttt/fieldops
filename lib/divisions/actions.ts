@@ -81,7 +81,7 @@ export async function createDivision(
 
   if (error) {
     console.error('Error creating division:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   revalidatePath('/admin/divisions');
@@ -110,7 +110,7 @@ export async function updateDivision(
 
   if (error) {
     console.error('Error updating division:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   revalidatePath('/admin/divisions');
@@ -130,7 +130,7 @@ export async function deleteDivision(id: string): Promise<ActionResult> {
 
   if (error) {
     console.error('Error deleting division:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Unable to complete this operation' };
   }
 
   revalidatePath('/admin/divisions');
