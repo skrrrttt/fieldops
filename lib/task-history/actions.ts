@@ -304,3 +304,75 @@ export async function cleanupOldHistory(
 
   return { success: true, data: data?.length || 0 };
 }
+
+/**
+ * Restore a task from history (creates a new task with the same data)
+ */
+export async function restoreTaskFromHistory(
+  historyId: string
+): Promise<ActionResult<{ taskId: string }>> {
+  const supabase = await createClient();
+
+  // Get the history record
+  const { data: historyData, error: fetchError } = await supabase
+    .from('task_history')
+    .select('*')
+    .eq('id', historyId)
+    .single();
+
+  if (fetchError || !historyData) {
+    return { success: false, error: fetchError?.message || 'History record not found' };
+  }
+
+  const history = historyData as TaskHistory;
+
+  // Get the default status
+  const { data: statusData } = await supabase
+    .from('statuses')
+    .select('id')
+    .eq('is_default', true)
+    .single();
+
+  const defaultStatus = statusData as { id: string } | null;
+
+  if (!defaultStatus) {
+    return { success: false, error: 'No default status found' };
+  }
+
+  // Find division by name if it exists
+  let divisionId: string | null = null;
+  if (history.division_name) {
+    const { data: divisionData } = await supabase
+      .from('divisions')
+      .select('id')
+      .eq('name', history.division_name)
+      .single();
+    const division = divisionData as { id: string } | null;
+    divisionId = division?.id || null;
+  }
+
+  // Create a new task from the history
+  const { data: newTask, error: createError } = await supabase
+    .from('tasks')
+    .insert({
+      title: history.title,
+      description: history.description,
+      specifications: history.specifications,
+      status_id: defaultStatus.id,
+      division_id: divisionId,
+      address: history.address,
+      location_lat: history.location_lat,
+      location_lng: history.location_lng,
+      custom_fields: history.custom_fields,
+      assigned_user_id: history.assigned_user_id,
+    } as never)
+    .select('id')
+    .single();
+
+  if (createError) {
+    return { success: false, error: createError.message };
+  }
+
+  const task = newTask as { id: string };
+  return { success: true, data: { taskId: task.id } };
+}
