@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useTransition, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import type { ChecklistWithItems } from '@/lib/database.types';
 import { ChecklistForm } from './checklist-form';
 import {
@@ -35,6 +36,8 @@ interface ChecklistListProps {
 }
 
 export function ChecklistList({ checklists: initialChecklists }: ChecklistListProps) {
+  const router = useRouter();
+  const [, startTransition] = useTransition();
   const [checklists, setChecklists] = useState(initialChecklists);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -49,6 +52,11 @@ export function ChecklistList({ checklists: initialChecklists }: ChecklistListPr
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [editingItemTitle, setEditingItemTitle] = useState('');
   const [itemLoading, setItemLoading] = useState<string | null>(null);
+
+  // Sync local state when props change (after router.refresh())
+  useEffect(() => {
+    setChecklists(initialChecklists);
+  }, [initialChecklists]);
 
   const toggleExpand = (id: string) => {
     setExpandedIds((prev) =>
@@ -151,6 +159,10 @@ export function ChecklistList({ checklists: initialChecklists }: ChecklistListPr
 
     if (result.success) {
       setNewItemTitle((prev) => ({ ...prev, [checklistId]: '' }));
+      // Refresh to get updated data
+      startTransition(() => {
+        router.refresh();
+      });
     } else {
       setError(result.error || 'Failed to add item');
     }
@@ -167,6 +179,9 @@ export function ChecklistList({ checklists: initialChecklists }: ChecklistListPr
     if (result.success) {
       setEditingItemId(null);
       setEditingItemTitle('');
+      startTransition(() => {
+        router.refresh();
+      });
     } else {
       setError(result.error || 'Failed to update item');
     }
@@ -177,7 +192,11 @@ export function ChecklistList({ checklists: initialChecklists }: ChecklistListPr
     const result = await deleteChecklistItem(itemId);
     setItemLoading(null);
 
-    if (!result.success) {
+    if (result.success) {
+      startTransition(() => {
+        router.refresh();
+      });
+    } else {
       setError(result.error || 'Failed to delete item');
     }
   };
