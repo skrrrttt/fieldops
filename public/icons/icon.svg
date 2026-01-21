@@ -1,4 +1,32 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="96" fill="#0f172a"/>
-  <text x="256" y="360" font-family="system-ui, -apple-system, sans-serif" font-size="320" font-weight="800" fill="#f97316" text-anchor="middle">P</text>
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a"/>
+      <stop offset="100%" style="stop-color:#1e293b"/>
+    </linearGradient>
+    <linearGradient id="orangeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f97316"/>
+      <stop offset="100%" style="stop-color:#fb923c"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f97316"/>
+      <stop offset="50%" style="stop-color:#ea580c"/>
+      <stop offset="100%" style="stop-color:#f97316"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="url(#bgGrad)"/>
+
+  <!-- Subtle inner glow -->
+  <rect x="24" y="24" width="464" height="464" rx="80" fill="none" stroke="#f97316" stroke-width="2" opacity="0.1"/>
+
+  <!-- Road/street accent bar at bottom -->
+  <rect x="64" y="420" width="384" height="28" rx="14" fill="url(#orangeGrad)"/>
+
+  <!-- Bold P letterform -->
+  <path d="M160 96h140c66 0 120 48 120 112s-54 112-120 112H224v100h-64V96zm64 168h72c36 0 60-24 60-56s-24-56-60-56h-72v112z" fill="url(#accentGrad)"/>
+
+  <!-- Chevron accent on P -->
+  <path d="M340 152l24 16-24 16" fill="none" stroke="#0f172a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"/>
 </svg>

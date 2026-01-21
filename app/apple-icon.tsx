@@ -11,22 +11,37 @@ export default function AppleIcon() {
     (
       <div
         style={{
-          fontSize: 100,
-          background: '#0f172a',
           width: '100%',
           height: '100%',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
           borderRadius: 36,
+          position: 'relative',
         }}
       >
+        {/* Road/street accent bar at bottom */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 18,
+            left: 22,
+            right: 22,
+            height: 10,
+            background: 'linear-gradient(90deg, #f97316 0%, #fb923c 100%)',
+            borderRadius: 5,
+          }}
+        />
+        {/* Bold P */}
         <span
           style={{
             color: '#f97316',
-            fontWeight: 800,
+            fontSize: 110,
+            fontWeight: 900,
             fontFamily: 'system-ui, sans-serif',
-            letterSpacing: '-0.02em',
+            letterSpacing: '-0.03em',
+            marginTop: -10,
           }}
         >
           P

@@ -11,22 +11,36 @@ export default function Icon() {
     (
       <div
         style={{
-          fontSize: 20,
-          background: '#0f172a',
           width: '100%',
           height: '100%',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
           borderRadius: 6,
         }}
       >
+        {/* Road/chevron accent */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 4,
+            left: 4,
+            right: 4,
+            height: 3,
+            background: 'linear-gradient(90deg, #f97316 0%, #fb923c 100%)',
+            borderRadius: 2,
+          }}
+        />
+        {/* Bold P */}
         <span
           style={{
             color: '#f97316',
-            fontWeight: 800,
+            fontSize: 22,
+            fontWeight: 900,
             fontFamily: 'system-ui, sans-serif',
-            letterSpacing: '-0.02em',
+            letterSpacing: '-0.03em',
+            marginTop: -2,
           }}
         >
           P
