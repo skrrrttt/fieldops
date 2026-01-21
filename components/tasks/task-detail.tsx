@@ -16,7 +16,7 @@ import { TaskChecklist } from '@/components/tasks/task-checklist';
 // ProStreet brand constants
 const PRIMARY_COLOR = '#f97316';
 const ACCENT_COLOR = '#64748b';
-import { ChevronDown, ChevronRight, Plus, Camera, FileText, MessageCircle, MapPin, Calendar, User, X, ClipboardList } from 'lucide-react';
+import { ChevronDown, ChevronRight, Plus, Camera, FileText, MessageCircle, MapPin, Calendar, User, X, ClipboardList, Building2, Phone } from 'lucide-react';
 
 interface TaskDetailProps {
   task: TaskWithRelations;
@@ -171,6 +171,38 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
       {/* Checklists Section */}
       {taskChecklists.length > 0 && (
         <TaskChecklist taskChecklists={taskChecklists} />
+      )}
+
+      {/* Customer/Job Section */}
+      {task.job && (
+        <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-4">
+          <h2 className="text-base font-semibold text-zinc-900 dark:text-white flex items-center gap-2 mb-3">
+            <Building2 className="w-4 h-4 text-zinc-400" />
+            Customer & Job
+          </h2>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                <Building2 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <p className="font-medium text-zinc-900 dark:text-white">
+                  {task.job.customer.name}
+                </p>
+                <p className="text-sm text-zinc-500">{task.job.name}</p>
+              </div>
+            </div>
+            {task.job.customer.contact_phone && (
+              <a
+                href={`tel:${task.job.customer.contact_phone}`}
+                className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 hover:underline ml-10"
+              >
+                <Phone className="w-3.5 h-3.5" />
+                {task.job.customer.contact_phone}
+              </a>
+            )}
+          </div>
+        </section>
       )}
 
       {/* Location Section - Compact */}

@@ -7,20 +7,6 @@ export type UserRole = 'admin' | 'field_user';
 
 export type FieldType = 'text' | 'number' | 'date' | 'dropdown' | 'checkbox';
 
-export type RecurrenceFrequency = 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'custom';
-
-export interface RecurrenceRule {
-  frequency: RecurrenceFrequency;
-  interval?: number;           // Every X days/weeks/months
-  daysOfWeek?: number[];       // 0-6 for weekly (0=Sunday)
-  dayOfMonth?: number;         // 1-31 for monthly
-  time?: string;               // "09:00" - when to generate
-  assignTo?: 'rotate' | 'fixed' | 'unassigned';
-  rotationUserIds?: string[];  // For rotation assignment
-  fixedUserId?: string;        // For fixed assignment
-  autoActivate?: boolean;      // Auto-set to default status
-}
-
 export interface Database {
   public: {
     Tables: {
@@ -111,6 +97,76 @@ export interface Database {
           created_at?: string;
         };
       };
+      customers: {
+        Row: {
+          id: string;
+          name: string;
+          contact_phone: string | null;
+          contact_email: string | null;
+          address: string | null;
+          notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          contact_phone?: string | null;
+          contact_email?: string | null;
+          address?: string | null;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          contact_phone?: string | null;
+          contact_email?: string | null;
+          address?: string | null;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      jobs: {
+        Row: {
+          id: string;
+          customer_id: string;
+          name: string;
+          address: string | null;
+          location_lat: number | null;
+          location_lng: number | null;
+          notes: string | null;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          customer_id: string;
+          name: string;
+          address?: string | null;
+          location_lat?: number | null;
+          location_lng?: number | null;
+          notes?: string | null;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          customer_id?: string;
+          name?: string;
+          address?: string | null;
+          location_lat?: number | null;
+          location_lng?: number | null;
+          notes?: string | null;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
       tasks: {
         Row: {
           id: string;
@@ -119,7 +175,7 @@ export interface Database {
           specifications: string | null;
           status_id: string;
           division_id: string | null;
-          template_id: string | null;
+          job_id: string | null;
           location_lat: number | null;
           location_lng: number | null;
           address: string | null;
@@ -138,7 +194,7 @@ export interface Database {
           specifications?: string | null;
           status_id: string;
           division_id?: string | null;
-          template_id?: string | null;
+          job_id?: string | null;
           location_lat?: number | null;
           location_lng?: number | null;
           address?: string | null;
@@ -157,7 +213,7 @@ export interface Database {
           specifications?: string | null;
           status_id?: string;
           division_id?: string | null;
-          template_id?: string | null;
+          job_id?: string | null;
           location_lat?: number | null;
           location_lng?: number | null;
           address?: string | null;
@@ -283,47 +339,6 @@ export interface Database {
           created_at?: string;
         };
       };
-      task_templates: {
-        Row: {
-          id: string;
-          name: string;
-          default_title: string | null;
-          default_description: string | null;
-          default_division_id: string | null;
-          default_custom_fields: Record<string, unknown> | null;
-          recurrence_rule: RecurrenceRule | null;
-          is_active: boolean;
-          last_generated_at: string | null;
-          next_generation_at: string | null;
-          created_at: string;
-        };
-        Insert: {
-          id?: string;
-          name: string;
-          default_title?: string | null;
-          default_description?: string | null;
-          default_division_id?: string | null;
-          default_custom_fields?: Record<string, unknown> | null;
-          recurrence_rule?: RecurrenceRule | null;
-          is_active?: boolean;
-          last_generated_at?: string | null;
-          next_generation_at?: string | null;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          name?: string;
-          default_title?: string | null;
-          default_description?: string | null;
-          default_division_id?: string | null;
-          default_custom_fields?: Record<string, unknown> | null;
-          recurrence_rule?: RecurrenceRule | null;
-          is_active?: boolean;
-          last_generated_at?: string | null;
-          next_generation_at?: string | null;
-          created_at?: string;
-        };
-      };
       branding: {
         Row: {
           id: string;
@@ -354,7 +369,6 @@ export interface Database {
         Row: {
           id: string;
           original_task_id: string;
-          template_id: string | null;
           title: string;
           description: string | null;
           specifications: string | null;
@@ -381,7 +395,6 @@ export interface Database {
         Insert: {
           id?: string;
           original_task_id: string;
-          template_id?: string | null;
           title: string;
           description?: string | null;
           specifications?: string | null;
@@ -408,7 +421,6 @@ export interface Database {
         Update: {
           id?: string;
           original_task_id?: string;
-          template_id?: string | null;
           title?: string;
           description?: string | null;
           specifications?: string | null;
@@ -518,12 +530,22 @@ export type Comment = Database['public']['Tables']['comments']['Row'];
 export type Photo = Database['public']['Tables']['photos']['Row'];
 export type File = Database['public']['Tables']['files']['Row'];
 export type CustomFieldDefinition = Database['public']['Tables']['custom_field_definitions']['Row'];
-export type TaskTemplate = Database['public']['Tables']['task_templates']['Row'];
+export type Customer = Database['public']['Tables']['customers']['Row'];
+export type Job = Database['public']['Tables']['jobs']['Row'];
 export type Branding = Database['public']['Tables']['branding']['Row'];
 export type TaskHistory = Database['public']['Tables']['task_history']['Row'];
 export type Checklist = Database['public']['Tables']['checklists']['Row'];
 export type ChecklistItem = Database['public']['Tables']['checklist_items']['Row'];
 export type TaskChecklist = Database['public']['Tables']['task_checklists']['Row'];
+
+// Extended types with relations for Customer/Job CRM
+export interface JobWithCustomer extends Job {
+  customer: Customer;
+}
+
+export interface CustomerWithJobs extends Customer {
+  jobs: Job[];
+}
 
 // Extended types with relations
 export interface ChecklistWithItems extends Checklist {
@@ -543,7 +565,8 @@ export type CommentInsert = Database['public']['Tables']['comments']['Insert'];
 export type PhotoInsert = Database['public']['Tables']['photos']['Insert'];
 export type FileInsert = Database['public']['Tables']['files']['Insert'];
 export type CustomFieldDefinitionInsert = Database['public']['Tables']['custom_field_definitions']['Insert'];
-export type TaskTemplateInsert = Database['public']['Tables']['task_templates']['Insert'];
+export type CustomerInsert = Database['public']['Tables']['customers']['Insert'];
+export type JobInsert = Database['public']['Tables']['jobs']['Insert'];
 export type BrandingInsert = Database['public']['Tables']['branding']['Insert'];
 export type TaskHistoryInsert = Database['public']['Tables']['task_history']['Insert'];
 export type ChecklistInsert = Database['public']['Tables']['checklists']['Insert'];
@@ -559,7 +582,8 @@ export type CommentUpdate = Database['public']['Tables']['comments']['Update'];
 export type PhotoUpdate = Database['public']['Tables']['photos']['Update'];
 export type FileUpdate = Database['public']['Tables']['files']['Update'];
 export type CustomFieldDefinitionUpdate = Database['public']['Tables']['custom_field_definitions']['Update'];
-export type TaskTemplateUpdate = Database['public']['Tables']['task_templates']['Update'];
+export type CustomerUpdate = Database['public']['Tables']['customers']['Update'];
+export type JobUpdate = Database['public']['Tables']['jobs']['Update'];
 export type BrandingUpdate = Database['public']['Tables']['branding']['Update'];
 export type TaskHistoryUpdate = Database['public']['Tables']['task_history']['Update'];
 export type ChecklistUpdate = Database['public']['Tables']['checklists']['Update'];

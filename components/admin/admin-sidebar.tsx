@@ -16,13 +16,13 @@ import {
   Users,
   Tags,
   CheckCircle,
-  FileText,
   ChevronLeft,
   ChevronDown,
   Layers,
   MessageSquareText,
   Archive,
   ListChecks,
+  Building2,
 } from 'lucide-react';
 
 // ProStreet brand constants
@@ -47,6 +47,11 @@ const navItems: NavItem[] = [
     label: 'Tasks',
     href: '/admin/tasks',
     icon: <ClipboardList className="w-5 h-5" />,
+  },
+  {
+    label: 'Customers',
+    href: '/admin/customers',
+    icon: <Building2 className="w-5 h-5" />,
   },
   {
     label: 'Archive',
@@ -91,11 +96,6 @@ const navItems: NavItem[] = [
         label: 'Checklists',
         href: '/admin/checklists',
         icon: <ListChecks className="w-4 h-4" />,
-      },
-      {
-        label: 'Templates',
-        href: '/admin/templates',
-        icon: <FileText className="w-4 h-4" />,
       },
     ],
   },
