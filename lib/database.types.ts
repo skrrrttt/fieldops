@@ -179,7 +179,8 @@ export interface Database {
           location_lat: number | null;
           location_lng: number | null;
           address: string | null;
-          due_date: string | null;
+          start_date: string | null;
+          end_date: string | null;
           assigned_user_id: string | null;
           custom_fields: Record<string, unknown> | null;
           assigned_field_ids: string[] | null;
@@ -198,7 +199,8 @@ export interface Database {
           location_lat?: number | null;
           location_lng?: number | null;
           address?: string | null;
-          due_date?: string | null;
+          start_date?: string | null;
+          end_date?: string | null;
           assigned_user_id?: string | null;
           custom_fields?: Record<string, unknown> | null;
           assigned_field_ids?: string[] | null;
@@ -217,7 +219,8 @@ export interface Database {
           location_lat?: number | null;
           location_lng?: number | null;
           address?: string | null;
-          due_date?: string | null;
+          start_date?: string | null;
+          end_date?: string | null;
           assigned_user_id?: string | null;
           custom_fields?: Record<string, unknown> | null;
           assigned_field_ids?: string[] | null;
@@ -382,7 +385,8 @@ export interface Database {
           location_lng: number | null;
           address: string | null;
           custom_fields: Record<string, unknown> | null;
-          due_date: string | null;
+          start_date: string | null;
+          end_date: string | null;
           task_created_at: string;
           completed_at: string;
           completed_by: string | null;
@@ -408,7 +412,8 @@ export interface Database {
           location_lng?: number | null;
           address?: string | null;
           custom_fields?: Record<string, unknown> | null;
-          due_date?: string | null;
+          start_date?: string | null;
+          end_date?: string | null;
           task_created_at: string;
           completed_at?: string;
           completed_by?: string | null;
@@ -434,7 +439,8 @@ export interface Database {
           location_lng?: number | null;
           address?: string | null;
           custom_fields?: Record<string, unknown> | null;
-          due_date?: string | null;
+          start_date?: string | null;
+          end_date?: string | null;
           task_created_at?: string;
           completed_at?: string;
           completed_by?: string | null;

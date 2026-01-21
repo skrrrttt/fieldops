@@ -305,11 +305,15 @@ export function TaskHistoryList({ initialData, divisions }: TaskHistoryListProps
                         <p className="mt-1 text-zinc-600 dark:text-zinc-400">{item.address}</p>
                       </div>
                     )}
-                    {item.due_date && (
+                    {(item.start_date || item.end_date) && (
                       <div>
-                        <span className="font-medium text-zinc-700 dark:text-zinc-300">Due Date:</span>
+                        <span className="font-medium text-zinc-700 dark:text-zinc-300">
+                          {item.start_date && item.end_date ? 'Date Range:' : item.start_date ? 'Start Date:' : 'End Date:'}
+                        </span>
                         <p className="mt-1 text-zinc-600 dark:text-zinc-400">
-                          {formatDate(item.due_date)}
+                          {item.start_date && item.end_date
+                            ? `${formatDate(item.start_date)} - ${formatDate(item.end_date)}`
+                            : formatDate((item.start_date || item.end_date)!)}
                         </p>
                       </div>
                     )}

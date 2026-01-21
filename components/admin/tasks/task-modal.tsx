@@ -91,7 +91,8 @@ export function TaskModal({
     status_id: defaultStatusId || '',
     division_id: '',
     assigned_user_id: '',
-    due_date: '',
+    start_date: '',
+    end_date: '',
     address: '',
     location_lat: '',
     location_lng: '',
@@ -166,7 +167,8 @@ export function TaskModal({
         status_id: task.status_id,
         division_id: task.division_id || '',
         assigned_user_id: task.assigned_user_id || '',
-        due_date: task.due_date ? task.due_date.split('T')[0] : '',
+        start_date: task.start_date ? task.start_date.split('T')[0] : '',
+        end_date: task.end_date ? task.end_date.split('T')[0] : '',
         address: task.address || '',
         location_lat: task.location_lat?.toString() || '',
         location_lng: task.location_lng?.toString() || '',
@@ -204,7 +206,8 @@ export function TaskModal({
         status_id: defaultStatusId || (statuses.length > 0 ? statuses[0].id : ''),
         division_id: '',
         assigned_user_id: '',
-        due_date: '',
+        start_date: '',
+        end_date: '',
         address: '',
         location_lat: '',
         location_lng: '',
@@ -302,7 +305,8 @@ export function TaskModal({
         division_id: formData.division_id || null,
         job_id: selectedJob?.id || null,
         assigned_user_id: formData.assigned_user_id || null,
-        due_date: formData.due_date || null,
+        start_date: formData.start_date || null,
+        end_date: formData.end_date || null,
         address: formData.address || null,
         location_lat: formData.location_lat ? parseFloat(formData.location_lat) : null,
         location_lng: formData.location_lng ? parseFloat(formData.location_lng) : null,
@@ -491,37 +495,45 @@ export function TaskModal({
                 </div>
               </div>
 
-              {/* Assigned User and Due Date row */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Assigned User */}
-                <div className="space-y-2">
-                  <Label>Assigned To</Label>
-                  <Select
-                    value={formData.assigned_user_id || 'none'}
-                    onValueChange={(value) => setFormData({ ...formData, assigned_user_id: value === 'none' ? '' : value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Unassigned" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">Unassigned</SelectItem>
-                      {users.map((user) => (
-                        <SelectItem key={user.id} value={user.id}>
-                          {user.email}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+              {/* Assigned User */}
+              <div className="space-y-2">
+                <Label>Assigned To</Label>
+                <Select
+                  value={formData.assigned_user_id || 'none'}
+                  onValueChange={(value) => setFormData({ ...formData, assigned_user_id: value === 'none' ? '' : value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Unassigned" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Unassigned</SelectItem>
+                    {users.map((user) => (
+                      <SelectItem key={user.id} value={user.id}>
+                        {user.email}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-                {/* Due Date */}
+              {/* Start Date and End Date row */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="due_date">Due Date</Label>
+                  <Label htmlFor="start_date">Start Date</Label>
                   <Input
-                    id="due_date"
+                    id="start_date"
                     type="date"
-                    value={formData.due_date}
-                    onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
+                    value={formData.start_date}
+                    onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="end_date">End Date</Label>
+                  <Input
+                    id="end_date"
+                    type="date"
+                    value={formData.end_date}
+                    onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
                   />
                 </div>
               </div>

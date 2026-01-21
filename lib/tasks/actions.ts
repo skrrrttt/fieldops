@@ -92,7 +92,8 @@ export async function getTasks(
     'title',
     'created_at',
     'updated_at',
-    'due_date',
+    'start_date',
+    'end_date',
   ];
   const sortColumn = validSortColumns.includes(sortBy) ? sortBy : 'created_at';
   query = query.order(sortColumn, { ascending: sortOrder === 'asc' });
@@ -208,7 +209,8 @@ export interface CreateTaskData {
   division_id?: string | null;
   job_id?: string | null;
   assigned_user_id?: string | null;
-  due_date?: string | null;
+  start_date?: string | null;
+  end_date?: string | null;
   address?: string | null;
   location_lat?: number | null;
   location_lng?: number | null;
@@ -232,7 +234,8 @@ export async function createTask(data: CreateTaskData): Promise<ActionResult<Tas
       division_id: data.division_id || null,
       job_id: data.job_id || null,
       assigned_user_id: data.assigned_user_id || null,
-      due_date: data.due_date || null,
+      start_date: data.start_date || null,
+      end_date: data.end_date || null,
       address: data.address || null,
       location_lat: data.location_lat || null,
       location_lng: data.location_lng || null,
@@ -259,7 +262,8 @@ export interface UpdateTaskData {
   division_id?: string | null;
   job_id?: string | null;
   assigned_user_id?: string | null;
-  due_date?: string | null;
+  start_date?: string | null;
+  end_date?: string | null;
   address?: string | null;
   location_lat?: number | null;
   location_lng?: number | null;
@@ -284,7 +288,8 @@ export async function updateTask(data: UpdateTaskData): Promise<ActionResult<Tas
   if (data.division_id !== undefined) updateData.division_id = data.division_id;
   if (data.job_id !== undefined) updateData.job_id = data.job_id;
   if (data.assigned_user_id !== undefined) updateData.assigned_user_id = data.assigned_user_id;
-  if (data.due_date !== undefined) updateData.due_date = data.due_date;
+  if (data.start_date !== undefined) updateData.start_date = data.start_date;
+  if (data.end_date !== undefined) updateData.end_date = data.end_date;
   if (data.address !== undefined) updateData.address = data.address;
   if (data.location_lat !== undefined) updateData.location_lat = data.location_lat;
   if (data.location_lng !== undefined) updateData.location_lng = data.location_lng;

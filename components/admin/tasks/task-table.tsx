@@ -204,7 +204,7 @@ export function TaskTable({
     };
 
     // CSV headers
-    const headers = ['ID', 'Title', 'Status', 'Division', 'Assigned User', 'Due Date', 'Created Date', 'Location'];
+    const headers = ['ID', 'Title', 'Status', 'Division', 'Assigned User', 'Start Date', 'End Date', 'Created Date', 'Location'];
 
     // Build CSV rows from visible/filtered tasks
     const rows = tasks.map(task => [
@@ -213,7 +213,8 @@ export function TaskTable({
       escapeCSV(task.status?.name),
       escapeCSV(task.division?.name),
       escapeCSV(task.assigned_user?.email),
-      escapeCSV(task.due_date ? new Date(task.due_date).toLocaleDateString() : ''),
+      escapeCSV(task.start_date ? new Date(task.start_date).toLocaleDateString() : ''),
+      escapeCSV(task.end_date ? new Date(task.end_date).toLocaleDateString() : ''),
       escapeCSV(task.created_at ? new Date(task.created_at).toLocaleDateString() : ''),
       escapeCSV(formatLocation(task)),
     ]);
@@ -482,12 +483,14 @@ export function TaskTable({
                             {task.division.name}
                           </span>
                         )}
-                        {task.due_date && (
+                        {(task.start_date || task.end_date) && (
                           <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300">
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
-                            {formatDate(task.due_date)}
+                            {task.start_date && task.end_date
+                              ? `${formatDate(task.start_date)} - ${formatDate(task.end_date)}`
+                              : formatDate(task.start_date || task.end_date)}
                           </span>
                         )}
                         {task.assigned_user && (
@@ -553,10 +556,10 @@ export function TaskTable({
               </th>
               <th
                 className="px-4 py-3 text-left text-sm font-semibold text-zinc-900 dark:text-white cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-600"
-                onClick={() => handleSort('due_date')}
+                onClick={() => handleSort('end_date')}
               >
-                Due Date
-                {renderSortIcon('due_date')}
+                Dates
+                {renderSortIcon('end_date')}
               </th>
               <th
                 className="px-4 py-3 text-left text-sm font-semibold text-zinc-900 dark:text-white cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-600"
@@ -663,7 +666,13 @@ export function TaskTable({
                     {task.assigned_user?.email || '-'}
                   </td>
                   <td className="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-400">
-                    {formatDate(task.due_date)}
+                    {task.start_date && task.end_date
+                      ? `${formatDate(task.start_date)} - ${formatDate(task.end_date)}`
+                      : task.end_date
+                        ? formatDate(task.end_date)
+                        : task.start_date
+                          ? `Starts ${formatDate(task.start_date)}`
+                          : '-'}
                   </td>
                   <td className="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-400">
                     {formatDate(task.created_at)}

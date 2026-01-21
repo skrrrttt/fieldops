@@ -24,8 +24,24 @@ function formatDate(dateString: string | null) {
 
 export const TaskCard = memo(function TaskCard({ task, onClick }: TaskCardProps) {
 
-  const isOverdue = task.due_date && new Date(task.due_date) < new Date() && !task.status?.is_complete;
+  const isOverdue = task.end_date && new Date(task.end_date) < new Date() && !task.status?.is_complete;
   const isComplete = task.status?.is_complete;
+
+  // Format date range for display
+  const getDateDisplay = () => {
+    if (task.start_date && task.end_date) {
+      return `${formatDate(task.start_date)} - ${formatDate(task.end_date)}`;
+    }
+    if (task.end_date) {
+      return formatDate(task.end_date);
+    }
+    if (task.start_date) {
+      return `Starts ${formatDate(task.start_date)}`;
+    }
+    return null;
+  };
+
+  const dateDisplay = getDateDisplay();
 
   return (
     <div
@@ -111,11 +127,11 @@ export const TaskCard = memo(function TaskCard({ task, onClick }: TaskCardProps)
           </div>
         )}
 
-        {/* Footer: Due date and Assigned user */}
+        {/* Footer: Date range and Assigned user */}
         <div className="flex items-center justify-between pt-3 border-t border-border/30">
-          {/* Due Date */}
+          {/* Date Range */}
           <div className="flex items-center gap-2">
-            {task.due_date && (
+            {dateDisplay && (
               <span
                 className={`flex items-center text-sm font-medium ${
                   isOverdue
@@ -128,7 +144,7 @@ export const TaskCard = memo(function TaskCard({ task, onClick }: TaskCardProps)
                 ) : (
                   <Calendar className="w-4 h-4 mr-1.5" />
                 )}
-                {formatDate(task.due_date)}
+                {dateDisplay}
                 {isOverdue && <span className="ml-1 text-xs font-bold uppercase tracking-wide">Overdue</span>}
               </span>
             )}

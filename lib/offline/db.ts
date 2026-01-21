@@ -240,6 +240,20 @@ class FieldOpsDB extends Dexie {
       // New pending_mutations table - indexed by id, type, status for queue processing
       pending_mutations: 'id, type, status, created_at',
     });
+
+    // Version 3 - replace due_date with start_date and end_date
+    this.version(3).stores({
+      // Update tasks table to use start_date and end_date
+      tasks: 'id, status_id, division_id, assigned_user_id, start_date, end_date, created_at, updated_at, deleted_at',
+      divisions: 'id, name, created_at',
+      statuses: 'id, order, is_default, created_at',
+      comments: 'id, task_id, user_id, created_at',
+      photos: 'id, task_id, user_id, created_at',
+      files: 'id, task_id, user_id, created_at',
+      custom_field_definitions: 'id, order, created_at',
+      sync_meta: 'id, table_name, last_synced_at',
+      pending_mutations: 'id, type, status, created_at',
+    });
   }
 }
 

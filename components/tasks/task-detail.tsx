@@ -72,9 +72,27 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
   };
 
   const isOverdue =
-    task.due_date &&
-    new Date(task.due_date) < new Date() &&
+    task.end_date &&
+    new Date(task.end_date) < new Date() &&
     !task.status?.is_complete;
+
+  // Format date range display
+  const formatDateRange = () => {
+    if (task.start_date && task.end_date) {
+      const start = formatDate(task.start_date);
+      const end = formatDate(task.end_date);
+      return `${start} - ${end}`;
+    }
+    if (task.start_date) {
+      return `Starts ${formatDate(task.start_date)}`;
+    }
+    if (task.end_date) {
+      return `Due ${formatDate(task.end_date)}`;
+    }
+    return null;
+  };
+
+  const dateRangeDisplay = formatDateRange();
 
   const hasLocation = task.location_lat && task.location_lng;
 
@@ -130,12 +148,12 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
               {task.division.name}
             </span>
           )}
-          {task.due_date && (
+          {dateRangeDisplay && (
             <span className={`inline-flex items-center gap-1 text-xs font-medium ${
               isOverdue ? 'text-red-600 dark:text-red-400' : 'text-zinc-500 dark:text-zinc-400'
             }`}>
               <Calendar className="w-3 h-3" />
-              {formatDate(task.due_date)}
+              {dateRangeDisplay}
               {isOverdue && <span className="text-red-600">(Overdue)</span>}
             </span>
           )}
