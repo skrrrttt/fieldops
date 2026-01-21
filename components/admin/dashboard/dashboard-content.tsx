@@ -20,7 +20,7 @@ import {
   Plus,
   Image as ImageIcon,
   Tags,
-  FileText,
+  Building2,
   ArrowRight,
   TrendingUp,
 } from 'lucide-react';
@@ -237,9 +237,9 @@ export function DashboardContent({ stats }: DashboardContentProps) {
                 color={PRIMARY_COLOR}
               />
               <QuickLink
-                href="/admin/templates"
-                label="Task Templates"
-                icon={<FileText className="w-4 h-4" />}
+                href="/admin/customers"
+                label="Customers & Jobs"
+                icon={<Building2 className="w-4 h-4" />}
                 color={PRIMARY_COLOR}
               />
             </div>

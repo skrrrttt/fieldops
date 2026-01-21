@@ -145,6 +145,7 @@ export function useTaskOffline(options: UseTaskOfflineOptions): UseTaskOfflineRe
         status: cachedTask.status ?? null,
         division: cachedTask.division ?? null,
         assigned_user: cachedTask.assigned_user ? cachedTask.assigned_user as User : null,
+        job: null, // Job data is not cached offline
       };
 
       setTask(taskWithRelations);

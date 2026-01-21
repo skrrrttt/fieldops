@@ -1,7 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import type { Task, Division, Status, User } from '@/lib/database.types';
+import type { Task, Division, Status, User, JobWithCustomer } from '@/lib/database.types';
 
 export interface ActionResult<T = void> {
   success: boolean;
@@ -13,6 +13,7 @@ export interface TaskWithRelations extends Task {
   status: Status | null;
   division: Division | null;
   assigned_user: User | null;
+  job: JobWithCustomer | null;
 }
 
 export interface TasksQueryParams {
@@ -63,7 +64,8 @@ export async function getTasks(
       *,
       status:statuses(*),
       division:divisions(*),
-      assigned_user:users(*)
+      assigned_user:users(*),
+      job:jobs(*, customer:customers(*))
     `,
       { count: 'exact' }
     )
@@ -136,7 +138,8 @@ export async function getTask(id: string): Promise<TaskWithRelations | null> {
       *,
       status:statuses(*),
       division:divisions(*),
-      assigned_user:users(*)
+      assigned_user:users(*),
+      job:jobs(*, customer:customers(*))
     `
     )
     .eq('id', id)
@@ -203,6 +206,7 @@ export interface CreateTaskData {
   specifications?: string | null;
   status_id: string;
   division_id?: string | null;
+  job_id?: string | null;
   assigned_user_id?: string | null;
   due_date?: string | null;
   address?: string | null;
@@ -226,6 +230,7 @@ export async function createTask(data: CreateTaskData): Promise<ActionResult<Tas
       specifications: data.specifications || null,
       status_id: data.status_id,
       division_id: data.division_id || null,
+      job_id: data.job_id || null,
       assigned_user_id: data.assigned_user_id || null,
       due_date: data.due_date || null,
       address: data.address || null,
@@ -252,6 +257,7 @@ export interface UpdateTaskData {
   specifications?: string | null;
   status_id?: string;
   division_id?: string | null;
+  job_id?: string | null;
   assigned_user_id?: string | null;
   due_date?: string | null;
   address?: string | null;
@@ -276,6 +282,7 @@ export async function updateTask(data: UpdateTaskData): Promise<ActionResult<Tas
   if (data.specifications !== undefined) updateData.specifications = data.specifications;
   if (data.status_id !== undefined) updateData.status_id = data.status_id;
   if (data.division_id !== undefined) updateData.division_id = data.division_id;
+  if (data.job_id !== undefined) updateData.job_id = data.job_id;
   if (data.assigned_user_id !== undefined) updateData.assigned_user_id = data.assigned_user_id;
   if (data.due_date !== undefined) updateData.due_date = data.due_date;
   if (data.address !== undefined) updateData.address = data.address;
@@ -489,7 +496,8 @@ export async function refreshTaskList(): Promise<{
         *,
         status:statuses(*),
         division:divisions(*),
-        assigned_user:users(*)
+        assigned_user:users(*),
+        job:jobs(*, customer:customers(*))
       `)
       .is('deleted_at', null)
       .order('created_at', { ascending: false })

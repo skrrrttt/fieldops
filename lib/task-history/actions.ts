@@ -12,7 +12,6 @@ export interface ActionResult<T = void> {
 export interface TaskHistoryQueryParams {
   page?: number;
   pageSize?: number;
-  templateId?: string;
   divisionName?: string;
   assignedUserId?: string;
   dateFrom?: string;
@@ -49,7 +48,6 @@ export async function getTaskHistory(
   const {
     page = 1,
     pageSize = 25,
-    templateId,
     divisionName,
     assignedUserId,
     dateFrom,
@@ -67,9 +65,6 @@ export async function getTaskHistory(
     .select('*', { count: 'exact' });
 
   // Apply filters
-  if (templateId) {
-    query = query.eq('template_id', templateId);
-  }
   if (divisionName) {
     query = query.eq('division_name', divisionName);
   }
@@ -137,44 +132,12 @@ export async function getTaskHistoryById(
 }
 
 /**
- * Get task history for a specific template (recurring task stats)
- */
-export async function getTemplateHistory(
-  templateId: string,
-  limit: number = 50
-): Promise<ActionResult<TaskHistory[]>> {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from('task_history')
-    .select('*')
-    .eq('template_id', templateId)
-    .order('completed_at', { ascending: false })
-    .limit(limit);
-
-  if (error) {
-    console.error('Error fetching template history:', error);
-    return { success: false, error: 'Unable to complete this operation' };
-  }
-
-  return { success: true, data: (data as TaskHistory[]) || [] };
-}
-
-/**
  * Get statistics for task history
  */
-export async function getTaskHistoryStats(
-  templateId?: string
-): Promise<ActionResult<TaskHistoryStats>> {
+export async function getTaskHistoryStats(): Promise<ActionResult<TaskHistoryStats>> {
   const supabase = await createClient();
 
-  // Base query with optional template filter
-  let baseQuery = supabase.from('task_history').select('*');
-  if (templateId) {
-    baseQuery = baseQuery.eq('template_id', templateId);
-  }
-
-  const { data: allHistory, error } = await baseQuery;
+  const { data: allHistory, error } = await supabase.from('task_history').select('*');
 
   if (error) {
     console.error('Error fetching task history stats:', error);

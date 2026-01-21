@@ -3,7 +3,7 @@
 import { useState, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import type { TaskWithRelations } from '@/lib/tasks/actions';
-import type { Status, Division, User, CustomFieldDefinition, TaskTemplate, ChecklistWithItems } from '@/lib/database.types';
+import type { Status, Division, User, CustomFieldDefinition, ChecklistWithItems, JobWithCustomer, Customer } from '@/lib/database.types';
 import { createTask, updateTask, deleteTask } from '@/lib/tasks/actions';
 import { syncTaskChecklists } from '@/lib/checklists/actions';
 import {
@@ -40,6 +40,8 @@ import { Separator } from '@/components/ui/separator';
 import { Loader2, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TaskMediaPanel } from './task-media-panel';
+import { JobSearch } from './job-search';
+import { QuickAddCustomerJob } from './quick-add-customer-job';
 
 interface TaskModalProps {
   isOpen: boolean;
@@ -50,7 +52,8 @@ interface TaskModalProps {
   users: User[];
   defaultStatusId: string | null;
   customFields: CustomFieldDefinition[];
-  templates?: TaskTemplate[];
+  jobs?: JobWithCustomer[];
+  customers?: Customer[];
   checklists?: ChecklistWithItems[];
   initialChecklistIds?: string[];
 }
@@ -64,7 +67,8 @@ export function TaskModal({
   users,
   defaultStatusId,
   customFields,
-  templates = [],
+  jobs = [],
+  customers = [],
   checklists = [],
   initialChecklistIds = [],
 }: TaskModalProps) {
@@ -75,7 +79,8 @@ export function TaskModal({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [customFieldErrors, setCustomFieldErrors] = useState<Record<string, string>>({});
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string>('');
+  const [selectedJob, setSelectedJob] = useState<JobWithCustomer | null>(null);
+  const [showQuickAddJob, setShowQuickAddJob] = useState(false);
 
   const isEditing = !!task;
 
@@ -124,62 +129,31 @@ export function TaskModal({
     return defaults;
   };
 
-  // Handle template selection - pre-fill form with template defaults
-  const handleTemplateSelect = (templateId: string) => {
-    setSelectedTemplateId(templateId);
+  // Handle job selection - auto-fill address from job
+  const handleJobSelect = (job: JobWithCustomer | null) => {
+    setSelectedJob(job);
 
-    if (!templateId) {
-      // Reset to defaults when "No template" is selected
-      setFormData({
-        title: '',
-        description: '',
-        specifications: '',
-        status_id: defaultStatusId || (statuses.length > 0 ? statuses[0].id : ''),
-        division_id: '',
-        assigned_user_id: '',
-        due_date: '',
-        address: '',
-        location_lat: '',
-        location_lng: '',
-      });
-      setCustomFieldValues(getDefaultCustomFieldValues());
-      return;
+    if (job) {
+      // Auto-fill address and location from job
+      setFormData((prev) => ({
+        ...prev,
+        address: job.address || '',
+        location_lat: job.location_lat?.toString() || '',
+        location_lng: job.location_lng?.toString() || '',
+      }));
     }
+  };
 
-    const template = templates.find((t) => t.id === templateId);
-    if (!template) return;
-
-    // Pre-fill form data from template
+  // Handle job created from quick-add modal
+  const handleJobCreated = (job: JobWithCustomer) => {
+    setSelectedJob(job);
+    // Auto-fill address from the new job
     setFormData((prev) => ({
       ...prev,
-      title: template.default_title || '',
-      description: template.default_description || '',
-      division_id: template.default_division_id || '',
-      // Keep status, assigned user, due date, and location unchanged (user must set these)
+      address: job.address || '',
+      location_lat: job.location_lat?.toString() || '',
+      location_lng: job.location_lng?.toString() || '',
     }));
-
-    // Pre-fill custom field values from template
-    if (template.default_custom_fields) {
-      const templateCustomFields: Record<string, unknown> = {};
-      customFields.forEach((field) => {
-        const templateValue = template.default_custom_fields?.[field.id];
-        if (templateValue !== undefined) {
-          templateCustomFields[field.id] = templateValue;
-        } else {
-          // Use default for fields not in template
-          switch (field.field_type) {
-            case 'checkbox':
-              templateCustomFields[field.id] = false;
-              break;
-            default:
-              templateCustomFields[field.id] = '';
-          }
-        }
-      });
-      setCustomFieldValues(templateCustomFields);
-    } else {
-      setCustomFieldValues(getDefaultCustomFieldValues());
-    }
   };
 
   // Reset form when task changes or modal opens
@@ -241,7 +215,12 @@ export function TaskModal({
     setError(null);
     setShowDeleteConfirm(false);
     setCustomFieldErrors({});
-    setSelectedTemplateId('');
+    // Initialize selected job from task
+    if (task?.job) {
+      setSelectedJob(task.job);
+    } else {
+      setSelectedJob(null);
+    }
     // Initialize selected checklists
     setSelectedChecklistIds(task ? initialChecklistIds : []);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -321,6 +300,7 @@ export function TaskModal({
         specifications: formData.specifications || null,
         status_id: formData.status_id,
         division_id: formData.division_id || null,
+        job_id: selectedJob?.id || null,
         assigned_user_id: formData.assigned_user_id || null,
         due_date: formData.due_date || null,
         address: formData.address || null,
@@ -406,31 +386,19 @@ export function TaskModal({
                 </Alert>
               )}
 
-              {/* Create from Template - only show in create mode */}
-              {!isEditing && templates.length > 0 && (
+              {/* Link to Job - auto-fills address */}
+              {jobs.length > 0 && (
                 <div className="pb-4">
-                  <Label>Create from Template</Label>
-                  <Select
-                    value={selectedTemplateId}
-                    onValueChange={handleTemplateSelect}
-                  >
-                    <SelectTrigger className="mt-2">
-                      <SelectValue placeholder="No template (start from scratch)" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">No template (start from scratch)</SelectItem>
-                      {templates.map((template) => (
-                        <SelectItem key={template.id} value={template.id}>
-                          {template.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {selectedTemplateId && (
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      Template values have been applied. You can override any field below.
-                    </p>
-                  )}
+                  <Label>Link to Customer Job</Label>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Select a job to auto-fill address information.
+                  </p>
+                  <JobSearch
+                    jobs={jobs}
+                    selectedJob={selectedJob}
+                    onJobSelect={handleJobSelect}
+                    onQuickAddClick={() => setShowQuickAddJob(true)}
+                  />
                   <Separator className="mt-4" />
                 </div>
               )}
@@ -853,6 +821,14 @@ export function TaskModal({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Quick Add Customer/Job Modal */}
+      <QuickAddCustomerJob
+        isOpen={showQuickAddJob}
+        onClose={() => setShowQuickAddJob(false)}
+        onJobCreated={handleJobCreated}
+        existingCustomers={customers}
+      />
     </>
   );
 }
