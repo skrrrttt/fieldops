@@ -31,13 +31,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Each test file uses isolated IndexedDB (no cross-test state pollution)
   5. Dexie operations in `lib/offline/` use typed table accessors (no `any` casts)
   6. `clearSyncedMutations()` deletes completed mutations from IndexedDB
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 01-01: Vitest configuration with fake-indexeddb
-- [ ] 01-02: Mutation queue unit tests
-- [ ] 01-03: Sync processor unit tests
-- [ ] 01-04: Type-safe Dexie and clearSyncedMutations fix
+- [ ] 01-01-PLAN.md — Vitest configuration with fake-indexeddb
+- [ ] 01-02-PLAN.md — Mutation queue unit tests (FIFO, retry count, CRUD)
+- [ ] 01-03-PLAN.md — Sync processor unit tests (conflict detection, status transitions)
+- [ ] 01-04-PLAN.md — Type-safe Dexie helpers and clearSyncedMutations fix
 
 ### Phase 2: Monitoring
 **Goal**: Developers have visibility into production sync behavior and errors, even when users are offline
@@ -102,7 +102,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Testing Foundation | 0/4 | Not started | - |
+| 1. Testing Foundation | 0/4 | Planned | - |
 | 2. Monitoring | 0/2 | Not started | - |
 | 3. Batch Sync | 0/1 | Not started | - |
 | 4. Web Worker | 0/1 | Not started | - |
@@ -110,4 +110,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 ---
 *Roadmap created: 2026-01-22*
+*Phase 1 planned: 2026-01-22*
 *Total requirements: 16 | Phases: 5 | Depth: standard*
