@@ -1,6 +1,9 @@
 /**
  * Helper functions for offline data storage
  * Provides saveToLocal, getFromLocal, and clearLocal operations
+ *
+ * Note: Uses switch/case pattern for type-safe table access instead of
+ * dynamic property access with `any` casts.
  */
 
 import {
@@ -40,8 +43,29 @@ export async function saveToLocal<T extends TableName>(
   if (!isIndexedDBAvailable()) return;
 
   const db = getDB();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (db[tableName] as any).put(data);
+  switch (tableName) {
+    case 'tasks':
+      await db.tasks.put(data as LocalTask);
+      break;
+    case 'divisions':
+      await db.divisions.put(data as Division);
+      break;
+    case 'statuses':
+      await db.statuses.put(data as Status);
+      break;
+    case 'comments':
+      await db.comments.put(data as LocalComment);
+      break;
+    case 'photos':
+      await db.photos.put(data as LocalPhoto);
+      break;
+    case 'files':
+      await db.files.put(data as LocalFile);
+      break;
+    case 'custom_field_definitions':
+      await db.custom_field_definitions.put(data as CustomFieldDefinition);
+      break;
+  }
 }
 
 /**
@@ -55,8 +79,29 @@ export async function saveAllToLocal<T extends TableName>(
   if (!isIndexedDBAvailable()) return;
 
   const db = getDB();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (db[tableName] as any).bulkPut(items);
+  switch (tableName) {
+    case 'tasks':
+      await db.tasks.bulkPut(items as LocalTask[]);
+      break;
+    case 'divisions':
+      await db.divisions.bulkPut(items as Division[]);
+      break;
+    case 'statuses':
+      await db.statuses.bulkPut(items as Status[]);
+      break;
+    case 'comments':
+      await db.comments.bulkPut(items as LocalComment[]);
+      break;
+    case 'photos':
+      await db.photos.bulkPut(items as LocalPhoto[]);
+      break;
+    case 'files':
+      await db.files.bulkPut(items as LocalFile[]);
+      break;
+    case 'custom_field_definitions':
+      await db.custom_field_definitions.bulkPut(items as CustomFieldDefinition[]);
+      break;
+  }
 
   if (updateTimestamp) {
     await updateSyncTimestamp(tableName);
@@ -73,8 +118,22 @@ export async function getFromLocal<T extends TableName>(
   if (!isIndexedDBAvailable()) return undefined;
 
   const db = getDB();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (db[tableName] as any).get(id);
+  switch (tableName) {
+    case 'tasks':
+      return (await db.tasks.get(id)) as TableDataMap[T] | undefined;
+    case 'divisions':
+      return (await db.divisions.get(id)) as TableDataMap[T] | undefined;
+    case 'statuses':
+      return (await db.statuses.get(id)) as TableDataMap[T] | undefined;
+    case 'comments':
+      return (await db.comments.get(id)) as TableDataMap[T] | undefined;
+    case 'photos':
+      return (await db.photos.get(id)) as TableDataMap[T] | undefined;
+    case 'files':
+      return (await db.files.get(id)) as TableDataMap[T] | undefined;
+    case 'custom_field_definitions':
+      return (await db.custom_field_definitions.get(id)) as TableDataMap[T] | undefined;
+  }
 }
 
 /**
@@ -86,23 +145,22 @@ export async function getAllFromLocal<T extends TableName>(
   if (!isIndexedDBAvailable()) return [];
 
   const db = getDB();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (db[tableName] as any).toArray();
-}
-
-/**
- * Get items matching a filter condition
- */
-export async function getFilteredFromLocal<T extends TableName>(
-  tableName: T,
-  indexName: string,
-  value: string | number | boolean
-): Promise<TableDataMap[T][]> {
-  if (!isIndexedDBAvailable()) return [];
-
-  const db = getDB();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (db[tableName] as any).where(indexName).equals(value).toArray();
+  switch (tableName) {
+    case 'tasks':
+      return (await db.tasks.toArray()) as TableDataMap[T][];
+    case 'divisions':
+      return (await db.divisions.toArray()) as TableDataMap[T][];
+    case 'statuses':
+      return (await db.statuses.toArray()) as TableDataMap[T][];
+    case 'comments':
+      return (await db.comments.toArray()) as TableDataMap[T][];
+    case 'photos':
+      return (await db.photos.toArray()) as TableDataMap[T][];
+    case 'files':
+      return (await db.files.toArray()) as TableDataMap[T][];
+    case 'custom_field_definitions':
+      return (await db.custom_field_definitions.toArray()) as TableDataMap[T][];
+  }
 }
 
 /**
@@ -115,8 +173,29 @@ export async function deleteFromLocal<T extends TableName>(
   if (!isIndexedDBAvailable()) return;
 
   const db = getDB();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (db[tableName] as any).delete(id);
+  switch (tableName) {
+    case 'tasks':
+      await db.tasks.delete(id);
+      break;
+    case 'divisions':
+      await db.divisions.delete(id);
+      break;
+    case 'statuses':
+      await db.statuses.delete(id);
+      break;
+    case 'comments':
+      await db.comments.delete(id);
+      break;
+    case 'photos':
+      await db.photos.delete(id);
+      break;
+    case 'files':
+      await db.files.delete(id);
+      break;
+    case 'custom_field_definitions':
+      await db.custom_field_definitions.delete(id);
+      break;
+  }
 }
 
 /**
@@ -129,8 +208,29 @@ export async function deleteAllFromLocal<T extends TableName>(
   if (!isIndexedDBAvailable()) return;
 
   const db = getDB();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (db[tableName] as any).bulkDelete(ids);
+  switch (tableName) {
+    case 'tasks':
+      await db.tasks.bulkDelete(ids);
+      break;
+    case 'divisions':
+      await db.divisions.bulkDelete(ids);
+      break;
+    case 'statuses':
+      await db.statuses.bulkDelete(ids);
+      break;
+    case 'comments':
+      await db.comments.bulkDelete(ids);
+      break;
+    case 'photos':
+      await db.photos.bulkDelete(ids);
+      break;
+    case 'files':
+      await db.files.bulkDelete(ids);
+      break;
+    case 'custom_field_definitions':
+      await db.custom_field_definitions.bulkDelete(ids);
+      break;
+  }
 }
 
 /**
@@ -140,8 +240,29 @@ export async function clearLocal(tableName: TableName): Promise<void> {
   if (!isIndexedDBAvailable()) return;
 
   const db = getDB();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (db[tableName] as any).clear();
+  switch (tableName) {
+    case 'tasks':
+      await db.tasks.clear();
+      break;
+    case 'divisions':
+      await db.divisions.clear();
+      break;
+    case 'statuses':
+      await db.statuses.clear();
+      break;
+    case 'comments':
+      await db.comments.clear();
+      break;
+    case 'photos':
+      await db.photos.clear();
+      break;
+    case 'files':
+      await db.files.clear();
+      break;
+    case 'custom_field_definitions':
+      await db.custom_field_definitions.clear();
+      break;
+  }
 }
 
 /**
@@ -170,8 +291,22 @@ export async function countLocal(tableName: TableName): Promise<number> {
   if (!isIndexedDBAvailable()) return 0;
 
   const db = getDB();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (db[tableName] as any).count();
+  switch (tableName) {
+    case 'tasks':
+      return db.tasks.count();
+    case 'divisions':
+      return db.divisions.count();
+    case 'statuses':
+      return db.statuses.count();
+    case 'comments':
+      return db.comments.count();
+    case 'photos':
+      return db.photos.count();
+    case 'files':
+      return db.files.count();
+    case 'custom_field_definitions':
+      return db.custom_field_definitions.count();
+  }
 }
 
 // ============================================

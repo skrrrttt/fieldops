@@ -45,7 +45,6 @@ export {
   // Bulk operations
   saveAllToLocal,
   getAllFromLocal,
-  getFilteredFromLocal,
   deleteAllFromLocal,
   // Clear operations
   clearLocal,
