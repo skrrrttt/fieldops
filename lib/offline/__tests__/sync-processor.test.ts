@@ -368,4 +368,389 @@ describe('sync-processor', () => {
       expect(updateMutationStatus).toHaveBeenCalledWith('mutation-1', 'syncing');
     });
   });
+
+  describe('processAllMutations - conflict detection', () => {
+    it('should detect conflict when server status differs from previous_status_id AND server updated after mutation', async () => {
+      // Mutation created at 10:00, expects status-old
+      const mutation = createMockStatusMutation({
+        id: 'mutation-1',
+        created_at: '2024-01-01T10:00:00Z',
+        payload: {
+          task_id: 'task-1',
+          status_id: 'status-new',
+          previous_status_id: 'status-old',
+        },
+      }) as PendingStatusMutation;
+
+      (getPendingMutations as Mock).mockResolvedValue([mutation]);
+
+      // Server has different status AND was updated AFTER mutation was created
+      mockConflictScenario(mockSupabase, 'status-different', '2024-01-01T11:00:00Z');
+
+      const result = await processAllMutations();
+
+      expect(result.conflicts.length).toBe(1);
+      expect(result.conflicts[0].mutationId).toBe('mutation-1');
+      expect(result.conflicts[0].conflict).toBeDefined();
+      expect(result.conflicts[0].conflict?.server_value).toBe('status-different');
+      expect(result.conflicts[0].conflict?.local_value).toBe('status-new');
+
+      // Verify conflict was marked
+      expect(markMutationConflict).toHaveBeenCalledWith(
+        'mutation-1',
+        expect.objectContaining({
+          server_value: 'status-different',
+          local_value: 'status-new',
+          field_name: 'status',
+        })
+      );
+    });
+
+    it('should NOT detect conflict when server status matches previous_status_id', async () => {
+      const mutation = createMockStatusMutation({
+        id: 'mutation-1',
+        created_at: '2024-01-01T10:00:00Z',
+        payload: {
+          task_id: 'task-1',
+          status_id: 'status-new',
+          previous_status_id: 'status-old',
+        },
+      }) as PendingStatusMutation;
+
+      (getPendingMutations as Mock).mockResolvedValue([mutation]);
+
+      // Server has the SAME status as previous_status_id (no conflict)
+      mockSuccessfulTaskUpdate(mockSupabase, 'status-old', '2024-01-01T11:00:00Z');
+      (getFromLocal as Mock).mockResolvedValue({ id: 'task-1', status_id: 'status-old' });
+
+      const result = await processAllMutations();
+
+      expect(result.conflicts.length).toBe(0);
+      expect(result.errors.length).toBe(0);
+      expect(markMutationConflict).not.toHaveBeenCalled();
+    });
+
+    it('should NOT detect conflict when server is older than mutation', async () => {
+      // Mutation created at 10:00
+      const mutation = createMockStatusMutation({
+        id: 'mutation-1',
+        created_at: '2024-01-01T10:00:00Z',
+        payload: {
+          task_id: 'task-1',
+          status_id: 'status-new',
+          previous_status_id: 'status-old',
+        },
+      }) as PendingStatusMutation;
+
+      (getPendingMutations as Mock).mockResolvedValue([mutation]);
+
+      // Server has different status but was updated BEFORE mutation was created
+      // This means the mutation was made with knowledge of this server state
+      mockSuccessfulTaskUpdate(mockSupabase, 'status-different', '2024-01-01T09:00:00Z');
+      (getFromLocal as Mock).mockResolvedValue({ id: 'task-1', status_id: 'status-different' });
+
+      const result = await processAllMutations();
+
+      // No conflict because server update predates the mutation
+      expect(result.conflicts.length).toBe(0);
+      expect(markMutationConflict).not.toHaveBeenCalled();
+    });
+
+    it('should skip conflict check when force_overwrite is true', async () => {
+      const mutation = createMockStatusMutation({
+        id: 'mutation-1',
+        created_at: '2024-01-01T10:00:00Z',
+        force_overwrite: true,
+        payload: {
+          task_id: 'task-1',
+          status_id: 'status-new',
+          previous_status_id: 'status-old',
+        },
+      }) as PendingStatusMutation;
+
+      (getPendingMutations as Mock).mockResolvedValue([mutation]);
+
+      // Server has different status and is newer - would normally conflict
+      // But force_overwrite bypasses conflict detection
+      mockSuccessfulTaskUpdate(mockSupabase, 'status-different', '2024-01-01T11:00:00Z');
+      (getFromLocal as Mock).mockResolvedValue({ id: 'task-1', status_id: 'status-different' });
+
+      const result = await processAllMutations();
+
+      expect(result.conflicts.length).toBe(0);
+      expect(result.errors.length).toBe(0);
+      expect(markMutationConflict).not.toHaveBeenCalled();
+      expect(deleteMutation).toHaveBeenCalledWith('mutation-1');
+    });
+  });
+
+  describe('processAllMutations - error handling', () => {
+    it('should mark mutation as failed on database fetch error', async () => {
+      const mutation = createMockStatusMutation({
+        id: 'mutation-1',
+      }) as PendingStatusMutation;
+
+      (getPendingMutations as Mock).mockResolvedValue([mutation]);
+      mockErrorScenario(mockSupabase, 'Database connection failed', 'fetch');
+
+      const result = await processAllMutations();
+
+      expect(result.errors.length).toBe(1);
+      expect(result.errors[0].mutationId).toBe('mutation-1');
+      expect(result.errors[0].error).toBe('Database connection failed');
+
+      // Verify mutation was marked as failed
+      expect(updateMutationStatus).toHaveBeenCalledWith(
+        'mutation-1',
+        'failed',
+        'Database connection failed'
+      );
+    });
+
+    it('should mark mutation as failed on database update error', async () => {
+      const mutation = createMockStatusMutation({
+        id: 'mutation-1',
+        payload: {
+          task_id: 'task-1',
+          status_id: 'status-new',
+          previous_status_id: 'status-old',
+        },
+      }) as PendingStatusMutation;
+
+      (getPendingMutations as Mock).mockResolvedValue([mutation]);
+      mockErrorScenario(mockSupabase, 'Update permission denied', 'update');
+
+      const result = await processAllMutations();
+
+      expect(result.errors.length).toBe(1);
+      expect(result.errors[0].error).toBe('Update permission denied');
+
+      expect(updateMutationStatus).toHaveBeenCalledWith(
+        'mutation-1',
+        'failed',
+        'Update permission denied'
+      );
+    });
+
+    it('should mark mutation as failed when task not found', async () => {
+      const mutation = createMockStatusMutation({
+        id: 'mutation-1',
+      }) as PendingStatusMutation;
+
+      (getPendingMutations as Mock).mockResolvedValue([mutation]);
+      mockTaskNotFound(mockSupabase);
+
+      const result = await processAllMutations();
+
+      expect(result.errors.length).toBe(1);
+      expect(result.errors[0].error).toBe('Task not found');
+
+      expect(updateMutationStatus).toHaveBeenCalledWith(
+        'mutation-1',
+        'failed',
+        'Task not found'
+      );
+    });
+
+    it('should continue processing after error (partial success)', async () => {
+      const mutation1 = createMockStatusMutation({
+        id: 'mutation-1',
+        created_at: '2024-01-01T08:00:00Z',
+        payload: { task_id: 'task-1', status_id: 'status-a', previous_status_id: 'status-old' },
+      }) as PendingStatusMutation;
+
+      const mutation2 = createMockStatusMutation({
+        id: 'mutation-2',
+        created_at: '2024-01-01T09:00:00Z',
+        payload: { task_id: 'task-2', status_id: 'status-b', previous_status_id: 'status-old' },
+      }) as PendingStatusMutation;
+
+      const mutation3 = createMockStatusMutation({
+        id: 'mutation-3',
+        created_at: '2024-01-01T10:00:00Z',
+        payload: { task_id: 'task-3', status_id: 'status-c', previous_status_id: 'status-old' },
+      }) as PendingStatusMutation;
+
+      (getPendingMutations as Mock).mockResolvedValue([mutation1, mutation2, mutation3]);
+
+      // First mutation fails, second and third succeed
+      let callCount = 0;
+      const selectMock = vi.fn().mockReturnValue({
+        eq: vi.fn().mockImplementation(() => ({
+          single: vi.fn().mockImplementation(() => {
+            callCount++;
+            if (callCount === 1) {
+              return Promise.resolve({
+                data: null,
+                error: { message: 'First mutation failed' },
+              });
+            }
+            return Promise.resolve({
+              data: { status_id: 'status-old', updated_at: '2023-12-01T00:00:00Z' },
+              error: null,
+            });
+          }),
+        })),
+      });
+
+      const updateMock = vi.fn().mockReturnValue({
+        eq: vi.fn().mockResolvedValue({ data: null, error: null }),
+      });
+
+      mockSupabase.from.mockImplementation((table: string) => {
+        if (table === 'tasks') {
+          return {
+            select: selectMock,
+            update: updateMock,
+          };
+        }
+        return {};
+      });
+
+      (getFromLocal as Mock).mockResolvedValue({ id: 'task-x', status_id: 'status-old' });
+
+      const result = await processAllMutations();
+
+      // Should have processed all 3
+      expect(result.current).toBe(3);
+      expect(result.total).toBe(3);
+
+      // 1 error, 2 successes
+      expect(result.errors.length).toBe(1);
+      expect(result.errors[0].mutationId).toBe('mutation-1');
+
+      // Partial success still counts as synced
+      expect(result.status).toBe('synced');
+
+      // Verify all were processed
+      expect(updateMutationStatus).toHaveBeenCalledWith('mutation-1', 'syncing');
+      expect(updateMutationStatus).toHaveBeenCalledWith('mutation-2', 'syncing');
+      expect(updateMutationStatus).toHaveBeenCalledWith('mutation-3', 'syncing');
+    });
+
+    it('should set error status when all mutations fail', async () => {
+      const mutation1 = createMockStatusMutation({
+        id: 'mutation-1',
+        created_at: '2024-01-01T08:00:00Z',
+      }) as PendingStatusMutation;
+
+      const mutation2 = createMockStatusMutation({
+        id: 'mutation-2',
+        created_at: '2024-01-01T09:00:00Z',
+      }) as PendingStatusMutation;
+
+      (getPendingMutations as Mock).mockResolvedValue([mutation1, mutation2]);
+
+      // All mutations fail
+      mockErrorScenario(mockSupabase, 'Database unavailable', 'fetch');
+
+      const result = await processAllMutations();
+
+      expect(result.errors.length).toBe(2);
+      expect(result.status).toBe('error');
+    });
+  });
+
+  describe('processAllMutations - progress tracking', () => {
+    it('should track errors in progress', async () => {
+      const mutation = createMockStatusMutation({
+        id: 'mutation-1',
+      }) as PendingStatusMutation;
+
+      (getPendingMutations as Mock).mockResolvedValue([mutation]);
+      mockErrorScenario(mockSupabase, 'Database error', 'fetch');
+
+      const progressUpdates: SyncProgress[] = [];
+      const onProgress = (progress: SyncProgress) => {
+        progressUpdates.push({ ...progress });
+      };
+
+      await processAllMutations(onProgress);
+
+      // Final progress should show the error
+      const finalProgress = progressUpdates[progressUpdates.length - 1];
+      expect(finalProgress.errors.length).toBe(1);
+      expect(finalProgress.errors[0].mutationId).toBe('mutation-1');
+    });
+
+    it('should track conflicts in progress', async () => {
+      const mutation = createMockStatusMutation({
+        id: 'mutation-1',
+        created_at: '2024-01-01T10:00:00Z',
+        payload: {
+          task_id: 'task-1',
+          status_id: 'status-new',
+          previous_status_id: 'status-old',
+        },
+      }) as PendingStatusMutation;
+
+      (getPendingMutations as Mock).mockResolvedValue([mutation]);
+      mockConflictScenario(mockSupabase, 'status-different', '2024-01-01T11:00:00Z');
+
+      const progressUpdates: SyncProgress[] = [];
+      const onProgress = (progress: SyncProgress) => {
+        progressUpdates.push({ ...progress });
+      };
+
+      await processAllMutations(onProgress);
+
+      // Final progress should show the conflict
+      const finalProgress = progressUpdates[progressUpdates.length - 1];
+      expect(finalProgress.conflicts.length).toBe(1);
+      expect(finalProgress.conflicts[0].mutationId).toBe('mutation-1');
+    });
+
+    it('should track mixed errors and conflicts in progress', async () => {
+      const mutation1 = createMockStatusMutation({
+        id: 'mutation-error',
+        created_at: '2024-01-01T08:00:00Z',
+      }) as PendingStatusMutation;
+
+      const mutation2 = createMockStatusMutation({
+        id: 'mutation-conflict',
+        created_at: '2024-01-01T09:00:00Z',
+        payload: {
+          task_id: 'task-2',
+          status_id: 'status-new',
+          previous_status_id: 'status-old',
+        },
+      }) as PendingStatusMutation;
+
+      (getPendingMutations as Mock).mockResolvedValue([mutation1, mutation2]);
+
+      // First: error, Second: conflict
+      let callCount = 0;
+      const selectMock = vi.fn().mockReturnValue({
+        eq: vi.fn().mockImplementation(() => ({
+          single: vi.fn().mockImplementation(() => {
+            callCount++;
+            if (callCount === 1) {
+              return Promise.resolve({
+                data: null,
+                error: { message: 'Network error' },
+              });
+            }
+            return Promise.resolve({
+              data: { status_id: 'status-different', updated_at: '2024-01-01T10:00:00Z' },
+              error: null,
+            });
+          }),
+        })),
+      });
+
+      mockSupabase.from.mockImplementation((table: string) => {
+        if (table === 'tasks') {
+          return { select: selectMock };
+        }
+        return {};
+      });
+
+      const result = await processAllMutations();
+
+      expect(result.errors.length).toBe(1);
+      expect(result.conflicts.length).toBe(1);
+      expect(result.errors[0].mutationId).toBe('mutation-error');
+      expect(result.conflicts[0].mutationId).toBe('mutation-conflict');
+    });
+  });
 });
