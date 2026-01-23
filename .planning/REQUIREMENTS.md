@@ -87,10 +87,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TEST-02 | Phase 1 | Pending |
 | TEST-03 | Phase 1 | Pending |
 | TEST-04 | Phase 1 | Pending |
-| MON-01 | Phase 2 | Pending |
-| MON-02 | Phase 2 | Pending |
-| MON-03 | Phase 2 | Pending |
-| MON-04 | Phase 2 | Pending |
+| MON-01 | Phase 2 | Complete |
+| MON-02 | Phase 2 | Complete |
+| MON-03 | Phase 2 | Complete |
+| MON-04 | Phase 2 | Complete |
 | PERF-01 | Phase 3 | Pending |
 | PERF-02 | Phase 3 | Pending |
 | PERF-03 | Phase 4 | Pending |
