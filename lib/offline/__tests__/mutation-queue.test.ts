@@ -43,6 +43,15 @@ import {
   updateMutationStatus,
   getMutationsByStatus,
   getMutationsByType,
+  markMutationConflict,
+  getConflictingMutations,
+  resolveConflict,
+  getConflictCount,
+  resetFailedMutations,
+  getMutationsSummary,
+  getPendingMutationCount,
+  getTotalMutationCount,
+  getMutationCountByStatus,
 } from '../mutation-queue';
 
 describe('mutation-queue CRUD operations', () => {
@@ -559,6 +568,443 @@ describe('mutation-queue filtering', () => {
       const comments = await getMutationsByType('comment');
       expect(comments[0].id).toBe(m1!.id);
       expect(comments[1].id).toBe(m2!.id);
+    });
+  });
+});
+
+describe('mutation-queue conflict handling', () => {
+  beforeEach(() => {
+    dbName = `test_mutation_queue_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    testDB = new MutationQueueTestDB(dbName);
+  });
+
+  afterEach(async () => {
+    if (testDB) {
+      testDB.close();
+      await Dexie.delete(dbName);
+    }
+  });
+
+  describe('markMutationConflict', () => {
+    it('should mark a mutation as having a conflict', async () => {
+      const mutation = await queueStatusMutation({
+        task_id: 'task-1',
+        status_id: 's1',
+        previous_status_id: 's0',
+      });
+
+      const conflictInfo = {
+        detected_at: new Date().toISOString(),
+        local_value: 's1',
+        server_value: 's2',
+        server_updated_at: new Date().toISOString(),
+        field_name: 'status_id',
+      };
+
+      await markMutationConflict(mutation!.id, conflictInfo);
+
+      const updated = await getMutation(mutation!.id);
+      expect(updated!.status).toBe('conflict');
+      expect(updated!.conflict).toEqual(conflictInfo);
+    });
+
+    it('should not throw for non-existent mutation', async () => {
+      const conflictInfo = {
+        detected_at: new Date().toISOString(),
+        local_value: 'local',
+        server_value: 'server',
+        server_updated_at: new Date().toISOString(),
+        field_name: 'field',
+      };
+
+      await expect(
+        markMutationConflict('non-existent', conflictInfo)
+      ).resolves.not.toThrow();
+    });
+  });
+
+  describe('getConflictingMutations', () => {
+    it('should return all mutations with conflict status', async () => {
+      const m1 = await queueStatusMutation({
+        task_id: 'task-1',
+        status_id: 's1',
+        previous_status_id: 's0',
+      });
+      const m2 = await queueStatusMutation({
+        task_id: 'task-2',
+        status_id: 's2',
+        previous_status_id: 's1',
+      });
+      await queueStatusMutation({
+        task_id: 'task-3',
+        status_id: 's3',
+        previous_status_id: 's2',
+      });
+
+      const conflictInfo = {
+        detected_at: new Date().toISOString(),
+        local_value: 'local',
+        server_value: 'server',
+        server_updated_at: new Date().toISOString(),
+        field_name: 'status_id',
+      };
+
+      await markMutationConflict(m1!.id, conflictInfo);
+      await markMutationConflict(m2!.id, conflictInfo);
+
+      const conflicts = await getConflictingMutations();
+
+      expect(conflicts).toHaveLength(2);
+      expect(conflicts.every((m) => m.status === 'conflict')).toBe(true);
+    });
+
+    it('should return conflicts sorted by created_at', async () => {
+      const m1 = await queueStatusMutation({
+        task_id: 'task-1',
+        status_id: 's1',
+        previous_status_id: 's0',
+      });
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      const m2 = await queueStatusMutation({
+        task_id: 'task-2',
+        status_id: 's2',
+        previous_status_id: 's1',
+      });
+
+      const conflictInfo = {
+        detected_at: new Date().toISOString(),
+        local_value: 'local',
+        server_value: 'server',
+        server_updated_at: new Date().toISOString(),
+        field_name: 'status_id',
+      };
+
+      await markMutationConflict(m1!.id, conflictInfo);
+      await markMutationConflict(m2!.id, conflictInfo);
+
+      const conflicts = await getConflictingMutations();
+
+      expect(conflicts[0].id).toBe(m1!.id);
+      expect(conflicts[1].id).toBe(m2!.id);
+    });
+  });
+
+  describe('resolveConflict', () => {
+    it('should resolve conflict by choosing local (reset to pending with force_overwrite)', async () => {
+      const mutation = await queueStatusMutation({
+        task_id: 'task-1',
+        status_id: 's1',
+        previous_status_id: 's0',
+      });
+
+      const conflictInfo = {
+        detected_at: new Date().toISOString(),
+        local_value: 's1',
+        server_value: 's2',
+        server_updated_at: new Date().toISOString(),
+        field_name: 'status_id',
+      };
+
+      await markMutationConflict(mutation!.id, conflictInfo);
+
+      const resolved = await resolveConflict(mutation!.id, 'local');
+
+      expect(resolved).not.toBeNull();
+      expect(resolved!.status).toBe('pending');
+      expect(resolved!.conflict).toBeUndefined();
+      expect(resolved!.force_overwrite).toBe(true);
+    });
+
+    it('should resolve conflict by choosing server (delete mutation)', async () => {
+      const mutation = await queueStatusMutation({
+        task_id: 'task-1',
+        status_id: 's1',
+        previous_status_id: 's0',
+      });
+
+      const conflictInfo = {
+        detected_at: new Date().toISOString(),
+        local_value: 's1',
+        server_value: 's2',
+        server_updated_at: new Date().toISOString(),
+        field_name: 'status_id',
+      };
+
+      await markMutationConflict(mutation!.id, conflictInfo);
+
+      const resolved = await resolveConflict(mutation!.id, 'server');
+
+      expect(resolved).toBeNull();
+
+      const retrieved = await getMutation(mutation!.id);
+      expect(retrieved).toBeUndefined();
+    });
+
+    it('should return null for non-conflict mutation', async () => {
+      const mutation = await queueStatusMutation({
+        task_id: 'task-1',
+        status_id: 's1',
+        previous_status_id: 's0',
+      });
+
+      const resolved = await resolveConflict(mutation!.id, 'local');
+
+      expect(resolved).toBeNull();
+    });
+
+    it('should return null for non-existent mutation', async () => {
+      const resolved = await resolveConflict('non-existent', 'local');
+
+      expect(resolved).toBeNull();
+    });
+  });
+
+  describe('getConflictCount', () => {
+    it('should return count of mutations with conflict status', async () => {
+      const m1 = await queueStatusMutation({
+        task_id: 'task-1',
+        status_id: 's1',
+        previous_status_id: 's0',
+      });
+      const m2 = await queueStatusMutation({
+        task_id: 'task-2',
+        status_id: 's2',
+        previous_status_id: 's1',
+      });
+      await queueStatusMutation({
+        task_id: 'task-3',
+        status_id: 's3',
+        previous_status_id: 's2',
+      });
+
+      expect(await getConflictCount()).toBe(0);
+
+      const conflictInfo = {
+        detected_at: new Date().toISOString(),
+        local_value: 'local',
+        server_value: 'server',
+        server_updated_at: new Date().toISOString(),
+        field_name: 'status_id',
+      };
+
+      await markMutationConflict(m1!.id, conflictInfo);
+      expect(await getConflictCount()).toBe(1);
+
+      await markMutationConflict(m2!.id, conflictInfo);
+      expect(await getConflictCount()).toBe(2);
+    });
+  });
+
+  describe('resetFailedMutations', () => {
+    it('should reset all failed mutations to pending', async () => {
+      const m1 = await queueStatusMutation({
+        task_id: 'task-1',
+        status_id: 's1',
+        previous_status_id: 's0',
+      });
+      const m2 = await queueStatusMutation({
+        task_id: 'task-2',
+        status_id: 's2',
+        previous_status_id: 's1',
+      });
+      await queueStatusMutation({
+        task_id: 'task-3',
+        status_id: 's3',
+        previous_status_id: 's2',
+      });
+
+      await updateMutationStatus(m1!.id, 'failed', 'Error 1');
+      await updateMutationStatus(m2!.id, 'failed', 'Error 2');
+
+      const resetCount = await resetFailedMutations();
+
+      expect(resetCount).toBe(2);
+
+      const m1Updated = await getMutation(m1!.id);
+      const m2Updated = await getMutation(m2!.id);
+
+      expect(m1Updated!.status).toBe('pending');
+      expect(m1Updated!.error_message).toBeUndefined();
+      expect(m2Updated!.status).toBe('pending');
+      expect(m2Updated!.error_message).toBeUndefined();
+    });
+
+    it('should return 0 when no failed mutations exist', async () => {
+      await queueStatusMutation({
+        task_id: 'task-1',
+        status_id: 's1',
+        previous_status_id: 's0',
+      });
+
+      const resetCount = await resetFailedMutations();
+
+      expect(resetCount).toBe(0);
+    });
+
+    it('should preserve retry_count after reset', async () => {
+      const mutation = await queueStatusMutation({
+        task_id: 'task-1',
+        status_id: 's1',
+        previous_status_id: 's0',
+      });
+
+      await updateMutationStatus(mutation!.id, 'failed', 'Error');
+      await updateMutationStatus(mutation!.id, 'failed', 'Error 2');
+
+      const beforeReset = await getMutation(mutation!.id);
+      expect(beforeReset!.retry_count).toBe(2);
+
+      await resetFailedMutations();
+
+      const afterReset = await getMutation(mutation!.id);
+      expect(afterReset!.retry_count).toBe(2); // Preserved
+    });
+  });
+});
+
+describe('mutation-queue summary and counts', () => {
+  beforeEach(() => {
+    dbName = `test_mutation_queue_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    testDB = new MutationQueueTestDB(dbName);
+  });
+
+  afterEach(async () => {
+    if (testDB) {
+      testDB.close();
+      await Dexie.delete(dbName);
+    }
+  });
+
+  describe('getMutationsSummary', () => {
+    it('should return correct summary with counts by status and type', async () => {
+      // Create mutations of different types
+      const m1 = await queueStatusMutation({
+        task_id: 'task-1',
+        status_id: 's1',
+        previous_status_id: 's0',
+      });
+      const m2 = await queueStatusMutation({
+        task_id: 'task-2',
+        status_id: 's2',
+        previous_status_id: 's1',
+      });
+      await queueCommentMutation({
+        task_id: 'task-3',
+        content: 'comment',
+        temp_id: 'temp-1',
+      });
+      const blob = new Blob(['data'], { type: 'image/jpeg' });
+      await queuePhotoMutation({
+        task_id: 'task-4',
+        blob,
+        timestamp: new Date().toISOString(),
+        gps_lat: null,
+        gps_lng: null,
+        temp_id: 'temp-photo',
+      });
+
+      // Change some statuses
+      await updateMutationStatus(m1!.id, 'syncing');
+      await updateMutationStatus(m2!.id, 'failed', 'error');
+
+      const summary = await getMutationsSummary();
+
+      expect(summary.total).toBe(4);
+      expect(summary.pending).toBe(2); // comment + photo
+      expect(summary.syncing).toBe(1);
+      expect(summary.failed).toBe(1);
+      expect(summary.conflict).toBe(0);
+      expect(summary.byType.status).toBe(2);
+      expect(summary.byType.comment).toBe(1);
+      expect(summary.byType.photo).toBe(1);
+      expect(summary.byType.file).toBe(0);
+    });
+
+    it('should return zero counts for empty queue', async () => {
+      const summary = await getMutationsSummary();
+
+      expect(summary.total).toBe(0);
+      expect(summary.pending).toBe(0);
+      expect(summary.syncing).toBe(0);
+      expect(summary.failed).toBe(0);
+      expect(summary.conflict).toBe(0);
+      expect(summary.byType.status).toBe(0);
+      expect(summary.byType.comment).toBe(0);
+      expect(summary.byType.photo).toBe(0);
+      expect(summary.byType.file).toBe(0);
+    });
+  });
+
+  describe('getPendingMutationCount', () => {
+    it('should return count of pending mutations only', async () => {
+      const m1 = await queueStatusMutation({
+        task_id: 'task-1',
+        status_id: 's1',
+        previous_status_id: 's0',
+      });
+      await queueStatusMutation({
+        task_id: 'task-2',
+        status_id: 's2',
+        previous_status_id: 's1',
+      });
+      await queueStatusMutation({
+        task_id: 'task-3',
+        status_id: 's3',
+        previous_status_id: 's2',
+      });
+
+      expect(await getPendingMutationCount()).toBe(3);
+
+      await updateMutationStatus(m1!.id, 'syncing');
+      expect(await getPendingMutationCount()).toBe(2);
+    });
+  });
+
+  describe('getTotalMutationCount', () => {
+    it('should return total count of all mutations regardless of status', async () => {
+      const m1 = await queueStatusMutation({
+        task_id: 'task-1',
+        status_id: 's1',
+        previous_status_id: 's0',
+      });
+      await queueCommentMutation({
+        task_id: 'task-2',
+        content: 'comment',
+        temp_id: 'temp-1',
+      });
+
+      expect(await getTotalMutationCount()).toBe(2);
+
+      await updateMutationStatus(m1!.id, 'failed', 'error');
+      expect(await getTotalMutationCount()).toBe(2); // Still 2
+    });
+  });
+
+  describe('getMutationCountByStatus', () => {
+    it('should return count for specific status', async () => {
+      const m1 = await queueStatusMutation({
+        task_id: 'task-1',
+        status_id: 's1',
+        previous_status_id: 's0',
+      });
+      const m2 = await queueStatusMutation({
+        task_id: 'task-2',
+        status_id: 's2',
+        previous_status_id: 's1',
+      });
+      await queueStatusMutation({
+        task_id: 'task-3',
+        status_id: 's3',
+        previous_status_id: 's2',
+      });
+
+      await updateMutationStatus(m1!.id, 'failed', 'error');
+      await updateMutationStatus(m2!.id, 'failed', 'error 2');
+
+      expect(await getMutationCountByStatus('pending')).toBe(1);
+      expect(await getMutationCountByStatus('failed')).toBe(2);
+      expect(await getMutationCountByStatus('syncing')).toBe(0);
+      expect(await getMutationCountByStatus('conflict')).toBe(0);
     });
   });
 });
