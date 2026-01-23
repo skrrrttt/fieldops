@@ -63,10 +63,10 @@ Plans:
   2. Batch size is configurable (default: 5 for data mutations, 2 for photos)
   3. Rate limit errors (429) trigger exponential backoff with jitter before retry
   4. Sync processor tests pass with batched implementation
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 03-01: Batch sync processor with rate limiting
+- [ ] 03-01-PLAN.md — Batch processor with p-limit concurrency and exponential backoff
 
 ### Phase 4: Web Worker
 **Goal**: Photo uploads do not freeze the UI during compression and watermarking
@@ -104,7 +104,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Testing Foundation | 4/4 | ✓ Complete | 2026-01-23 |
 | 2. Monitoring | 2/2 | ✓ Complete | 2026-01-23 |
-| 3. Batch Sync | 0/1 | Not started | - |
+| 3. Batch Sync | 0/1 | Planned | - |
 | 4. Web Worker | 0/1 | Not started | - |
 | 5. Documentation | 0/1 | Not started | - |
 
@@ -112,4 +112,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 *Roadmap created: 2026-01-22*
 *Phase 1 planned: 2026-01-22*
 *Phase 2 planned: 2026-01-23*
+*Phase 3 planned: 2026-01-23*
 *Total requirements: 16 | Phases: 5 | Depth: standard*
