@@ -312,8 +312,8 @@ describe('sync-processor', () => {
       expect(progressUpdates[progressUpdates.length - 1].status).toBe('synced');
     });
 
-    it('should process mutations in FIFO order (oldest first)', async () => {
-      const processOrder: string[] = [];
+    it('should mark all mutations as syncing before batch processing starts', async () => {
+      const syncingOrder: string[] = [];
 
       // Create mutations with explicit timestamps
       const mutation1 = createMockStatusMutation({
@@ -337,10 +337,10 @@ describe('sync-processor', () => {
       // Return in FIFO order (oldest first) - getPendingMutations sorts by created_at
       (getPendingMutations as Mock).mockResolvedValue([mutation1, mutation2, mutation3]);
 
-      // Track processing order via updateMutationStatus calls - only track 'syncing' status
+      // Track 'syncing' status calls to verify batch marking
       (updateMutationStatus as Mock).mockImplementation((id: string, status: string) => {
         if (status === 'syncing') {
-          processOrder.push(id);
+          syncingOrder.push(id);
         }
         return Promise.resolve();
       });
@@ -350,8 +350,8 @@ describe('sync-processor', () => {
 
       await processAllMutations();
 
-      // Verify FIFO order: oldest processed first
-      expect(processOrder).toEqual([
+      // With batch processing, all mutations are marked as syncing (order preserved from input)
+      expect(syncingOrder).toEqual([
         'mutation-oldest',
         'mutation-middle',
         'mutation-newest',
@@ -372,6 +372,80 @@ describe('sync-processor', () => {
 
       // Verify status was updated to syncing
       expect(updateMutationStatus).toHaveBeenCalledWith('mutation-1', 'syncing');
+    });
+
+    it('should process mutations concurrently (not sequentially)', async () => {
+      // Create multiple mutations
+      const mutations = [
+        createMockStatusMutation({
+          id: 'mutation-1',
+          created_at: '2024-01-01T08:00:00Z',
+          payload: { task_id: 'task-1', status_id: 'status-a', previous_status_id: 'status-old' },
+        }),
+        createMockStatusMutation({
+          id: 'mutation-2',
+          created_at: '2024-01-01T08:01:00Z',
+          payload: { task_id: 'task-2', status_id: 'status-b', previous_status_id: 'status-old' },
+        }),
+        createMockStatusMutation({
+          id: 'mutation-3',
+          created_at: '2024-01-01T08:02:00Z',
+          payload: { task_id: 'task-3', status_id: 'status-c', previous_status_id: 'status-old' },
+        }),
+      ] as PendingStatusMutation[];
+
+      (getPendingMutations as Mock).mockResolvedValue(mutations);
+
+      // Track when each mutation starts and ends processing
+      const processingTimeline: { id: string; event: 'start' | 'end'; time: number }[] = [];
+      let callCount = 0;
+
+      const selectMock = vi.fn().mockReturnValue({
+        eq: vi.fn().mockImplementation(() => ({
+          single: vi.fn().mockImplementation(async () => {
+            callCount++;
+            const mutationId = mutations[callCount - 1]?.id || 'unknown';
+            processingTimeline.push({ id: mutationId, event: 'start', time: Date.now() });
+
+            // Simulate network delay
+            await new Promise(r => setTimeout(r, 50));
+
+            processingTimeline.push({ id: mutationId, event: 'end', time: Date.now() });
+            return {
+              data: { status_id: 'status-old', updated_at: '2023-12-01T00:00:00Z' },
+              error: null,
+            };
+          }),
+        })),
+      });
+
+      const updateMock = vi.fn().mockReturnValue({
+        eq: vi.fn().mockResolvedValue({ data: null, error: null }),
+      });
+
+      mockSupabase.from.mockImplementation((table: string) => {
+        if (table === 'tasks') {
+          return { select: selectMock, update: updateMock };
+        }
+        return {};
+      });
+
+      (getFromLocal as Mock).mockResolvedValue({ id: 'task-1', status_id: 'status-old' });
+
+      await processAllMutations();
+
+      // With concurrent processing, start events should happen before all end events
+      // (i.e., mutations overlap in processing time)
+      const startTimes = processingTimeline.filter(e => e.event === 'start').map(e => e.time);
+      const endTimes = processingTimeline.filter(e => e.event === 'end').map(e => e.time);
+
+      // At least some starts should happen before some ends (concurrent)
+      // With sequential processing, all events would alternate: start, end, start, end...
+      const lastStart = Math.max(...startTimes);
+      const firstEnd = Math.min(...endTimes);
+
+      // In concurrent processing, the last mutation should start before the first mutation ends
+      expect(lastStart).toBeLessThan(firstEnd);
     });
   });
 
