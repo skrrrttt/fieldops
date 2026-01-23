@@ -13,6 +13,7 @@ import {
   deleteMutation,
   markMutationConflict,
 } from './mutation-queue';
+import { processBatchWithRateLimit } from './batch-processor';
 import {
   type TypedPendingMutation,
   type PendingStatusMutation,
@@ -335,7 +336,9 @@ async function processMutation(mutation: TypedPendingMutation): Promise<SyncResu
 }
 
 /**
- * Process all pending mutations in FIFO order
+ * Process all pending mutations in parallel batches
+ * Data mutations (status, comment) use concurrency of 5
+ * File mutations (photo, file) use concurrency of 2
  * Returns progress callback for UI updates
  */
 export async function processAllMutations(
@@ -361,26 +364,37 @@ export async function processAllMutations(
 
   onProgress?.(progress);
 
-  // Process mutations in order (FIFO)
-  for (const mutation of mutations) {
-    // Mark as syncing
-    await updateMutationStatus(mutation.id, 'syncing');
+  // Mark all mutations as syncing before batch processing
+  await Promise.all(mutations.map(m => updateMutationStatus(m.id, 'syncing')));
 
-    // Process the mutation
-    const result = await processMutation(mutation);
+  // Process mutations in parallel batches with rate limit handling
+  const { results, rateLimitHit, rateLimitRetries } = await processBatchWithRateLimit(
+    mutations,
+    processMutation,
+    (retryNumber, delayMs) => {
+      console.log(`Rate limited. Retry ${retryNumber}/${5} after ${delayMs}ms`);
+    }
+  );
+
+  // Log rate limit info if it occurred
+  if (rateLimitHit) {
+    console.log(`Sync completed with ${rateLimitRetries} rate limit retries`);
+  }
+
+  // Process results - handle success, conflict, and error cases
+  for (const result of results) {
+    const mutation = mutations.find(m => m.id === result.mutationId);
+    if (!mutation) continue;
 
     progress.current++;
 
     if (result.success) {
-      // Mark as synced then remove from queue
       await updateMutationStatus(mutation.id, 'synced');
       await deleteMutation(mutation.id);
     } else if (result.conflict) {
-      // Conflict detected - mark mutation and track in progress
       await markMutationConflict(mutation.id, result.conflict);
       progress.conflicts.push(result);
     } else {
-      // Mark as failed and keep in queue
       await updateMutationStatus(mutation.id, 'failed', result.error);
       progress.errors.push(result);
     }
