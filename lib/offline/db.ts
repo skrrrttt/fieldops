@@ -71,7 +71,7 @@ export type MutationType = 'status' | 'comment' | 'photo' | 'file';
 /**
  * Mutation status in the queue
  */
-export type MutationStatus = 'pending' | 'syncing' | 'failed' | 'conflict';
+export type MutationStatus = 'pending' | 'syncing' | 'synced' | 'failed' | 'conflict';
 
 /**
  * Conflict information for a mutation

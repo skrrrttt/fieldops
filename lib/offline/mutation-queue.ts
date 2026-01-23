@@ -220,16 +220,24 @@ export async function deleteMutation(id: string): Promise<void> {
 
 /**
  * Delete all mutations that were successfully synced
+ * Returns the number of mutations deleted
  */
-export async function clearSyncedMutations(): Promise<void> {
-  if (!isIndexedDBAvailable()) return;
+export async function clearSyncedMutations(): Promise<number> {
+  if (!isIndexedDBAvailable()) return 0;
 
-  // Note: We don't have a 'synced' status, but this clears mutations
-  // that were marked for deletion after successful sync
   const db = getDB();
-  const synced = await db.pending_mutations.toArray();
-  // Filter out any that should be removed (handled by processMutation)
-  await Promise.resolve(synced);
+  const synced = await db.pending_mutations
+    .where('status')
+    .equals('synced')
+    .toArray();
+
+  if (synced.length === 0) {
+    return 0;
+  }
+
+  const ids = synced.map((m) => m.id);
+  await db.pending_mutations.bulkDelete(ids);
+  return ids.length;
 }
 
 /**
@@ -305,6 +313,7 @@ export interface MutationsSummary {
   total: number;
   pending: number;
   syncing: number;
+  synced: number;
   failed: number;
   conflict: number;
   byType: {
@@ -321,6 +330,7 @@ export async function getMutationsSummary(): Promise<MutationsSummary> {
       total: 0,
       pending: 0,
       syncing: 0,
+      synced: 0,
       failed: 0,
       conflict: 0,
       byType: { status: 0, comment: 0, photo: 0, file: 0 },
@@ -334,6 +344,7 @@ export async function getMutationsSummary(): Promise<MutationsSummary> {
     total: all.length,
     pending: 0,
     syncing: 0,
+    synced: 0,
     failed: 0,
     conflict: 0,
     byType: { status: 0, comment: 0, photo: 0, file: 0 },
@@ -343,6 +354,7 @@ export async function getMutationsSummary(): Promise<MutationsSummary> {
     // Count by status
     if (mutation.status === 'pending') summary.pending++;
     else if (mutation.status === 'syncing') summary.syncing++;
+    else if (mutation.status === 'synced') summary.synced++;
     else if (mutation.status === 'failed') summary.failed++;
     else if (mutation.status === 'conflict') summary.conflict++;
 

@@ -371,7 +371,8 @@ export async function processAllMutations(
     progress.current++;
 
     if (result.success) {
-      // Remove from queue on success
+      // Mark as synced then remove from queue
+      await updateMutationStatus(mutation.id, 'synced');
       await deleteMutation(mutation.id);
     } else if (result.conflict) {
       // Conflict detected - mark mutation and track in progress
