@@ -39,6 +39,10 @@ import {
   deleteMutation,
   getAllMutations,
   clearAllMutations,
+  getPendingMutations,
+  updateMutationStatus,
+  getMutationsByStatus,
+  getMutationsByType,
 } from '../mutation-queue';
 
 describe('mutation-queue CRUD operations', () => {
@@ -267,6 +271,294 @@ describe('mutation-queue CRUD operations', () => {
 
       const all = await getAllMutations();
       expect(all).toHaveLength(0);
+    });
+  });
+});
+
+describe('mutation-queue FIFO ordering', () => {
+  beforeEach(() => {
+    dbName = `test_mutation_queue_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    testDB = new MutationQueueTestDB(dbName);
+  });
+
+  afterEach(async () => {
+    if (testDB) {
+      testDB.close();
+      await Dexie.delete(dbName);
+    }
+  });
+
+  it('should return pending mutations in FIFO order (oldest first)', async () => {
+    // Create mutations with controlled timestamps to ensure ordering
+    const m1 = await queueStatusMutation({
+      task_id: 'task-first',
+      status_id: 's1',
+      previous_status_id: 's0',
+    });
+
+    // Small delay to ensure different timestamps
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
+    const m2 = await queueCommentMutation({
+      task_id: 'task-second',
+      content: 'second',
+      temp_id: 'temp-2',
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
+    const m3 = await queueStatusMutation({
+      task_id: 'task-third',
+      status_id: 's3',
+      previous_status_id: 's2',
+    });
+
+    const pending = await getPendingMutations();
+
+    expect(pending).toHaveLength(3);
+    // Oldest first (FIFO)
+    expect(pending[0].id).toBe(m1!.id);
+    expect(pending[1].id).toBe(m2!.id);
+    expect(pending[2].id).toBe(m3!.id);
+  });
+
+  it('should only return pending mutations, not syncing or failed', async () => {
+    const m1 = await queueStatusMutation({
+      task_id: 'task-pending',
+      status_id: 's1',
+      previous_status_id: 's0',
+    });
+
+    const m2 = await queueStatusMutation({
+      task_id: 'task-syncing',
+      status_id: 's2',
+      previous_status_id: 's1',
+    });
+
+    const m3 = await queueStatusMutation({
+      task_id: 'task-failed',
+      status_id: 's3',
+      previous_status_id: 's2',
+    });
+
+    // Change m2 to syncing, m3 to failed
+    await updateMutationStatus(m2!.id, 'syncing');
+    await updateMutationStatus(m3!.id, 'failed', 'Network error');
+
+    const pending = await getPendingMutations();
+
+    expect(pending).toHaveLength(1);
+    expect(pending[0].id).toBe(m1!.id);
+  });
+});
+
+describe('mutation-queue status transitions', () => {
+  beforeEach(() => {
+    dbName = `test_mutation_queue_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    testDB = new MutationQueueTestDB(dbName);
+  });
+
+  afterEach(async () => {
+    if (testDB) {
+      testDB.close();
+      await Dexie.delete(dbName);
+    }
+  });
+
+  it('should update status from pending to syncing', async () => {
+    const mutation = await queueStatusMutation({
+      task_id: 'task-1',
+      status_id: 's1',
+      previous_status_id: 's0',
+    });
+
+    await updateMutationStatus(mutation!.id, 'syncing');
+
+    const updated = await getMutation(mutation!.id);
+    expect(updated!.status).toBe('syncing');
+    expect(updated!.retry_count).toBe(0); // retry_count should NOT increment for syncing
+  });
+
+  it('should increment retry_count when status changes to failed', async () => {
+    const mutation = await queueStatusMutation({
+      task_id: 'task-1',
+      status_id: 's1',
+      previous_status_id: 's0',
+    });
+
+    expect(mutation!.retry_count).toBe(0);
+
+    await updateMutationStatus(mutation!.id, 'failed', 'First failure');
+    let updated = await getMutation(mutation!.id);
+    expect(updated!.status).toBe('failed');
+    expect(updated!.retry_count).toBe(1);
+    expect(updated!.error_message).toBe('First failure');
+
+    // Fail again
+    await updateMutationStatus(updated!.id, 'failed', 'Second failure');
+    updated = await getMutation(mutation!.id);
+    expect(updated!.retry_count).toBe(2);
+    expect(updated!.error_message).toBe('Second failure');
+  });
+
+  it('should NOT increment retry_count for non-failed status transitions', async () => {
+    const mutation = await queueStatusMutation({
+      task_id: 'task-1',
+      status_id: 's1',
+      previous_status_id: 's0',
+    });
+
+    // pending -> syncing (no increment)
+    await updateMutationStatus(mutation!.id, 'syncing');
+    let updated = await getMutation(mutation!.id);
+    expect(updated!.retry_count).toBe(0);
+
+    // syncing -> pending (no increment)
+    await updateMutationStatus(mutation!.id, 'pending');
+    updated = await getMutation(mutation!.id);
+    expect(updated!.retry_count).toBe(0);
+
+    // pending -> conflict (no increment)
+    await updateMutationStatus(mutation!.id, 'conflict');
+    updated = await getMutation(mutation!.id);
+    expect(updated!.retry_count).toBe(0);
+  });
+
+  it('should store error message with failed status', async () => {
+    const mutation = await queueStatusMutation({
+      task_id: 'task-1',
+      status_id: 's1',
+      previous_status_id: 's0',
+    });
+
+    const errorMsg = 'Network timeout after 30 seconds';
+    await updateMutationStatus(mutation!.id, 'failed', errorMsg);
+
+    const updated = await getMutation(mutation!.id);
+    expect(updated!.error_message).toBe(errorMsg);
+  });
+});
+
+describe('mutation-queue filtering', () => {
+  beforeEach(() => {
+    dbName = `test_mutation_queue_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    testDB = new MutationQueueTestDB(dbName);
+  });
+
+  afterEach(async () => {
+    if (testDB) {
+      testDB.close();
+      await Dexie.delete(dbName);
+    }
+  });
+
+  describe('getMutationsByStatus', () => {
+    it('should filter mutations by status', async () => {
+      const m1 = await queueStatusMutation({
+        task_id: 'task-1',
+        status_id: 's1',
+        previous_status_id: 's0',
+      });
+      const m2 = await queueStatusMutation({
+        task_id: 'task-2',
+        status_id: 's2',
+        previous_status_id: 's1',
+      });
+      const m3 = await queueStatusMutation({
+        task_id: 'task-3',
+        status_id: 's3',
+        previous_status_id: 's2',
+      });
+
+      await updateMutationStatus(m2!.id, 'failed', 'error');
+      await updateMutationStatus(m3!.id, 'syncing');
+
+      const pending = await getMutationsByStatus('pending');
+      expect(pending).toHaveLength(1);
+      expect(pending[0].id).toBe(m1!.id);
+
+      const failed = await getMutationsByStatus('failed');
+      expect(failed).toHaveLength(1);
+      expect(failed[0].id).toBe(m2!.id);
+
+      const syncing = await getMutationsByStatus('syncing');
+      expect(syncing).toHaveLength(1);
+      expect(syncing[0].id).toBe(m3!.id);
+    });
+
+    it('should return mutations sorted by created_at', async () => {
+      const m1 = await queueStatusMutation({
+        task_id: 'task-1',
+        status_id: 's1',
+        previous_status_id: 's0',
+      });
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      const m2 = await queueStatusMutation({
+        task_id: 'task-2',
+        status_id: 's2',
+        previous_status_id: 's1',
+      });
+
+      const pending = await getMutationsByStatus('pending');
+      expect(pending[0].id).toBe(m1!.id);
+      expect(pending[1].id).toBe(m2!.id);
+    });
+  });
+
+  describe('getMutationsByType', () => {
+    it('should filter mutations by type', async () => {
+      await queueStatusMutation({
+        task_id: 'task-1',
+        status_id: 's1',
+        previous_status_id: 's0',
+      });
+      await queueCommentMutation({
+        task_id: 'task-2',
+        content: 'comment 1',
+        temp_id: 'temp-1',
+      });
+      await queueCommentMutation({
+        task_id: 'task-3',
+        content: 'comment 2',
+        temp_id: 'temp-2',
+      });
+
+      const statusMutations = await getMutationsByType('status');
+      expect(statusMutations).toHaveLength(1);
+      expect(statusMutations[0].type).toBe('status');
+
+      const commentMutations = await getMutationsByType('comment');
+      expect(commentMutations).toHaveLength(2);
+      expect(commentMutations.every((m) => m.type === 'comment')).toBe(true);
+    });
+
+    it('should return empty array for type with no mutations', async () => {
+      await queueStatusMutation({
+        task_id: 'task-1',
+        status_id: 's1',
+        previous_status_id: 's0',
+      });
+
+      const photoMutations = await getMutationsByType('photo');
+      expect(photoMutations).toEqual([]);
+    });
+
+    it('should return mutations sorted by created_at', async () => {
+      const m1 = await queueCommentMutation({
+        task_id: 'task-1',
+        content: 'first',
+        temp_id: 'temp-1',
+      });
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      const m2 = await queueCommentMutation({
+        task_id: 'task-2',
+        content: 'second',
+        temp_id: 'temp-2',
+      });
+
+      const comments = await getMutationsByType('comment');
+      expect(comments[0].id).toBe(m1!.id);
+      expect(comments[1].id).toBe(m2!.id);
     });
   });
 });
