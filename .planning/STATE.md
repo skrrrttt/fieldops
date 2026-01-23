@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-22)
 
 **Core value:** Field crews can work offline without losing data, and the code is maintainable enough to evolve confidently
-**Current focus:** Phase 3 - Batch Sync (Complete)
+**Current focus:** Phase 4 - Web Worker
 
 ## Current Position
 
-Phase: 3 of 5 (Batch Sync)
-Plan: 1 of 1 in current phase
-Status: Phase complete
+Phase: 4 of 5 (Web Worker)
+Plan: 0 of 1 in current phase
+Status: Ready to plan
 Last activity: 2026-01-23 — Completed 03-01-PLAN.md (Batch sync with rate limiting)
 
-Progress: [██████████] 50%
+Progress: [████████████░░] 60%
 
 ## Performance Metrics
 

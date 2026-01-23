@@ -23,8 +23,8 @@ Requirements for this quality milestone. Each maps to roadmap phases.
 
 ### Performance
 
-- [ ] **PERF-01**: Batch mutation sync processes mutations in parallel groups (not sequential)
-- [ ] **PERF-02**: Batch sync includes rate limiting protection (controlled concurrency, exponential backoff with jitter)
+- [x] **PERF-01**: Batch mutation sync processes mutations in parallel groups (not sequential)
+- [x] **PERF-02**: Batch sync includes rate limiting protection (controlled concurrency, exponential backoff with jitter)
 - [ ] **PERF-03**: Photo processing runs in Web Worker (OffscreenCanvas) with main thread fallback
 - [ ] **PERF-04**: Photo upload UI remains responsive during compression
 
@@ -91,8 +91,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MON-02 | Phase 2 | Complete |
 | MON-03 | Phase 2 | Complete |
 | MON-04 | Phase 2 | Complete |
-| PERF-01 | Phase 3 | Pending |
-| PERF-02 | Phase 3 | Pending |
+| PERF-01 | Phase 3 | Complete |
+| PERF-02 | Phase 3 | Complete |
 | PERF-03 | Phase 4 | Pending |
 | PERF-04 | Phase 4 | Pending |
 | QUAL-01 | Phase 1 | Pending |
@@ -107,4 +107,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-22*
-*Last updated: 2026-01-22 after initial definition*
+*Last updated: 2026-01-23 after Phase 3 completion*
