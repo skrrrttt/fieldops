@@ -6,6 +6,7 @@
  */
 
 import { createClient } from '@/lib/supabase/client';
+import { trackSyncMetrics, setSyncContext } from '@/lib/monitoring/sentry';
 import {
   getPendingMutations,
   updateMutationStatus,
@@ -399,6 +400,11 @@ export async function processAllMutations(
 
   progress.lastSyncedAt = new Date().toISOString();
   onProgress?.(progress);
+
+  // Track sync metrics in Sentry
+  trackSyncMetrics(progress);
+  // Update sync context with latest sync time
+  setSyncContext(progress.lastSyncedAt);
 
   return progress;
 }

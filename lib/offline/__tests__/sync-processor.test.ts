@@ -22,6 +22,12 @@ vi.mock('../helpers', () => ({
   deleteFromLocal: vi.fn(),
 }));
 
+// Mock the monitoring/sentry module to avoid importing mutation-queue
+vi.mock('@/lib/monitoring/sentry', () => ({
+  trackSyncMetrics: vi.fn(),
+  setSyncContext: vi.fn(),
+}));
+
 // Import mocked modules
 import { createClient } from '@/lib/supabase/client';
 import {
