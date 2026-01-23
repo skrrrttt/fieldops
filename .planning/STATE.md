@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-22)
 
 **Core value:** Field crews can work offline without losing data, and the code is maintainable enough to evolve confidently
-**Current focus:** Phase 3 - Batch Sync
+**Current focus:** Phase 3 - Batch Sync (Complete)
 
 ## Current Position
 
 Phase: 3 of 5 (Batch Sync)
-Plan: 0 of 1 in current phase
-Status: Ready to plan
-Last activity: 2026-01-23 — Completed Phase 2 (Monitoring)
+Plan: 1 of 1 in current phase
+Status: Phase complete
+Last activity: 2026-01-23 — Completed 03-01-PLAN.md (Batch sync with rate limiting)
 
-Progress: [████████░░] 40%
+Progress: [██████████] 50%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: 3.3 min
-- Total execution time: 20 min
+- Total plans completed: 7
+- Average duration: 3.4 min
+- Total execution time: 24 min
 
 **By Phase:**
 
@@ -29,9 +29,10 @@ Progress: [████████░░] 40%
 |-------|-------|-------|----------|
 | 01-testing-foundation | 4 | 13 min | 3.3 min |
 | 02-monitoring | 2 | 7 min | 3.5 min |
+| 03-batch-sync | 1 | 4 min | 4.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-03 (3 min), 01-04 (6 min), 02-01 (4 min), 02-02 (3 min)
+- Last 5 plans: 01-04 (6 min), 02-01 (4 min), 02-02 (3 min), 03-01 (4 min)
 - Trend: Steady
 
 *Updated after each plan completion*
@@ -59,6 +60,9 @@ Recent decisions affecting current work:
 - [02-01]: 10% sample rate production, 100% development for Web Vitals
 - [02-02]: Sentry.metrics.count over increment (matches current SDK API)
 - [02-02]: Mock monitoring/sentry in sync-processor tests for isolation
+- [03-01]: DATA_CONCURRENCY=5 for status/comment, FILE_CONCURRENCY=2 for photo/file
+- [03-01]: Bounded jitter +/- 25% prevents thundering herd on rate limit retry
+- [03-01]: Promise.allSettled for independent batch failure handling
 
 ### Pending Todos
 
@@ -70,6 +74,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-23T23:20:44Z
-Stopped at: Completed 02-02-PLAN.md (Sync context and metrics)
+Last session: 2026-01-23T16:53:00Z
+Stopped at: Completed 03-01-PLAN.md (Batch sync with rate limiting)
 Resume file: None
