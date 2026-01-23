@@ -49,6 +49,8 @@ Recent decisions affecting current work:
 - [01-01]: TestDB uses unique random names to avoid Dexie singleton conflicts
 - [01-03]: Mock Supabase client at module level using vi.mock for isolation
 - [01-03]: Create helper functions for reusable test scenarios (success, conflict, error)
+- [01-02]: Mock getDB() instead of modifying production code for testability
+- [01-02]: Create MutationQueueTestDB class with unique names per test
 
 ### Pending Todos
 
@@ -60,6 +62,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-01-23T22:13:44Z
-Stopped at: Completed 01-03-PLAN.md
+Last session: 2026-01-23T22:13:56Z
+Stopped at: Completed 01-02-PLAN.md (mutation queue tests)
 Resume file: None
