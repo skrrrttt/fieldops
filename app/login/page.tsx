@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { setSentryUser, setSyncContext, updateSyncContextOnNetworkChange } from '@/lib/monitoring/sentry';
 // ProStreet brand constants
 const APP_NAME = 'ProStreet';
 const PRIMARY_COLOR = '#f97316';
@@ -15,6 +16,12 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  // Set up network change listener for sync context updates
+  useEffect(() => {
+    const cleanup = updateSyncContextOnNetworkChange();
+    return cleanup;
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,6 +47,11 @@ export default function LoginPage() {
         setLoading(false);
         return;
       }
+
+      // Set Sentry user context for error attribution
+      setSentryUser({ id: data.user.id, email: data.user.email || '' });
+      // Initialize sync context
+      setSyncContext();
 
       // Store remember me preference in localStorage
       if (rememberMe) {

@@ -2,12 +2,16 @@
 
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { clearSentryUser } from '@/lib/monitoring/sentry';
 import { Button } from '@/components/ui/button';
 
 export function LogoutButton() {
   const router = useRouter();
 
   const handleLogout = async () => {
+    // Clear Sentry user context
+    clearSentryUser();
+
     const supabase = createClient();
     await supabase.auth.signOut();
 
