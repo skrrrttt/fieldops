@@ -48,11 +48,11 @@ Plans:
   2. Core Web Vitals (LCP, INP, CLS) are reported to analytics
   3. Sync metrics (success count, failure count, conflict count) are tracked per sync run
   4. Error reports include offline status and pending mutation count as context
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 02-01: Sentry integration with offline transport
-- [ ] 02-02: Core Web Vitals and sync metrics
+- [ ] 02-01-PLAN.md — Sentry SDK setup with offline transport and Web Vitals
+- [ ] 02-02-PLAN.md — Sync metrics tracking and user context integration
 
 ### Phase 3: Batch Sync
 **Goal**: Sync completes faster by processing mutations in parallel batches instead of one-by-one
@@ -111,4 +111,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 ---
 *Roadmap created: 2026-01-22*
 *Phase 1 planned: 2026-01-22*
+*Phase 2 planned: 2026-01-23*
 *Total requirements: 16 | Phases: 5 | Depth: standard*
