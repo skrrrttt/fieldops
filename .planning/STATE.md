@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 ## Current Position
 
 Phase: 4 of 5 (Web Worker)
-Plan: 0 of 1 in current phase
-Status: Ready to plan
-Last activity: 2026-01-23 — Completed 03-01-PLAN.md (Batch sync with rate limiting)
+Plan: 1 of 2 in current phase
+Status: Executing
+Last activity: 2026-02-15 — Completed 04-01-PLAN.md (Web Worker photo processing)
 
-Progress: [████████████░░] 60%
+Progress: [██████████████░] 70%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
-- Average duration: 3.4 min
-- Total execution time: 24 min
+- Total plans completed: 8
+- Average duration: 3.3 min
+- Total execution time: 26 min
 
 **By Phase:**
 
@@ -30,9 +30,10 @@ Progress: [████████████░░] 60%
 | 01-testing-foundation | 4 | 13 min | 3.3 min |
 | 02-monitoring | 2 | 7 min | 3.5 min |
 | 03-batch-sync | 1 | 4 min | 4.0 min |
+| 04-web-worker | 1 | 2 min | 2.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-04 (6 min), 02-01 (4 min), 02-02 (3 min), 03-01 (4 min)
+- Last 5 plans: 02-01 (4 min), 02-02 (3 min), 03-01 (4 min), 04-01 (2 min)
 - Trend: Steady
 
 *Updated after each plan completion*
@@ -63,6 +64,10 @@ Recent decisions affecting current work:
 - [03-01]: DATA_CONCURRENCY=5 for status/comment, FILE_CONCURRENCY=2 for photo/file
 - [03-01]: Bounded jitter +/- 25% prevents thundering herd on rate limit retry
 - [03-01]: Promise.allSettled for independent batch failure handling
+- [04-01]: ArrayBuffer-based API instead of File for worker transferability
+- [04-01]: OffscreenCanvas detection locked once per session for consistency
+- [04-01]: Worker crash permanently marks _workerFailed=true for session fallback
+- [04-01]: Watermark failure returns compressed photo; compression failure returns original
 
 ### Pending Todos
 
@@ -74,6 +79,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-23T16:53:00Z
-Stopped at: Completed 03-01-PLAN.md (Batch sync with rate limiting)
+Last session: 2026-02-15T03:10:01Z
+Stopped at: Completed 04-01-PLAN.md (Web Worker photo processing)
 Resume file: None
