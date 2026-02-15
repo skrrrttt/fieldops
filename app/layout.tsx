@@ -5,6 +5,7 @@ import { ServiceWorkerRegistration } from "@/components/pwa/service-worker-regis
 import { PWAInstallPrompt } from "@/components/pwa/pwa-install-prompt";
 import { PWASplashScreen } from "@/components/pwa/pwa-splash-screen";
 import { ThemeProviderWrapper } from "@/components/providers/branding-provider-wrapper";
+import { Toaster } from "@/components/ui/sonner";
 
 // Display & Heading font - geometric, modern, tech-forward
 const sora = Sora({
@@ -73,6 +74,7 @@ export default function RootLayout({
           <PWASplashScreen />
           <PWAInstallPrompt />
           {children}
+          <Toaster />
         </ThemeProviderWrapper>
       </body>
     </html>

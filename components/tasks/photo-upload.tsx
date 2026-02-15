@@ -3,8 +3,10 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { createPhotoRecord } from '@/lib/photos/actions';
-import { processPhoto, requestGpsCoordinates } from '@/lib/photos/process-photo';
+import { processPhotoOffThread } from '@/lib/photos/photo-processor';
+import { requestGpsCoordinates } from '@/lib/photos/process-photo';
 import { useOnlineStatus, queuePhotoMutation, saveToLocal, type LocalPhoto } from '@/lib/offline';
+import { toast } from 'sonner';
 
 interface PhotoUploadProps {
   taskId: string;
@@ -123,26 +125,26 @@ export function PhotoUpload({ taskId, onUploadComplete }: PhotoUploadProps) {
     setError(null);
     setSuccess(false);
 
+    const total = selectedPhotos.length;
+    toast.loading(`Processing photo 1 of ${total}...`, { id: 'photo-processing' });
+
     let successCount = 0;
     let failCount = 0;
 
     // If offline, queue photos for later sync
     if (!isOnline) {
-      for (const photo of selectedPhotos) {
+      for (let i = 0; i < selectedPhotos.length; i++) {
+        const photo = selectedPhotos[i];
         try {
-          // Update progress to show processing
+          toast.loading(`Processing photo ${i + 1} of ${total}...`, { id: 'photo-processing' });
           setUploadProgress(prev => ({ ...prev, [photo.id]: 5 }));
 
-          // Process photo: resize, compress, and add watermark
           const timestamp = new Date();
-          const processed = await processPhoto(photo.file, {
-            maxSize: 1920,
-            quality: 0.8,
-            timestamp,
-            gpsCoordinates,
+          const processed = await processPhotoOffThread({
+            file: photo.file,
+            options: { maxSize: 1920, quality: 0.8, timestamp, gpsCoordinates },
           });
 
-          setIsProcessing(false);
           setUploadProgress(prev => ({ ...prev, [photo.id]: 50 }));
 
           const tempId = `temp_photo_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -182,10 +184,19 @@ export function PhotoUpload({ taskId, onUploadComplete }: PhotoUploadProps) {
         }
       }
 
+      toast.dismiss('photo-processing');
       setIsUploading(false);
       setIsProcessing(false);
 
-      if (successCount > 0) {
+      if (successCount > 0 && failCount === 0) {
+        toast.success('Photos ready', { duration: 3000 });
+        setSuccess(true);
+        setSuccessMessage(`${successCount} photo(s) queued (will sync when online)`);
+        setSelectedPhotos(prev => prev.filter(p => uploadProgress[p.id] !== 100));
+        setUploadProgress({});
+        onUploadComplete?.();
+      }
+      if (successCount > 0 && failCount > 0) {
         setSuccess(true);
         setSuccessMessage(`${successCount} photo(s) queued (will sync when online)`);
         setSelectedPhotos(prev => prev.filter(p => uploadProgress[p.id] !== 100));
@@ -194,6 +205,7 @@ export function PhotoUpload({ taskId, onUploadComplete }: PhotoUploadProps) {
       }
 
       if (failCount > 0) {
+        toast.error(`${failCount} photo(s) failed to process`);
         setError(`${failCount} photo(s) failed to queue`);
       }
       return;
@@ -202,21 +214,20 @@ export function PhotoUpload({ taskId, onUploadComplete }: PhotoUploadProps) {
     // Online: upload to server immediately
     const supabase = createClient();
 
-    for (const photo of selectedPhotos) {
+    for (let i = 0; i < selectedPhotos.length; i++) {
+      const photo = selectedPhotos[i];
       try {
-        // Update progress to show processing
+        toast.loading(`Processing photo ${i + 1} of ${total}...`, { id: 'photo-processing' });
         setUploadProgress(prev => ({ ...prev, [photo.id]: 5 }));
 
-        // Process photo: resize, compress, and add watermark
         const timestamp = new Date();
-        const processed = await processPhoto(photo.file, {
-          maxSize: 1920,
-          quality: 0.8,
-          timestamp,
-          gpsCoordinates,
+        const processed = await processPhotoOffThread({
+          file: photo.file,
+          options: { maxSize: 1920, quality: 0.8, timestamp, gpsCoordinates },
         });
 
-        setIsProcessing(false);
+        // After processing, update toast to "Uploading..." for this photo
+        toast.loading(`Uploading photo ${i + 1} of ${total}...`, { id: 'photo-processing' });
         setUploadProgress(prev => ({ ...prev, [photo.id]: 20 }));
 
         // Generate unique file path (always use .jpg since we convert to JPEG)
@@ -267,10 +278,12 @@ export function PhotoUpload({ taskId, onUploadComplete }: PhotoUploadProps) {
       }
     }
 
+    toast.dismiss('photo-processing');
     setIsUploading(false);
     setIsProcessing(false);
 
-    if (successCount > 0) {
+    if (successCount > 0 && failCount === 0) {
+      toast.success('Photos ready', { duration: 3000 });
       setSuccess(true);
       setSuccessMessage('Photos uploaded successfully!');
       // Clear successfully uploaded photos
@@ -278,8 +291,16 @@ export function PhotoUpload({ taskId, onUploadComplete }: PhotoUploadProps) {
       setUploadProgress({});
       onUploadComplete?.();
     }
+    if (successCount > 0 && failCount > 0) {
+      setSuccess(true);
+      setSuccessMessage('Photos uploaded successfully!');
+      setSelectedPhotos(prev => prev.filter(p => uploadProgress[p.id] !== 100));
+      setUploadProgress({});
+      onUploadComplete?.();
+    }
 
     if (failCount > 0) {
+      toast.error(`${failCount} photo(s) failed to process`);
       setError(`${failCount} photo(s) failed to upload`);
     }
   };
@@ -321,7 +342,7 @@ export function PhotoUpload({ taskId, onUploadComplete }: PhotoUploadProps) {
         <button
           type="button"
           onClick={handleCameraClick}
-          disabled={isUploading}
+          disabled={isUploading || isProcessing}
           className="flex-1 flex items-center justify-center gap-2 min-h-[64px] px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-lg transition-colors"
         >
           <svg
@@ -349,7 +370,7 @@ export function PhotoUpload({ taskId, onUploadComplete }: PhotoUploadProps) {
         <button
           type="button"
           onClick={handleGalleryClick}
-          disabled={isUploading}
+          disabled={isUploading || isProcessing}
           className="flex-1 flex items-center justify-center gap-2 min-h-[64px] px-4 py-3 bg-zinc-600 hover:bg-zinc-700 disabled:bg-zinc-400 text-white font-medium rounded-lg transition-colors"
         >
           <svg
@@ -497,7 +518,7 @@ export function PhotoUpload({ taskId, onUploadComplete }: PhotoUploadProps) {
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   />
                 </svg>
-                {isProcessing ? 'Processing...' : 'Uploading...'}
+                Uploading...
               </>
             ) : (
               <>
