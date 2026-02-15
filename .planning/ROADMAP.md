@@ -77,10 +77,11 @@ Plans:
   2. UI remains responsive during photo processing (no visible stutter)
   3. Browsers without OffscreenCanvas support fall back to main thread processing
   4. Photo upload tests pass with worker implementation
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 04-01: Photo processing Web Worker with main thread fallback
+- [ ] 04-01-PLAN.md — Core processing extraction, Web Worker, and orchestrator
+- [ ] 04-02-PLAN.md — Sonner toast integration, upload component migration, and unit tests
 
 ### Phase 5: Documentation
 **Goal**: New developers can understand the offline sync architecture without reverse-engineering code
