@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-22)
 
 **Core value:** Field crews can work offline without losing data, and the code is maintainable enough to evolve confidently
-**Current focus:** Phase 4 - Web Worker
+**Current focus:** Phase 4 - Web Worker (Complete)
 
 ## Current Position
 
 Phase: 4 of 5 (Web Worker)
-Plan: 1 of 2 in current phase
-Status: Executing
-Last activity: 2026-02-15 — Completed 04-01-PLAN.md (Web Worker photo processing)
+Plan: 2 of 2 in current phase
+Status: Phase Complete
+Last activity: 2026-02-15 — Completed 04-02-PLAN.md (UI Integration with toast notifications)
 
-Progress: [██████████████░] 70%
+Progress: [████████████████░] 80%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
+- Total plans completed: 9
 - Average duration: 3.3 min
-- Total execution time: 26 min
+- Total execution time: 30 min
 
 **By Phase:**
 
@@ -30,10 +30,10 @@ Progress: [██████████████░] 70%
 | 01-testing-foundation | 4 | 13 min | 3.3 min |
 | 02-monitoring | 2 | 7 min | 3.5 min |
 | 03-batch-sync | 1 | 4 min | 4.0 min |
-| 04-web-worker | 1 | 2 min | 2.0 min |
+| 04-web-worker | 2 | 6 min | 3.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (4 min), 02-02 (3 min), 03-01 (4 min), 04-01 (2 min)
+- Last 5 plans: 02-02 (3 min), 03-01 (4 min), 04-01 (2 min), 04-02 (4 min)
 - Trend: Steady
 
 *Updated after each plan completion*
@@ -68,6 +68,10 @@ Recent decisions affecting current work:
 - [04-01]: OffscreenCanvas detection locked once per session for consistency
 - [04-01]: Worker crash permanently marks _workerFailed=true for session fallback
 - [04-01]: Watermark failure returns compressed photo; compression failure returns original
+- [04-02]: Stable toast ID 'photo-processing' for in-place updates without stacking
+- [04-02]: isProcessing stays true for full loop; toast provides per-photo feedback
+- [04-02]: Polyfill File.arrayBuffer() in tests for jsdom compatibility
+- [04-02]: Worker-path tests as .todo for future E2E coverage
 
 ### Pending Todos
 
@@ -79,6 +83,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-15T03:10:01Z
-Stopped at: Completed 04-01-PLAN.md (Web Worker photo processing)
+Last session: 2026-02-15T03:17:09Z
+Stopped at: Completed 04-02-PLAN.md (UI Integration with toast notifications)
 Resume file: None
