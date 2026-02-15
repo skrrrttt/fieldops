@@ -11,8 +11,10 @@ import { useRouter } from 'next/navigation';
 import { Camera, ImagePlus, ChevronLeft, Check, X, MapPin } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { createPhotoRecord } from '@/lib/photos/actions';
-import { processPhoto, requestGpsCoordinates } from '@/lib/photos/process-photo';
+import { processPhotoOffThread } from '@/lib/photos/photo-processor';
+import { requestGpsCoordinates } from '@/lib/photos/process-photo';
 import { useOnlineStatus, queuePhotoMutation, saveToLocal, type LocalPhoto } from '@/lib/offline';
+import { toast } from 'sonner';
 // ProStreet brand constant
 const PRIMARY_COLOR = '#f97316';
 import { MobileBottomNav, MobileBottomNavSpacer } from '@/components/layout/mobile-bottom-nav';
@@ -119,16 +121,17 @@ export default function UploadPage() {
     setUploadProgress(10);
     setError(null);
 
+    toast.loading('Processing photo...', { id: 'photo-processing' });
+
     try {
       // Process photo
       const timestamp = new Date();
-      const processed = await processPhoto(capturedPhoto.file, {
-        maxSize: 1920,
-        quality: 0.8,
-        timestamp,
-        gpsCoordinates,
+      const processed = await processPhotoOffThread({
+        file: capturedPhoto.file,
+        options: { maxSize: 1920, quality: 0.8, timestamp, gpsCoordinates },
       });
 
+      toast.dismiss('photo-processing');
       setUploadProgress(40);
 
       if (!isOnline) {
@@ -159,6 +162,7 @@ export default function UploadPage() {
 
         setUploadProgress(100);
         setStep('done');
+        toast.success('Photo uploaded!', { duration: 3000 });
         return;
       }
 
@@ -192,10 +196,13 @@ export default function UploadPage() {
 
       setUploadProgress(100);
       setStep('done');
+      toast.success('Photo uploaded!', { duration: 3000 });
 
       // Clean up preview URL
       URL.revokeObjectURL(capturedPhoto.preview);
     } catch {
+      toast.dismiss('photo-processing');
+      toast.error('Failed to upload photo');
       setError('Failed to upload photo. Please try again.');
       setStep('select-task');
     }
