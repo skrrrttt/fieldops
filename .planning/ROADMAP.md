@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Testing Foundation** - Unit tests for mutation queue and sync processor with Vitest + fake-indexeddb
 - [x] **Phase 2: Monitoring** - Sentry error tracking with offline transport, Core Web Vitals, sync metrics
 - [x] **Phase 3: Batch Sync** - Parallel mutation processing with rate limiting
-- [ ] **Phase 4: Web Worker** - Photo processing in Web Worker for responsive UI
+- [x] **Phase 4: Web Worker** - Photo processing in Web Worker for responsive UI
 - [ ] **Phase 5: Documentation** - Mutation lifecycle state machine and conflict resolution flow
 
 ## Phase Details
@@ -80,8 +80,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — Core processing extraction, Web Worker, and orchestrator
-- [ ] 04-02-PLAN.md — Sonner toast integration, upload component migration, and unit tests
+- [x] 04-01-PLAN.md — Core processing extraction, Web Worker, and orchestrator
+- [x] 04-02-PLAN.md — Sonner toast integration, upload component migration, and unit tests
 
 ### Phase 5: Documentation
 **Goal**: New developers can understand the offline sync architecture without reverse-engineering code
@@ -106,7 +106,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 1. Testing Foundation | 4/4 | ✓ Complete | 2026-01-23 |
 | 2. Monitoring | 2/2 | ✓ Complete | 2026-01-23 |
 | 3. Batch Sync | 1/1 | ✓ Complete | 2026-01-23 |
-| 4. Web Worker | 0/1 | Not started | - |
+| 4. Web Worker | 2/2 | ✓ Complete | 2026-02-14 |
 | 5. Documentation | 0/1 | Not started | - |
 
 ---
