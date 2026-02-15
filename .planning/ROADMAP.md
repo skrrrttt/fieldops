@@ -91,10 +91,10 @@ Plans:
   1. Mutation lifecycle (pending -> syncing -> synced/failed/conflict) is documented as a state machine diagram
   2. Conflict resolution flow is documented with decision points and outcomes
   3. Documentation lives in `.planning/docs/` or codebase (not external wiki)
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 05-01: State machine and conflict resolution documentation
+- [ ] 05-01-PLAN.md — Offline sync architecture document with state machine and conflict resolution flow
 
 ## Progress
 
