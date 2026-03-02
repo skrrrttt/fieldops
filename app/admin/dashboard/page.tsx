@@ -1,14 +1,9 @@
-import { requireAdmin } from '@/lib/auth/actions';
 import { getDashboardStats } from '@/lib/dashboard/actions';
-import { AdminLayout } from '@/components/admin/admin-layout';
 import { DashboardContent } from '@/components/admin/dashboard/dashboard-content';
 import { createClient } from '@/lib/supabase/server';
 
 export default async function AdminDashboardPage() {
-  const [user, stats] = await Promise.all([
-    requireAdmin(),
-    getDashboardStats(),
-  ]);
+  const stats = await getDashboardStats();
 
   // Compute photo URLs server-side to avoid client-side Supabase dependency
   const supabase = await createClient();
@@ -19,9 +14,5 @@ export default async function AdminDashboardPage() {
       .getPublicUrl(upload.storage_path).data.publicUrl;
   }
 
-  return (
-    <AdminLayout user={user}>
-      <DashboardContent stats={stats} photoUrls={photoUrls} />
-    </AdminLayout>
-  );
+  return <DashboardContent stats={stats} photoUrls={photoUrls} />;
 }
