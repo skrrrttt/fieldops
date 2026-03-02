@@ -1,13 +1,9 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { requireAdmin } from '@/lib/auth/actions';
 import type { TaskHistory } from '@/lib/database.types';
-
-export interface ActionResult<T = void> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
+import type { ActionResult } from '@/lib/types';
 
 export interface TaskHistoryQueryParams {
   page?: number;
@@ -137,46 +133,56 @@ export async function getTaskHistoryById(
 export async function getTaskHistoryStats(): Promise<ActionResult<TaskHistoryStats>> {
   const supabase = await createClient();
 
-  const { data: allHistory, error } = await supabase.from('task_history').select('*');
-
-  if (error) {
-    console.error('Error fetching task history stats:', error);
-    return { success: false, error: 'Unable to complete this operation' };
-  }
-
-  const history = (allHistory as TaskHistory[]) || [];
-
-  // Calculate stats
   const now = new Date();
   const startOfWeek = new Date(now);
   startOfWeek.setDate(now.getDate() - now.getDay());
   startOfWeek.setHours(0, 0, 0, 0);
-
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const totalCompleted = history.length;
+  // Run all queries concurrently instead of fetching all rows
+  const [totalResult, weekResult, monthResult, divisionsResult, durationResult] = await Promise.all([
+    // Total count
+    supabase
+      .from('task_history')
+      .select('id', { count: 'exact', head: true }),
+    // This week count
+    supabase
+      .from('task_history')
+      .select('id', { count: 'exact', head: true })
+      .gte('completed_at', startOfWeek.toISOString()),
+    // This month count
+    supabase
+      .from('task_history')
+      .select('id', { count: 'exact', head: true })
+      .gte('completed_at', startOfMonth.toISOString()),
+    // By division - fetch only needed columns
+    supabase
+      .from('task_history')
+      .select('division_name, division_color'),
+    // Duration - fetch only duration column
+    supabase
+      .from('task_history')
+      .select('duration_minutes')
+      .not('duration_minutes', 'is', null),
+  ]);
 
-  const validDurations = history
-    .filter((h) => h.duration_minutes !== null)
-    .map((h) => h.duration_minutes as number);
+  if (totalResult.error) {
+    console.error('Error fetching task history stats:', totalResult.error);
+    return { success: false, error: 'Unable to complete this operation' };
+  }
+
+  // Calculate avg duration from minimal data
+  const durations = (durationResult.data || []) as { duration_minutes: number }[];
   const avgDurationMinutes =
-    validDurations.length > 0
+    durations.length > 0
       ? Math.round(
-          validDurations.reduce((a, b) => a + b, 0) / validDurations.length
+          durations.reduce((a, b) => a + b.duration_minutes, 0) / durations.length
         )
       : 0;
 
-  const completedThisWeek = history.filter(
-    (h) => new Date(h.completed_at) >= startOfWeek
-  ).length;
-
-  const completedThisMonth = history.filter(
-    (h) => new Date(h.completed_at) >= startOfMonth
-  ).length;
-
-  // Group by division
-  const divisionCounts = history.reduce(
-    (acc, h) => {
+  // Group by division from minimal data
+  const divisionCounts = (divisionsResult.data || []).reduce(
+    (acc, h: { division_name: string | null; division_color: string | null }) => {
       const key = h.division_name || 'Unassigned';
       if (!acc[key]) {
         acc[key] = { count: 0, color: h.division_color };
@@ -194,10 +200,10 @@ export async function getTaskHistoryStats(): Promise<ActionResult<TaskHistorySta
   return {
     success: true,
     data: {
-      totalCompleted,
+      totalCompleted: totalResult.count || 0,
       avgDurationMinutes,
-      completedThisWeek,
-      completedThisMonth,
+      completedThisWeek: weekResult.count || 0,
+      completedThisMonth: monthResult.count || 0,
       byDivision,
     },
   };
@@ -230,6 +236,7 @@ export async function getHistoryDivisions(): Promise<ActionResult<string[]>> {
 export async function deleteTaskHistory(
   id: string
 ): Promise<ActionResult> {
+  await requireAdmin();
   const supabase = await createClient();
 
   const { error } = await supabase
@@ -251,6 +258,7 @@ export async function deleteTaskHistory(
 export async function cleanupOldHistory(
   olderThanDays: number = 365
 ): Promise<ActionResult<number>> {
+  await requireAdmin();
   const supabase = await createClient();
 
   const cutoffDate = new Date();

@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { requireAuth } from '@/lib/auth/actions';
 import type { Status } from '@/lib/database.types';
 
 export interface TaskCountByStatus {
@@ -182,33 +183,29 @@ export async function getUserStats(): Promise<{
 }> {
   const supabase = await createClient();
 
-  // Get total users
-  const { data: users, error } = await supabase
-    .from('users')
-    .select('id, last_active_at, is_active')
-    .eq('is_active', true);
+  const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
-  if (error || !users) {
-    console.error('Error fetching users:', error);
+  // Fire both count queries concurrently
+  const [totalResult, activeResult] = await Promise.all([
+    supabase
+      .from('users')
+      .select('id', { count: 'exact', head: true })
+      .eq('is_active', true),
+    supabase
+      .from('users')
+      .select('id', { count: 'exact', head: true })
+      .eq('is_active', true)
+      .gte('last_active_at', twentyFourHoursAgo),
+  ]);
+
+  if (totalResult.error) {
+    console.error('Error fetching users:', totalResult.error);
     return { total: 0, activeToday: 0 };
   }
 
-  // Count users active in the last 24 hours
-  const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-
-  interface UserWithActivity {
-    id: string;
-    last_active_at: string | null;
-    is_active: boolean;
-  }
-
-  const activeToday = (users as UserWithActivity[]).filter(
-    user => user.last_active_at && user.last_active_at > twentyFourHoursAgo
-  ).length;
-
   return {
-    total: users.length,
-    activeToday,
+    total: totalResult.count || 0,
+    activeToday: activeResult.count || 0,
   };
 }
 
@@ -216,6 +213,7 @@ export async function getUserStats(): Promise<{
  * Get full dashboard stats in a single call
  */
 export async function getDashboardStats(): Promise<DashboardStats> {
+  await requireAuth();
   const [tasksByStatus, recentUploads, taskStats, userStats] = await Promise.all([
     getTaskCountsByStatus(),
     getRecentUploads(),

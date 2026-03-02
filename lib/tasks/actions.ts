@@ -1,13 +1,10 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { requireAuth } from '@/lib/auth/actions';
 import type { Task, Division, Status, User, JobWithCustomer } from '@/lib/database.types';
-
-export interface ActionResult<T = void> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
+import type { ActionResult } from '@/lib/types';
 
 export interface TaskWithRelations extends Task {
   status: Status | null;
@@ -222,6 +219,7 @@ export interface CreateTaskData {
  * Create a new task
  */
 export async function createTask(data: CreateTaskData): Promise<ActionResult<Task>> {
+  await requireAuth();
   const supabase = await createClient();
 
   const { data: task, error } = await supabase
@@ -250,6 +248,7 @@ export async function createTask(data: CreateTaskData): Promise<ActionResult<Tas
     return { success: false, error: 'Unable to complete this operation' };
   }
 
+  revalidatePath('/tasks');
   return { success: true, data: task as Task };
 }
 
@@ -275,6 +274,7 @@ export interface UpdateTaskData {
  * Update an existing task
  */
 export async function updateTask(data: UpdateTaskData): Promise<ActionResult<Task>> {
+  await requireAuth();
   const supabase = await createClient();
 
   const updateData: Record<string, unknown> = {
@@ -308,6 +308,8 @@ export async function updateTask(data: UpdateTaskData): Promise<ActionResult<Tas
     return { success: false, error: 'Unable to complete this operation' };
   }
 
+  revalidatePath('/tasks');
+  revalidatePath(`/tasks/${data.id}`);
   return { success: true, data: task as Task };
 }
 
@@ -315,6 +317,7 @@ export async function updateTask(data: UpdateTaskData): Promise<ActionResult<Tas
  * Soft delete a task by setting deleted_at
  */
 export async function deleteTask(id: string): Promise<ActionResult> {
+  await requireAuth();
   const supabase = await createClient();
 
   const { error } = await supabase
@@ -330,6 +333,7 @@ export async function deleteTask(id: string): Promise<ActionResult> {
     return { success: false, error: 'Unable to complete this operation' };
   }
 
+  revalidatePath('/tasks');
   return { success: true };
 }
 
@@ -340,6 +344,7 @@ export async function updateTaskStatus(
   taskId: string,
   statusId: string
 ): Promise<ActionResult<Task>> {
+  await requireAuth();
   const supabase = await createClient();
 
   const { data: task, error } = await supabase
@@ -357,6 +362,8 @@ export async function updateTaskStatus(
     return { success: false, error: 'Unable to complete this operation' };
   }
 
+  revalidatePath('/tasks');
+  revalidatePath(`/tasks/${taskId}`);
   return { success: true, data: task as Task };
 }
 
@@ -367,6 +374,7 @@ export async function bulkAssignTasks(
   taskIds: string[],
   userId: string | null
 ): Promise<ActionResult<{ updated: number }>> {
+  await requireAuth();
   const supabase = await createClient();
 
   const { error, count } = await supabase
@@ -383,6 +391,7 @@ export async function bulkAssignTasks(
     return { success: false, error: 'Unable to complete this operation' };
   }
 
+  revalidatePath('/tasks');
   return { success: true, data: { updated: count || taskIds.length } };
 }
 
@@ -393,6 +402,7 @@ export async function bulkChangeStatus(
   taskIds: string[],
   statusId: string
 ): Promise<ActionResult<{ updated: number }>> {
+  await requireAuth();
   const supabase = await createClient();
 
   const { error, count } = await supabase
@@ -409,6 +419,7 @@ export async function bulkChangeStatus(
     return { success: false, error: 'Unable to complete this operation' };
   }
 
+  revalidatePath('/tasks');
   return { success: true, data: { updated: count || taskIds.length } };
 }
 
@@ -418,6 +429,7 @@ export async function bulkChangeStatus(
 export async function bulkDeleteTasks(
   taskIds: string[]
 ): Promise<ActionResult<{ deleted: number }>> {
+  await requireAuth();
   const supabase = await createClient();
 
   const { error, count } = await supabase
@@ -434,6 +446,7 @@ export async function bulkDeleteTasks(
     return { success: false, error: 'Unable to complete this operation' };
   }
 
+  revalidatePath('/tasks');
   return { success: true, data: { deleted: count || taskIds.length } };
 }
 
@@ -444,6 +457,7 @@ export async function updateTaskCustomFields(
   taskId: string,
   customFields: Record<string, unknown>
 ): Promise<ActionResult<Task>> {
+  await requireAuth();
   const supabase = await createClient();
 
   // First get the current task to merge custom fields
@@ -479,6 +493,7 @@ export async function updateTaskCustomFields(
     return { success: false, error: 'Unable to complete this operation' };
   }
 
+  revalidatePath(`/tasks/${taskId}`);
   return { success: true, data: task as Task };
 }
 

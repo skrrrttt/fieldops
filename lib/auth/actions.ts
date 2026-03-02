@@ -27,9 +27,9 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
   // Get user data from users table
   const { data: userData, error: userError } = await supabase
     .from('users')
-    .select('role, display_name, avatar_url')
+    .select('role, display_name, avatar_url, is_active')
     .eq('id', user.id)
-    .single<{ role: UserRole; display_name: string | null; avatar_url: string | null }>();
+    .single<{ role: UserRole; display_name: string | null; avatar_url: string | null; is_active: boolean }>();
 
   if (userError || !userData) {
     // User exists in auth but not in users table - default to field_user
@@ -40,6 +40,11 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
       display_name: null,
       avatar_url: null,
     };
+  }
+
+  // Deactivated users should not be able to authenticate
+  if (userData.is_active === false) {
+    return null;
   }
 
   return {

@@ -2,13 +2,9 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdmin } from '@/lib/auth/actions';
 import type { Division } from '@/lib/database.types';
-
-export interface ActionResult<T = void> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
+import type { ActionResult } from '@/lib/types';
 
 export interface CreateDivisionInput {
   name: string;
@@ -67,6 +63,7 @@ export async function getDivision(id: string): Promise<Division | null> {
 export async function createDivision(
   division: CreateDivisionInput
 ): Promise<ActionResult<Division>> {
+  await requireAdmin();
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -95,6 +92,7 @@ export async function updateDivision(
   id: string,
   division: UpdateDivisionInput
 ): Promise<ActionResult<Division>> {
+  await requireAdmin();
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -121,6 +119,7 @@ export async function updateDivision(
  * Delete a division
  */
 export async function deleteDivision(id: string): Promise<ActionResult> {
+  await requireAdmin();
   const supabase = await createClient();
 
   const { error } = await supabase

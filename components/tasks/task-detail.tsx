@@ -9,6 +9,8 @@ import type { PhotoWithUser } from '@/lib/photos/actions';
 import type { FileWithUser } from '@/lib/files/actions';
 import type { CommentWithUser } from '@/lib/comments/actions';
 import type { CustomFieldDefinition, TaskChecklistWithDetails } from '@/lib/database.types';
+import { createClient } from '@/lib/supabase/client';
+import { createComment } from '@/lib/comments/actions';
 import { PhotoUpload } from '@/components/tasks/photo-upload';
 import { FileUpload } from '@/components/tasks/file-upload';
 import { CustomFieldEdit } from '@/components/tasks/custom-field-edit';
@@ -442,7 +444,6 @@ const PhotoGalleryInline = memo(function PhotoGalleryInline({ photos }: { photos
 
   useEffect(() => {
     const fetchUrls = async () => {
-      const { createClient } = await import('@/lib/supabase/client');
       const supabase = createClient();
       const withUrls = photos.map(photo => {
         const { data } = supabase.storage.from('photos').getPublicUrl(photo.storage_path);
@@ -535,7 +536,6 @@ const PhotoGalleryInline = memo(function PhotoGalleryInline({ photos }: { photos
 // Inline File List (simplified, without outer section wrapper)
 const FileListInline = memo(function FileListInline({ files }: { files: FileWithUser[] }) {
   const getFileUrl = (storagePath: string): string => {
-    const { createClient } = require('@/lib/supabase/client');
     const supabase = createClient();
     const { data } = supabase.storage.from('files').getPublicUrl(storagePath);
     return data.publicUrl;
@@ -592,7 +592,6 @@ const CommentInputInline = memo(function CommentInputInline({ taskId, onCommentA
 
     setIsSubmitting(true);
     try {
-      const { createComment } = await import('@/lib/comments/actions');
       const result = await createComment({ task_id: taskId, content: content.trim() });
       if (result.success && result.data) {
         setContent('');

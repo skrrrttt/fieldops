@@ -3,12 +3,7 @@
 import { createClient } from '@/lib/supabase/server';
 import type { Photo, Division } from '@/lib/database.types';
 import { getCurrentUser } from '@/lib/auth/actions';
-
-export interface ActionResult<T = void> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
+import type { ActionResult } from '@/lib/types';
 
 export interface PhotoWithUser extends Photo {
   user: { id: string; email: string } | null;

@@ -2,13 +2,10 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { requireAdmin } from '@/lib/auth/actions';
 import type { User, UserRole } from '@/lib/database.types';
-
-export interface ActionResult<T = void> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
+import type { ActionResult } from '@/lib/types';
 
 /**
  * Get all users with their status
@@ -57,11 +54,12 @@ export async function inviteUser(
   email: string,
   role: UserRole
 ): Promise<ActionResult<{ userId: string }>> {
+  await requireAdmin();
+  const adminClient = createAdminClient();
   const supabase = await createClient();
 
-  // Use Supabase Admin API to invite user
-  // Note: This requires service_role key which should be configured in env
-  const { data: authData, error: authError } = await supabase.auth.admin.inviteUserByEmail(email, {
+  // Use service_role client for admin auth operations
+  const { data: authData, error: authError } = await adminClient.auth.admin.inviteUserByEmail(email, {
     data: {
       role: role,
     },
@@ -102,6 +100,7 @@ export async function updateUserRole(
   userId: string,
   role: UserRole
 ): Promise<ActionResult<User>> {
+  await requireAdmin();
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -124,6 +123,7 @@ export async function updateUserRole(
  * Deactivate a user (revokes access but preserves history)
  */
 export async function deactivateUser(userId: string): Promise<ActionResult<User>> {
+  await requireAdmin();
   const supabase = await createClient();
 
   // Update user status to inactive

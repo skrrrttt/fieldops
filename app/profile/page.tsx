@@ -22,7 +22,7 @@ export default async function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900 pb-24">
       <DetailHeader title="Profile" backHref="/tasks" />
       <main className="max-w-3xl mx-auto px-4 py-6">
         <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm p-6 space-y-6">

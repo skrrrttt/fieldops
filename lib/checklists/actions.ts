@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdmin, requireAuth } from '@/lib/auth/actions';
 import type {
   Checklist,
   ChecklistItem,
@@ -9,12 +10,7 @@ import type {
   TaskChecklist,
   TaskChecklistWithDetails,
 } from '@/lib/database.types';
-
-export interface ActionResult<T = void> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
+import type { ActionResult } from '@/lib/types';
 
 export interface CreateChecklistInput {
   name: string;
@@ -164,6 +160,7 @@ export async function getNextChecklistOrder(): Promise<number> {
 export async function createChecklist(
   checklist: CreateChecklistInput
 ): Promise<ActionResult<Checklist>> {
+  await requireAdmin();
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -192,6 +189,7 @@ export async function updateChecklist(
   id: string,
   checklist: UpdateChecklistInput
 ): Promise<ActionResult<Checklist>> {
+  await requireAdmin();
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -218,6 +216,7 @@ export async function updateChecklist(
  * Delete a checklist (will fail if attached to tasks due to RESTRICT)
  */
 export async function deleteChecklist(id: string): Promise<ActionResult> {
+  await requireAdmin();
   const supabase = await createClient();
 
   // Check if checklist is attached to any tasks
@@ -494,6 +493,7 @@ export async function attachChecklistToTask(
   taskId: string,
   checklistId: string
 ): Promise<ActionResult<TaskChecklist>> {
+  await requireAuth();
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -530,6 +530,7 @@ export async function removeChecklistFromTask(
   taskId: string,
   checklistId: string
 ): Promise<ActionResult> {
+  await requireAuth();
   const supabase = await createClient();
 
   const { error } = await supabase
@@ -556,6 +557,7 @@ export async function toggleChecklistItemCompletion(
   itemId: string,
   completed: boolean
 ): Promise<ActionResult> {
+  await requireAuth();
   const supabase = await createClient();
 
   // Get current completions
@@ -618,6 +620,7 @@ export async function syncTaskChecklists(
   taskId: string,
   checklistIds: string[]
 ): Promise<ActionResult> {
+  await requireAuth();
   const supabase = await createClient();
 
   // Get current checklist IDs for this task

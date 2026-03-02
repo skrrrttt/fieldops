@@ -1,13 +1,9 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { requireAdmin } from '@/lib/auth/actions';
 import type { Customer, Job, CustomerWithJobs, JobWithCustomer } from '@/lib/database.types';
-
-export interface ActionResult<T = void> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
+import type { ActionResult } from '@/lib/types';
 
 // ============ Customer Actions ============
 
@@ -87,6 +83,7 @@ export interface CreateCustomerInput {
  * Create a new customer
  */
 export async function createCustomer(input: CreateCustomerInput): Promise<ActionResult<Customer>> {
+  await requireAdmin();
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -121,6 +118,7 @@ export interface UpdateCustomerInput {
  * Update an existing customer
  */
 export async function updateCustomer(id: string, input: UpdateCustomerInput): Promise<ActionResult<Customer>> {
+  await requireAdmin();
   const supabase = await createClient();
 
   const updateData: Record<string, unknown> = {
@@ -152,6 +150,7 @@ export async function updateCustomer(id: string, input: UpdateCustomerInput): Pr
  * Delete a customer (cascades to jobs)
  */
 export async function deleteCustomer(id: string): Promise<ActionResult> {
+  await requireAdmin();
   const supabase = await createClient();
 
   const { error } = await supabase
@@ -229,6 +228,7 @@ export interface CreateJobInput {
  * Create a new job under a customer
  */
 export async function createJob(input: CreateJobInput): Promise<ActionResult<Job>> {
+  await requireAdmin();
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -266,6 +266,7 @@ export interface UpdateJobInput {
  * Update an existing job
  */
 export async function updateJob(id: string, input: UpdateJobInput): Promise<ActionResult<Job>> {
+  await requireAdmin();
   const supabase = await createClient();
 
   const updateData: Record<string, unknown> = {
@@ -298,6 +299,7 @@ export async function updateJob(id: string, input: UpdateJobInput): Promise<Acti
  * Delete a job
  */
 export async function deleteJob(id: string): Promise<ActionResult> {
+  await requireAdmin();
   const supabase = await createClient();
 
   const { error } = await supabase

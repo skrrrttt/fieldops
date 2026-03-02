@@ -2,13 +2,9 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdmin } from '@/lib/auth/actions';
 import type { Status } from '@/lib/database.types';
-
-export interface ActionResult<T = void> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
+import type { ActionResult } from '@/lib/types';
 
 export interface CreateStatusInput {
   name: string;
@@ -91,6 +87,7 @@ export async function getNextStatusOrder(): Promise<number> {
 export async function createStatus(
   status: CreateStatusInput
 ): Promise<ActionResult<Status>> {
+  await requireAdmin();
   const supabase = await createClient();
 
   // If this status is set as default, unset other defaults first
@@ -129,6 +126,7 @@ export async function updateStatus(
   id: string,
   status: UpdateStatusInput
 ): Promise<ActionResult<Status>> {
+  await requireAdmin();
   const supabase = await createClient();
 
   // If this status is being set as default, unset other defaults first
@@ -166,6 +164,7 @@ export async function updateStatus(
  * Delete a status
  */
 export async function deleteStatus(id: string): Promise<ActionResult> {
+  await requireAdmin();
   const supabase = await createClient();
 
   const { error } = await supabase
@@ -188,6 +187,7 @@ export async function deleteStatus(id: string): Promise<ActionResult> {
 export async function reorderStatuses(
   orderedIds: string[]
 ): Promise<ActionResult> {
+  await requireAdmin();
   const supabase = await createClient();
 
   // Update each status with its new order

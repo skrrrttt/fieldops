@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation';
 import { requireAuth } from '@/lib/auth/actions';
 import { getTask } from '@/lib/tasks/actions';
 import { getTaskPhotos } from '@/lib/photos/actions';
@@ -17,21 +18,19 @@ export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
   await requireAuth();
   const { id } = await params;
 
-  // Fetch task and related data (may be null if offline or not found)
-  const [task, customFields] = await Promise.all([
+  // Fetch all data in a single parallel batch to eliminate waterfall
+  const [task, customFields, photos, files, comments, taskChecklists] = await Promise.all([
     getTask(id),
     getCustomFields(),
+    getTaskPhotos(id),
+    getTaskFiles(id),
+    getTaskComments(id),
+    getTaskChecklists(id),
   ]);
 
-  // Parallelize photos, files, comments, and checklists fetches for better performance
-  const [photos, files, comments, taskChecklists] = task
-    ? await Promise.all([
-        getTaskPhotos(id),
-        getTaskFiles(id),
-        getTaskComments(id),
-        getTaskChecklists(id),
-      ])
-    : [[], [], [], []];
+  if (!task) {
+    notFound();
+  }
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900 pb-24">
