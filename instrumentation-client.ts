@@ -10,7 +10,7 @@ Sentry.init({
     // Maximum number of envelopes to store in IndexedDB
     maxQueueSize: 100,
     // Flush stored events on startup when online
-    flushAtStartup: true,
+    flushAtStartup: false,
   } as Record<string, unknown>,
 
   // Sample rate for performance monitoring (enables Web Vitals)

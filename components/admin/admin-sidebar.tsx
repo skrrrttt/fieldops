@@ -155,6 +155,7 @@ export function AdminSidebar({ isCollapsed, onToggleCollapse }: AdminSidebarProp
       <div className="flex items-center justify-between p-4 h-16 border-b border-sidebar-border">
         <Link
           href="/admin/dashboard"
+          prefetch={false}
           className="flex items-center gap-3 overflow-hidden group"
         >
           <div
@@ -191,6 +192,7 @@ export function AdminSidebar({ isCollapsed, onToggleCollapse }: AdminSidebarProp
               {item.href ? (
                 <Link
                   href={item.href}
+                  prefetch={false}
                   className={`
                     flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200
                     ${isActive(item.href)
@@ -243,6 +245,7 @@ export function AdminSidebar({ isCollapsed, onToggleCollapse }: AdminSidebarProp
                         <li key={child.label}>
                           <Link
                             href={child.href!}
+                            prefetch={false}
                             className={`
                               flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 text-sm
                               ${isActive(child.href)

@@ -1,15 +1,13 @@
-'use client';
-
 /**
  * DashboardContent - Premium admin dashboard with refined visual hierarchy
  * Features: vibrant stat cards, clear data visualization, elegant spacing
  */
 
 import Link from 'next/link';
+import Image from 'next/image';
 // ProStreet brand constant
 const PRIMARY_COLOR = '#f97316';
 import type { DashboardStats } from '@/lib/dashboard/actions';
-import { createClient } from '@/lib/supabase/client';
 import { formatDistanceToNow } from '@/lib/utils/date';
 import {
   ClipboardList,
@@ -27,10 +25,10 @@ import {
 
 interface DashboardContentProps {
   stats: DashboardStats;
+  photoUrls?: Record<string, string>;
 }
 
-export function DashboardContent({ stats }: DashboardContentProps) {
-  const supabase = createClient();
+export function DashboardContent({ stats, photoUrls }: DashboardContentProps) {
 
   const completionPercentage = stats.totalTasks > 0
     ? Math.round((stats.completedTasks / stats.totalTasks) * 100)
@@ -266,9 +264,7 @@ export function DashboardContent({ stats }: DashboardContentProps) {
         {stats.recentUploads.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
             {stats.recentUploads.map(upload => {
-              const publicUrl = supabase.storage
-                .from('photos')
-                .getPublicUrl(upload.storage_path).data.publicUrl;
+              const publicUrl = photoUrls?.[upload.id] || '';
 
               return (
                 <Link
@@ -276,11 +272,12 @@ export function DashboardContent({ stats }: DashboardContentProps) {
                   href={`/admin/media?photo=${upload.id}`}
                   className="group relative aspect-square rounded-xl overflow-hidden bg-secondary"
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <Image
                     src={publicUrl}
                     alt={`Photo from ${upload.task_title}`}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    fill
+                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 12.5vw"
+                    className="object-cover transition-transform duration-300 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     <div className="absolute bottom-3 left-3 right-3">

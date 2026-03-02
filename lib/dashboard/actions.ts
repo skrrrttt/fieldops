@@ -1,7 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import type { Status, Photo, Task, User, Division } from '@/lib/database.types';
+import type { Status } from '@/lib/database.types';
 
 export interface TaskCountByStatus {
   status_id: string;
@@ -33,45 +33,43 @@ export interface DashboardStats {
 
 /**
  * Get task counts grouped by status
- * Optimized: Uses parallel count queries instead of fetching all tasks
+ * Optimized: Single query for statuses + single query for task status_ids, counted in JS
  */
 export async function getTaskCountsByStatus(): Promise<TaskCountByStatus[]> {
   const supabase = await createClient();
 
-  // Get all statuses first
-  const { data: statuses, error: statusError } = await supabase
+  // Fire both queries concurrently (2 queries instead of N+1)
+  const statusPromise = supabase
     .from('statuses')
     .select('id, name, color, is_complete')
     .order('order');
+  const taskPromise = supabase
+    .from('tasks')
+    .select('status_id')
+    .is('deleted_at', null)
+    .returns<{ status_id: string }[]>();
 
-  if (statusError || !statuses) {
-    console.error('Error fetching statuses:', statusError);
+  const statusResult = await statusPromise;
+  const taskResult = await taskPromise;
+
+  if (statusResult.error || !statusResult.data) {
+    console.error('Error fetching statuses:', statusResult.error);
     return [];
   }
 
-  // Get counts for each status in parallel using count queries
-  // This is much more efficient than fetching all tasks
-  const countPromises = (statuses as Status[]).map(async (status) => {
-    const { count, error } = await supabase
-      .from('tasks')
-      .select('*', { count: 'exact', head: true })
-      .eq('status_id', status.id)
-      .is('deleted_at', null);
-
-    if (error) {
-      console.error(`Error counting tasks for status ${status.id}:`, error);
-      return 0;
+  // Count tasks per status in JS
+  const countMap = new Map<string, number>();
+  if (taskResult.data) {
+    for (const task of taskResult.data) {
+      countMap.set(task.status_id, (countMap.get(task.status_id) || 0) + 1);
     }
-    return count || 0;
-  });
+  }
 
-  const counts = await Promise.all(countPromises);
-
-  return (statuses as Status[]).map((status, index) => ({
+  return (statusResult.data as Status[]).map((status) => ({
     status_id: status.id,
     status_name: status.name,
     status_color: status.color,
-    count: counts[index],
+    count: countMap.get(status.id) || 0,
     is_complete: status.is_complete,
   }));
 }
@@ -122,7 +120,7 @@ export async function getRecentUploads(limit: number = 8): Promise<RecentUpload[
 
 /**
  * Get overall task statistics
- * Optimized: Uses parallel count queries instead of fetching all tasks
+ * Optimized: Fetches minimal task data in one query, computes stats in JS
  */
 export async function getTaskStats(): Promise<{
   total: number;
@@ -132,56 +130,47 @@ export async function getTaskStats(): Promise<{
 }> {
   const supabase = await createClient();
 
-  // Get complete status IDs first
-  const { data: completeStatuses } = await supabase
-    .from('statuses')
-    .select('id')
-    .eq('is_complete', true);
-
-  const completeStatusIds = (completeStatuses || []).map((s: { id: string }) => s.id);
-
   const now = new Date();
   now.setHours(0, 0, 0, 0);
   const todayStr = now.toISOString().split('T')[0];
 
-  // Run all count queries in parallel
-  const [totalResult, completedResult, overdueResult] = await Promise.all([
-    // Total non-deleted tasks
-    supabase
-      .from('tasks')
-      .select('*', { count: 'exact', head: true })
-      .is('deleted_at', null),
+  // Fire both queries concurrently
+  const statusPromise = supabase
+    .from('statuses')
+    .select('id')
+    .eq('is_complete', true);
+  const tasksPromise = supabase
+    .from('tasks')
+    .select('status_id, end_date')
+    .is('deleted_at', null)
+    .returns<{ status_id: string; end_date: string | null }[]>();
 
-    // Completed tasks (status.is_complete = true)
-    completeStatusIds.length > 0
-      ? supabase
-          .from('tasks')
-          .select('*', { count: 'exact', head: true })
-          .is('deleted_at', null)
-          .in('status_id', completeStatusIds)
-      : Promise.resolve({ count: 0, error: null }),
+  const completeStatusResult = await statusPromise;
+  const tasksResult = await tasksPromise;
 
-    // Overdue tasks (due_date < today AND not complete)
-    completeStatusIds.length > 0
-      ? supabase
-          .from('tasks')
-          .select('*', { count: 'exact', head: true })
-          .is('deleted_at', null)
-          .lt('due_date', todayStr)
-          .not('status_id', 'in', `(${completeStatusIds.join(',')})`)
-      : supabase
-          .from('tasks')
-          .select('*', { count: 'exact', head: true })
-          .is('deleted_at', null)
-          .lt('due_date', todayStr),
-  ]);
+  const completeStatusIds = new Set(
+    (completeStatusResult.data || []).map((s: { id: string }) => s.id)
+  );
+  const tasks = tasksResult.data || [];
 
-  const total = totalResult.count || 0;
-  const completed = completedResult.count || 0;
-  const pending = total - completed;
-  const overdue = overdueResult.count || 0;
+  let completed = 0;
+  let overdue = 0;
 
-  return { total, completed, pending, overdue };
+  for (const task of tasks) {
+    const isComplete = completeStatusIds.has(task.status_id);
+    if (isComplete) {
+      completed++;
+    } else if (task.end_date && task.end_date < todayStr) {
+      overdue++;
+    }
+  }
+
+  return {
+    total: tasks.length,
+    completed,
+    pending: tasks.length - completed,
+    overdue,
+  };
 }
 
 /**

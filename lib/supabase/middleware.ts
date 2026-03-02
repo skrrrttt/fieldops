@@ -30,8 +30,8 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  // Refreshing the auth token
-  await supabase.auth.getUser();
+  // Refreshing the auth token — return user to avoid duplicate getUser() calls
+  const { data: { user } } = await supabase.auth.getUser();
 
-  return supabaseResponse;
+  return { response: supabaseResponse, user, supabase };
 }

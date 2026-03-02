@@ -39,17 +39,11 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
   const [showShortcutsModal, setShowShortcutsModal] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isMounted, setIsMounted] = useState(false);
 
   // Auto-close mobile menu on navigation
   useEffect(() => {
     setShowMobileMenu(false);
   }, [pathname]);
-
-  // Track mount state to avoid hydration mismatch
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   // Load collapsed state from localStorage
   useEffect(() => {
@@ -118,10 +112,7 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
     }
   };
 
-  // Calculate sidebar width for margin
-  const sidebarWidth = isMounted
-    ? (isCollapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED)
-    : SIDEBAR_WIDTH_EXPANDED;
+  const sidebarWidth = isCollapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED;
 
   return (
     <div className="min-h-screen bg-background">
@@ -145,14 +136,10 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
         </div>
       )}
 
-      {/* Main content area */}
+      {/* Main content area — use CSS for responsive margin to avoid layout shift */}
       <div
-        className="min-h-screen transition-[margin] duration-300 ease-out"
-        style={{
-          marginLeft: isMounted && typeof window !== 'undefined' && window.innerWidth >= 1024
-            ? sidebarWidth
-            : 0
-        }}
+        className="min-h-screen transition-[margin] duration-300 ease-out lg:ml-[var(--sidebar-width)]"
+        style={{ '--sidebar-width': `${sidebarWidth}px` } as React.CSSProperties}
       >
         {/* Top header bar */}
         <header className="bg-card/80 backdrop-blur-md border-b border-border/50 sticky top-0 z-10">

@@ -1,7 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
-import { createServerClient } from '@supabase/ssr';
-import type { Database, UserRole } from '@/lib/database.types';
+import type { UserRole } from '@/lib/database.types';
 
 type UserRoleResult = { role: UserRole };
 
@@ -12,8 +11,8 @@ const publicRoutes = ['/login'];
 const adminRoutes = ['/admin'];
 
 export async function middleware(request: NextRequest) {
-  // First, update the session (refresh tokens if needed)
-  const response = await updateSession(request);
+  // Update session and get the authenticated user in one call
+  const { response, user, supabase } = await updateSession(request);
 
   const { pathname } = request.nextUrl;
 
@@ -25,26 +24,6 @@ export async function middleware(request: NextRequest) {
   ) {
     return response;
   }
-
-  // Create supabase client to check auth
-  const supabase = createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          );
-        },
-      },
-    }
-  );
-
-  const { data: { user } } = await supabase.auth.getUser();
 
   // Check if route is public
   const isPublicRoute = publicRoutes.some((route) => pathname.startsWith(route));
