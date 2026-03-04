@@ -443,6 +443,7 @@ export function TaskTable({
                       type="checkbox"
                       checked={selectedTaskIds.has(task.id)}
                       onChange={(e) => handleSelectTask(task.id, index, e)}
+                      aria-label={`Select task ${task.title}`}
                       className="mt-0.5 w-5 h-5 rounded border-zinc-300 dark:border-zinc-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-0"
                     />
                     <div className="flex-1 min-w-0">
@@ -535,6 +536,7 @@ export function TaskTable({
                     if (el) el.indeterminate = isSomeSelected;
                   }}
                   onChange={(e) => handleSelectAll(e.target.checked)}
+                  aria-label="Select all tasks"
                   className="w-4 h-4 rounded border-zinc-300 dark:border-zinc-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-0"
                 />
               </th>
@@ -616,6 +618,7 @@ export function TaskTable({
                           handleSelectTask(task.id, index, e);
                         }
                       }}
+                      aria-label={`Select task ${task.title}`}
                       className="w-4 h-4 rounded border-zinc-300 dark:border-zinc-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-0"
                     />
                   </td>

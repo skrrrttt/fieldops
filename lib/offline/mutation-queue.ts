@@ -272,8 +272,11 @@ export async function getMutationCountByStatus(
   return db.pending_mutations.where('status').equals(status).count();
 }
 
+const MAX_RETRY_COUNT = 5;
+
 /**
  * Reset failed mutations back to pending for retry
+ * Only resets mutations that haven't exceeded the max retry limit
  */
 export async function resetFailedMutations(): Promise<number> {
   if (!isIndexedDBAvailable()) return 0;
@@ -286,11 +289,13 @@ export async function resetFailedMutations(): Promise<number> {
 
   let count = 0;
   for (const mutation of failed) {
-    await db.pending_mutations.update(mutation.id, {
-      status: 'pending',
-      error_message: undefined,
-    });
-    count++;
+    if ((mutation.retry_count || 0) < MAX_RETRY_COUNT) {
+      await db.pending_mutations.update(mutation.id, {
+        status: 'pending',
+        error_message: undefined,
+      });
+      count++;
+    }
   }
 
   return count;
@@ -424,10 +429,40 @@ export async function resolveConflict(
     });
     return db.pending_mutations.get(mutationId) as Promise<TypedPendingMutation>;
   } else {
-    // Server wins - delete the mutation and revert local cache
+    // Server wins - update local IndexedDB with server value, then delete mutation
+    if (mutation.conflict) {
+      const { server_value, field_name } = mutation.conflict;
+      if (field_name === 'status' && mutation.type === 'status') {
+        const task = await db.tasks.get(mutation.payload.task_id);
+        if (task) {
+          task.status_id = server_value as string;
+          await db.tasks.put(task);
+        }
+      }
+    }
     await db.pending_mutations.delete(mutationId);
     return null;
   }
+}
+
+/**
+ * Recover stuck mutations that were left in 'syncing' state
+ * (e.g. due to app crash or tab close during sync)
+ */
+export async function recoverStuckMutations(): Promise<number> {
+  if (!isIndexedDBAvailable()) return 0;
+
+  const db = getDB();
+  const stuck = await db.pending_mutations
+    .where('status')
+    .equals('syncing')
+    .toArray();
+
+  for (const mutation of stuck) {
+    await db.pending_mutations.update(mutation.id, { status: 'pending' });
+  }
+
+  return stuck.length;
 }
 
 /**

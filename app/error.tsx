@@ -10,6 +10,7 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
+    // TODO: Report to Sentry when @sentry/nextjs error boundary is configured
     console.error('Unhandled error:', error);
   }, [error]);
 

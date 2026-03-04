@@ -117,9 +117,45 @@ export async function processBatchWithRateLimit(
     return [];
   };
 
-  // Process data mutations first (faster, smaller payloads)
-  const dataResults = await processWithRetry(dataMutations, DATA_CONCURRENCY);
-  allResults.push(...dataResults);
+  // Group data mutations by task_id to serialize same-task mutations (FIFO)
+  // Across different tasks, process in parallel with p-limit
+  const taskGroups = new Map<string, TypedPendingMutation[]>();
+  for (const m of dataMutations) {
+    const taskId = m.payload.task_id;
+    if (!taskGroups.has(taskId)) {
+      taskGroups.set(taskId, []);
+    }
+    taskGroups.get(taskId)!.push(m);
+  }
+
+  if (taskGroups.size > 0) {
+    const limit = pLimit(DATA_CONCURRENCY);
+    const chainPromises = Array.from(taskGroups.values()).map(group =>
+      limit(async () => {
+        const chainResults: SyncResult[] = [];
+        for (const mutation of group) {
+          const result = await processMutation(mutation);
+          chainResults.push(result);
+        }
+        return chainResults;
+      })
+    );
+    const chainResults = await Promise.allSettled(chainPromises);
+    for (const [i, result] of chainResults.entries()) {
+      if (result.status === 'fulfilled') {
+        allResults.push(...result.value);
+      } else {
+        const group = Array.from(taskGroups.values())[i];
+        for (const m of group) {
+          allResults.push({
+            success: false,
+            mutationId: m.id,
+            error: result.reason?.message || 'Unknown error during batch processing',
+          });
+        }
+      }
+    }
+  }
 
   // Then file mutations (slower, larger payloads, stricter rate limits)
   const fileResults = await processWithRetry(fileMutations, FILE_CONCURRENCY);

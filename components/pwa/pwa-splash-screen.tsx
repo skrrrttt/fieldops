@@ -52,6 +52,7 @@ export function PWASplashScreen() {
 
     // Only show splash in standalone mode and if not shown this session
     if (isStandaloneMode() && !wasSplashShown()) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowSplash(true);
       markSplashShown();
 

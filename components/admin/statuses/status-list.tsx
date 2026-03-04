@@ -212,7 +212,7 @@ export function StatusList({ statuses: initialStatuses }: StatusListProps) {
       {/* Delete Confirmation Dialog */}
       {deletingId && deletingStatus && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-md w-full p-6">
+          <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-md w-full p-6" role="dialog" aria-modal="true" aria-label="Confirm deletion">
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">
               Delete Status
             </h3>

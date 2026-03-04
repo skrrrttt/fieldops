@@ -251,6 +251,7 @@ export async function deleteChecklist(id: string): Promise<ActionResult> {
 export async function reorderChecklists(
   orderedIds: string[]
 ): Promise<ActionResult> {
+  await requireAdmin();
   const supabase = await createClient();
 
   const updates = orderedIds.map((id, index) =>
@@ -303,6 +304,7 @@ export async function getNextChecklistItemOrder(
 export async function createChecklistItem(
   item: CreateChecklistItemInput
 ): Promise<ActionResult<ChecklistItem>> {
+  await requireAdmin();
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -331,6 +333,7 @@ export async function updateChecklistItem(
   id: string,
   item: UpdateChecklistItemInput
 ): Promise<ActionResult<ChecklistItem>> {
+  await requireAdmin();
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -356,6 +359,7 @@ export async function updateChecklistItem(
  * Delete a checklist item
  */
 export async function deleteChecklistItem(id: string): Promise<ActionResult> {
+  await requireAdmin();
   const supabase = await createClient();
 
   const { error } = await supabase
@@ -378,6 +382,7 @@ export async function deleteChecklistItem(id: string): Promise<ActionResult> {
 export async function reorderChecklistItems(
   orderedIds: string[]
 ): Promise<ActionResult> {
+  await requireAdmin();
   const supabase = await createClient();
 
   const updates = orderedIds.map((id, index) =>

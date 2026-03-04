@@ -11,10 +11,10 @@ export default function NotFound() {
           The page you&apos;re looking for doesn&apos;t exist or has been moved.
         </p>
         <Link
-          href="/tasks"
+          href="/"
           className="inline-block px-6 py-3 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-lg font-medium hover:opacity-90 transition-opacity"
         >
-          Go to tasks
+          Go home
         </Link>
       </div>
     </div>

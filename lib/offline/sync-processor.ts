@@ -12,6 +12,7 @@ import {
   updateMutationStatus,
   deleteMutation,
   markMutationConflict,
+  recoverStuckMutations,
 } from './mutation-queue';
 import { processBatchWithRateLimit } from './batch-processor';
 import {
@@ -344,6 +345,9 @@ async function processMutation(mutation: TypedPendingMutation): Promise<SyncResu
 export async function processAllMutations(
   onProgress?: (progress: SyncProgress) => void
 ): Promise<SyncProgress> {
+  // Recover any mutations stuck in 'syncing' state from a previous interrupted sync
+  await recoverStuckMutations();
+
   const mutations = await getPendingMutations();
 
   const progress: SyncProgress = {
@@ -372,12 +376,14 @@ export async function processAllMutations(
     mutations,
     processMutation,
     (retryNumber, delayMs) => {
-      console.log(`Rate limited. Retry ${retryNumber}/${5} after ${delayMs}ms`);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`Rate limited. Retry ${retryNumber}/${5} after ${delayMs}ms`);
+      }
     }
   );
 
   // Log rate limit info if it occurred
-  if (rateLimitHit) {
+  if (rateLimitHit && process.env.NODE_ENV !== 'production') {
     console.log(`Sync completed with ${rateLimitRetries} rate limit retries`);
   }
 

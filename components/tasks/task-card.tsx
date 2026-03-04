@@ -46,6 +46,14 @@ export const TaskCard = memo(function TaskCard({ task, onClick }: TaskCardProps)
   return (
     <div
       onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if ((e.key === 'Enter' || e.key === ' ') && onClick) {
+          e.preventDefault();
+          onClick();
+        }
+      }}
       className={`
         group relative bg-card rounded-xl border overflow-hidden cursor-pointer
         transition-all duration-200 ease-out

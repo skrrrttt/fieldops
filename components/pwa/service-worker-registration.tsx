@@ -10,7 +10,9 @@ export function ServiceWorkerRegistration() {
         navigator.serviceWorker
           .register('/sw.js')
           .then((registration) => {
-            console.log('[PWA] Service Worker registered:', registration.scope);
+            if (process.env.NODE_ENV !== 'production') {
+              console.log('[PWA] Service Worker registered:', registration.scope);
+            }
 
             // Check for updates periodically
             registration.addEventListener('updatefound', () => {
@@ -21,7 +23,9 @@ export function ServiceWorkerRegistration() {
                     newWorker.state === 'installed' &&
                     navigator.serviceWorker.controller
                   ) {
-                    console.log('[PWA] New content available, refresh to update');
+                    if (process.env.NODE_ENV !== 'production') {
+                      console.log('[PWA] New content available, refresh to update');
+                    }
                   }
                 });
               }

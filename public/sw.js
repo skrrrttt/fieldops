@@ -119,18 +119,16 @@ self.addEventListener('sync', (event) => {
 
 // Process pending mutations - notify clients to handle in the app
 async function processPendingMutations() {
-  try {
-    const clients = await self.clients.matchAll({ type: 'window' });
+  const clients = await self.clients.matchAll({ type: 'window' });
 
-    if (clients.length > 0) {
-      clients[0].postMessage({
-        type: 'SYNC_MUTATIONS',
-        timestamp: new Date().toISOString(),
-      });
-    }
-  } catch (error) {
-    throw error; // Rethrow to retry sync
+  if (clients.length === 0) {
+    throw new Error('No active clients available to process mutations');
   }
+
+  clients[0].postMessage({
+    type: 'SYNC_MUTATIONS',
+    timestamp: new Date().toISOString(),
+  });
 }
 
 // Message event - handle messages from clients

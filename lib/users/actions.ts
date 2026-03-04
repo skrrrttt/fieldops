@@ -147,6 +147,7 @@ export async function deactivateUser(userId: string): Promise<ActionResult<User>
  * Reactivate a previously deactivated user
  */
 export async function reactivateUser(userId: string): Promise<ActionResult<User>> {
+  await requireAdmin();
   const supabase = await createClient();
 
   const { data, error } = await supabase

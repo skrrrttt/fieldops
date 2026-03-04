@@ -205,6 +205,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
               size="icon"
               onClick={handleSaveName}
               disabled={isSavingName}
+              aria-label="Save name"
             >
               {isSavingName ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -221,6 +222,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
                 setDisplayName(user.display_name || '');
               }}
               disabled={isSavingName}
+              aria-label="Cancel editing"
             >
               <X className="w-4 h-4" />
             </Button>
@@ -235,6 +237,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
               size="icon"
               variant="outline"
               onClick={() => setIsEditingName(true)}
+              aria-label="Edit name"
             >
               <Pencil className="w-4 h-4" />
             </Button>

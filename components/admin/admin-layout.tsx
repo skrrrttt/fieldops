@@ -34,7 +34,11 @@ const SIDEBAR_WIDTH_COLLAPSED = 68; // w-[68px]
 export function AdminLayout({ children, user }: AdminLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const saved = localStorage.getItem('admin-sidebar-collapsed');
+    return saved !== null ? JSON.parse(saved) : false;
+  });
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showShortcutsModal, setShowShortcutsModal] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
@@ -42,20 +46,13 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
 
   // Auto-close mobile menu on navigation
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setShowMobileMenu(false);
   }, [pathname]);
 
-  // Load collapsed state from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem('admin-sidebar-collapsed');
-    if (saved !== null) {
-      setIsCollapsed(JSON.parse(saved));
-    }
-  }, []);
-
   // Save collapsed state to localStorage
   const toggleCollapse = useCallback(() => {
-    setIsCollapsed(prev => {
+    setIsCollapsed((prev: boolean) => {
       const newValue = !prev;
       localStorage.setItem('admin-sidebar-collapsed', JSON.stringify(newValue));
       return newValue;
@@ -129,6 +126,9 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
         >
           <div
             className="absolute left-0 top-0 h-full w-72 animate-slide-in-right"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navigation menu"
             onClick={e => e.stopPropagation()}
           >
             <AdminSidebar isCollapsed={false} onToggleCollapse={() => setShowMobileMenu(false)} />
@@ -205,6 +205,9 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
         >
           <div
             className="bg-card rounded-2xl shadow-2xl border border-border/50 max-w-md w-full p-6 animate-scale-in"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Keyboard shortcuts"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-6">
@@ -214,6 +217,7 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
               <button
                 onClick={() => setShowShortcutsModal(false)}
                 className="p-2 rounded-xl hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Close"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -241,6 +245,9 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
         >
           <div
             className="bg-card rounded-2xl shadow-2xl border border-border/50 max-w-xl w-full mx-4 animate-scale-in overflow-hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Search tasks"
             onClick={e => e.stopPropagation()}
           >
             <form onSubmit={handleSearch}>
@@ -252,6 +259,7 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
                   onChange={e => setSearchQuery(e.target.value)}
                   placeholder="Search tasks..."
                   className="flex-1 bg-transparent border-none outline-none text-foreground placeholder-muted-foreground text-lg"
+                  aria-label="Search tasks"
                   autoFocus
                 />
                 <kbd className="hidden sm:inline-block px-2 py-1 text-xs bg-secondary rounded font-mono text-muted-foreground">

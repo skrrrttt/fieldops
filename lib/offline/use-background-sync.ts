@@ -133,7 +133,9 @@ export function useBackgroundSync(): UseBackgroundSyncResult {
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data && event.data.type === 'SYNC_MUTATIONS') {
-        console.log('[BackgroundSync] Received sync request from service worker');
+        if (process.env.NODE_ENV !== 'production') {
+          console.log('[BackgroundSync] Received sync request from service worker');
+        }
         processMutations();
       }
     };
@@ -152,7 +154,9 @@ export function useBackgroundSync(): UseBackgroundSyncResult {
       // Check if there are pending mutations
       getPendingMutationCount().then((count) => {
         if (count > 0) {
-          console.log('[BackgroundSync] Online with pending mutations, triggering sync');
+          if (process.env.NODE_ENV !== 'production') {
+            console.log('[BackgroundSync] Online with pending mutations, triggering sync');
+          }
           autoSyncTriggeredRef.current = true;
           syncNow().finally(() => {
             // Reset after a delay to allow re-triggering

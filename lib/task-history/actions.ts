@@ -284,6 +284,7 @@ export async function cleanupOldHistory(
 export async function restoreTaskFromHistory(
   historyId: string
 ): Promise<ActionResult<{ taskId: string }>> {
+  await requireAdmin();
   const supabase = await createClient();
 
   // Get the history record

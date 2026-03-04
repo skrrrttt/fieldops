@@ -11,6 +11,7 @@ export default function TasksError({
   reset: () => void;
 }) {
   useEffect(() => {
+    // TODO: Report to Sentry when @sentry/nextjs error boundary is configured
     console.error('Tasks error:', error);
   }, [error]);
 

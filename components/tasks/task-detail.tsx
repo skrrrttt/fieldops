@@ -485,16 +485,21 @@ const PhotoGalleryInline = memo(function PhotoGalleryInline({ photos }: { photos
       {lightboxIndex !== null && (
         <div
           className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Photo viewer"
           onClick={() => setLightboxIndex(null)}
         >
           <button
             className="absolute top-4 right-4 p-2 text-white/80 hover:text-white"
+            aria-label="Close lightbox"
             onClick={() => setLightboxIndex(null)}
           >
             <X className="w-8 h-8" />
           </button>
           <button
             className="absolute left-4 top-1/2 -translate-y-1/2 p-2 text-white/80 hover:text-white"
+            aria-label="Previous photo"
             onClick={(e) => {
               e.stopPropagation();
               setLightboxIndex(i => i === 0 ? photosWithUrls.length - 1 : (i ?? 0) - 1);
@@ -508,7 +513,7 @@ const PhotoGalleryInline = memo(function PhotoGalleryInline({ photos }: { photos
           >
             <NextImage
               src={photosWithUrls[lightboxIndex]?.url}
-              alt=""
+              alt={`Task photo ${lightboxIndex + 1}`}
               fill
               sizes="90vw"
               className="object-contain"
@@ -517,6 +522,7 @@ const PhotoGalleryInline = memo(function PhotoGalleryInline({ photos }: { photos
           </div>
           <button
             className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-white/80 hover:text-white"
+            aria-label="Next photo"
             onClick={(e) => {
               e.stopPropagation();
               setLightboxIndex(i => i === photosWithUrls.length - 1 ? 0 : (i ?? 0) + 1);
@@ -609,6 +615,7 @@ const CommentInputInline = memo(function CommentInputInline({ taskId, onCommentA
         value={content}
         onChange={(e) => setContent(e.target.value)}
         placeholder="Add a comment..."
+        aria-label="Add a comment"
         className="flex-1 px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white placeholder:text-zinc-400"
         disabled={isSubmitting}
       />

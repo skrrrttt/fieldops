@@ -281,6 +281,7 @@ export async function clearAllLocal(): Promise<void> {
     db.files.clear(),
     db.custom_field_definitions.clear(),
     db.sync_meta.clear(),
+    db.pending_mutations.clear(),
   ]);
 }
 

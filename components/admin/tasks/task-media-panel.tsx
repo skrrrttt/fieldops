@@ -52,6 +52,7 @@ export function TaskMediaPanel({ taskId }: TaskMediaPanelProps) {
   }, [taskId]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchData();
   }, [fetchData]);
 
@@ -295,6 +296,7 @@ export function TaskMediaPanel({ taskId }: TaskMediaPanelProps) {
             disabled={isSubmittingComment || !newComment.trim()}
             size="icon"
             className="self-end"
+            aria-label="Send comment"
           >
             {isSubmittingComment ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -379,6 +381,7 @@ export function TaskMediaPanel({ taskId }: TaskMediaPanelProps) {
                   size="icon"
                   className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
                   onClick={() => handleDeletePhoto(photo.id, photo.storage_path)}
+                  aria-label="Delete photo"
                 >
                   <Trash2 className="w-3 h-3" />
                 </Button>

@@ -170,6 +170,7 @@ export async function deleteCustomField(id: string): Promise<ActionResult> {
 export async function reorderCustomFields(
   orderedIds: string[]
 ): Promise<ActionResult> {
+  await requireAdmin();
   const supabase = await createClient();
 
   // Update each custom field with its new order

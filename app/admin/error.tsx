@@ -11,6 +11,7 @@ export default function AdminError({
   reset: () => void;
 }) {
   useEffect(() => {
+    // TODO: Report to Sentry when @sentry/nextjs error boundary is configured
     console.error('Admin error:', error);
   }, [error]);
 

@@ -5,7 +5,7 @@
  * Refined, polished design with smooth transitions
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -108,16 +108,16 @@ interface AdminSidebarProps {
 
 export function AdminSidebar({ isCollapsed, onToggleCollapse }: AdminSidebarProps) {
   const pathname = usePathname();
-  const [expandedSections, setExpandedSections] = useState<string[]>(['Configuration']);
-
-  useEffect(() => {
+  const [expandedSections, setExpandedSections] = useState<string[]>(() => {
+    const sections = ['Configuration'];
     const configItem = navItems.find(item => item.label === 'Configuration');
     if (configItem?.children?.some(child => child.href === pathname)) {
-      setExpandedSections(prev =>
-        prev.includes('Configuration') ? prev : [...prev, 'Configuration']
-      );
+      if (!sections.includes('Configuration')) {
+        sections.push('Configuration');
+      }
     }
-  }, [pathname]);
+    return sections;
+  });
 
   const toggleSection = (label: string) => {
     setExpandedSections(prev =>
