@@ -23,6 +23,7 @@ import {
   Archive,
   ListChecks,
   Building2,
+  BarChart3,
 } from 'lucide-react';
 
 const APP_NAME = 'ProStreet';
@@ -64,6 +65,11 @@ const navItems: NavItem[] = [
     label: 'Responses',
     href: '/admin/responses',
     icon: <MessageSquareText className="w-5 h-5" />,
+  },
+  {
+    label: 'Reports',
+    href: '/admin/reports',
+    icon: <BarChart3 className="w-5 h-5" />,
   },
   {
     label: 'Configuration',

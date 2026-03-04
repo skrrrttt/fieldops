@@ -574,3 +574,28 @@ button, a, [role="button"], input, select, textarea {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+@media print {
+  [data-slot="sidebar"],
+  header,
+  [data-print-hide] {
+    display: none !important;
+  }
+
+  main {
+    margin: 0 !important;
+    padding: 1rem !important;
+  }
+
+  .recharts-wrapper {
+    page-break-inside: avoid;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
+}
