@@ -25,10 +25,7 @@ import {
   Building2,
 } from 'lucide-react';
 
-// ProStreet brand constants
 const APP_NAME = 'ProStreet';
-const PRIMARY_COLOR = '#f97316';
-const DARK_BG = '#0f172a';
 
 interface NavItem {
   label: string;
@@ -158,11 +155,7 @@ export function AdminSidebar({ isCollapsed, onToggleCollapse }: AdminSidebarProp
           className="flex items-center gap-3 overflow-hidden group"
         >
           <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-lg font-bold flex-shrink-0 shadow-md transition-transform group-hover:scale-105"
-            style={{
-              backgroundColor: DARK_BG,
-              color: PRIMARY_COLOR,
-            }}
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-lg font-bold flex-shrink-0 shadow-md transition-transform group-hover:scale-105 bg-foreground text-primary"
           >
             {initial}
           </div>
@@ -194,18 +187,10 @@ export function AdminSidebar({ isCollapsed, onToggleCollapse }: AdminSidebarProp
                   className={`
                     flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200
                     ${isActive(item.href)
-                      ? 'shadow-md'
+                      ? 'bg-primary text-primary-foreground shadow-md'
                       : 'text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent'
                     }
                   `}
-                  style={
-                    isActive(item.href)
-                      ? {
-                          background: `linear-gradient(135deg, ${PRIMARY_COLOR}, ${PRIMARY_COLOR}dd)`,
-                          color: DARK_BG,
-                        }
-                      : undefined
-                  }
                   title={isCollapsed ? item.label : undefined}
                 >
                   <span className="flex-shrink-0">{item.icon}</span>
@@ -246,23 +231,17 @@ export function AdminSidebar({ isCollapsed, onToggleCollapse }: AdminSidebarProp
                             className={`
                               flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 text-sm
                               ${isActive(child.href)
-                                ? 'font-semibold'
+                                ? 'font-semibold text-primary'
                                 : 'text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent'
                               }
                             `}
-                            style={
-                              isActive(child.href)
-                                ? { color: PRIMARY_COLOR }
-                                : undefined
-                            }
                             title={isCollapsed ? child.label : undefined}
                           >
                             <span className="flex-shrink-0 opacity-70">{child.icon}</span>
                             {!isCollapsed && <span>{child.label}</span>}
                             {isActive(child.href) && !isCollapsed && (
                               <span
-                                className="ml-auto w-1.5 h-1.5 rounded-full"
-                                style={{ backgroundColor: PRIMARY_COLOR }}
+                                className="ml-auto w-1.5 h-1.5 rounded-full bg-primary"
                               />
                             )}
                           </Link>

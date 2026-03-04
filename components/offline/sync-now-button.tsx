@@ -50,8 +50,8 @@ export function SyncNowButton({
         disabled={disabled}
         className={`p-2 rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center ${
           disabled
-            ? 'text-zinc-400 dark:text-zinc-600 cursor-not-allowed'
-            : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700 active:bg-zinc-200 dark:active:bg-zinc-600'
+            ? 'text-muted-foreground cursor-not-allowed'
+            : 'text-muted-foreground hover:bg-muted active:bg-muted'
         } ${className}`}
         title={!isOnline ? 'Offline' : syncing ? 'Syncing...' : 'Sync Now'}
         aria-label={!isOnline ? 'Offline' : syncing ? 'Syncing...' : 'Sync Now'}
@@ -103,8 +103,8 @@ export function SyncNowButton({
         disabled={disabled}
         className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
           disabled
-            ? 'text-zinc-400 dark:text-zinc-600 cursor-not-allowed'
-            : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+            ? 'text-muted-foreground cursor-not-allowed'
+            : 'text-primary hover:bg-primary/5'
         } ${className}`}
       >
         {syncing ? (
@@ -159,8 +159,8 @@ export function SyncNowButton({
       disabled={disabled}
       className={`flex items-center justify-center gap-2 px-4 py-2 min-h-[44px] rounded-lg text-sm font-medium transition-colors ${
         disabled
-          ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-600 cursor-not-allowed'
-          : 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800'
+          ? 'bg-muted text-muted-foreground cursor-not-allowed'
+          : 'bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/80'
       } ${className}`}
     >
       {syncing ? (

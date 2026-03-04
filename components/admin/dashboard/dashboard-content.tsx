@@ -5,8 +5,6 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-// ProStreet brand constant
-const PRIMARY_COLOR = '#f97316';
 import type { DashboardStats } from '@/lib/dashboard/actions';
 import { formatDistanceToNow } from '@/lib/utils/date';
 import {
@@ -61,7 +59,6 @@ export function DashboardContent({ stats, photoUrls }: DashboardContentProps) {
           value={stats.totalTasks}
           icon={<ClipboardList className="w-6 h-6" />}
           href="/admin/tasks"
-          color={PRIMARY_COLOR}
           trend={stats.totalTasks > 0 ? 'active' : undefined}
         />
         <StatCard
@@ -98,8 +95,7 @@ export function DashboardContent({ stats, photoUrls }: DashboardContentProps) {
               </h2>
               <Link
                 href="/admin/tasks"
-                className="text-sm font-medium flex items-center gap-1 transition-colors hover:gap-2"
-                style={{ color: PRIMARY_COLOR }}
+                className="text-sm font-medium flex items-center gap-1 transition-colors hover:gap-2 text-primary"
               >
                 View all
                 <ArrowRight className="w-4 h-4" />
@@ -155,8 +151,7 @@ export function DashboardContent({ stats, photoUrls }: DashboardContentProps) {
                 </p>
                 <Link
                   href="/admin/statuses"
-                  className="inline-flex items-center gap-1.5 text-sm font-medium mt-2"
-                  style={{ color: PRIMARY_COLOR }}
+                  className="inline-flex items-center gap-1.5 text-sm font-medium mt-2 text-primary"
                 >
                   Create statuses
                   <ArrowRight className="w-4 h-4" />
@@ -172,11 +167,7 @@ export function DashboardContent({ stats, photoUrls }: DashboardContentProps) {
           <div className="bg-card rounded-2xl border border-border/50 p-6 shadow-sm">
             <div className="flex items-center gap-3 mb-5">
               <div
-                className="p-2.5 rounded-xl"
-                style={{
-                  backgroundColor: `${PRIMARY_COLOR}15`,
-                  color: PRIMARY_COLOR,
-                }}
+                className="p-2.5 rounded-xl bg-primary/10 text-primary"
               >
                 <Users className="w-5 h-5" />
               </div>
@@ -198,11 +189,7 @@ export function DashboardContent({ stats, photoUrls }: DashboardContentProps) {
             </div>
             <Link
               href="/admin/users"
-              className="flex items-center justify-center gap-2 w-full mt-5 py-2.5 rounded-xl font-medium text-sm transition-all hover:gap-3"
-              style={{
-                backgroundColor: `${PRIMARY_COLOR}12`,
-                color: PRIMARY_COLOR,
-              }}
+              className="flex items-center justify-center gap-2 w-full mt-5 py-2.5 rounded-xl font-medium text-sm transition-all hover:gap-3 bg-primary/10 text-primary"
             >
               Manage Users
               <ArrowRight className="w-4 h-4" />
@@ -220,25 +207,25 @@ export function DashboardContent({ stats, photoUrls }: DashboardContentProps) {
                 label="Create Task"
                 icon={<Plus className="w-4 h-4" />}
                 shortcut="n"
-                color={PRIMARY_COLOR}
+                color="var(--primary)"
               />
               <QuickLink
                 href="/admin/media"
                 label="View Media"
                 icon={<ImageIcon className="w-4 h-4" />}
-                color={PRIMARY_COLOR}
+                color="var(--primary)"
               />
               <QuickLink
                 href="/admin/divisions"
                 label="Manage Divisions"
                 icon={<Tags className="w-4 h-4" />}
-                color={PRIMARY_COLOR}
+                color="var(--primary)"
               />
               <QuickLink
                 href="/admin/customers"
                 label="Customers & Jobs"
                 icon={<Building2 className="w-4 h-4" />}
-                color={PRIMARY_COLOR}
+                color="var(--primary)"
               />
             </div>
           </div>
@@ -253,8 +240,7 @@ export function DashboardContent({ stats, photoUrls }: DashboardContentProps) {
           </h2>
           <Link
             href="/admin/media"
-            className="text-sm font-medium flex items-center gap-1 transition-colors hover:gap-2"
-            style={{ color: PRIMARY_COLOR }}
+            className="text-sm font-medium flex items-center gap-1 transition-colors hover:gap-2 text-primary"
           >
             View all media
             <ArrowRight className="w-4 h-4" />
@@ -313,18 +299,18 @@ interface StatCardProps {
   value: number;
   subtext?: string;
   icon: React.ReactNode;
-  color: string;
+  color?: string;
   href?: string;
   alert?: boolean;
   trend?: 'active' | 'up' | 'down';
 }
 
-function StatCard({ label, value, subtext, icon, color, href, alert, trend }: StatCardProps) {
+function StatCard({ label, value, subtext, icon, color = 'var(--primary)', href, alert, trend }: StatCardProps) {
   const content = (
     <div
       className={`
         relative bg-card rounded-2xl border p-6 transition-all duration-200
-        ${href ? 'hover:shadow-lg hover:-translate-y-0.5 cursor-pointer' : ''}
+        ${href ? 'hover:shadow-md cursor-pointer' : ''}
         ${alert
           ? 'border-destructive/40 bg-destructive/5 dark:bg-destructive/10'
           : 'border-border/50 hover:border-border'
@@ -333,7 +319,7 @@ function StatCard({ label, value, subtext, icon, color, href, alert, trend }: St
     >
       {/* Glow effect for alert */}
       {alert && (
-        <div className="absolute inset-0 rounded-2xl bg-destructive/10 animate-pulse" />
+        <div className="absolute inset-0 rounded-2xl bg-destructive/10" />
       )}
 
       <div className="relative flex items-start justify-between">
@@ -374,10 +360,10 @@ interface QuickLinkProps {
   label: string;
   icon: React.ReactNode;
   shortcut?: string;
-  color: string;
+  color?: string;
 }
 
-function QuickLink({ href, label, icon, shortcut, color }: QuickLinkProps) {
+function QuickLink({ href, label, icon, shortcut, color = 'var(--primary)' }: QuickLinkProps) {
   return (
     <Link
       href={href}

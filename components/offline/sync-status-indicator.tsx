@@ -77,22 +77,22 @@ export function SyncStatusIndicator({
 
   // Get status color
   const getStatusColor = (): string => {
-    if (isSyncing) return 'text-blue-600 dark:text-blue-400';
+    if (isSyncing) return 'text-primary';
     if (conflictCount > 0) return 'text-amber-600 dark:text-amber-400';
     if (failedCount > 0) return 'text-red-600 dark:text-red-400';
     if (summary.pending > 0) return 'text-amber-600 dark:text-amber-400';
     if (status === 'synced') return 'text-green-600 dark:text-green-400';
-    return 'text-zinc-500 dark:text-zinc-400';
+    return 'text-muted-foreground';
   };
 
   // Get background color for badge variant
   const getBadgeColor = (): string => {
-    if (isSyncing) return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200';
+    if (isSyncing) return 'bg-primary/10 text-primary';
     if (conflictCount > 0) return 'bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200';
     if (failedCount > 0) return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200';
     if (summary.pending > 0) return 'bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200';
     if (status === 'synced') return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200';
-    return 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400';
+    return 'bg-muted text-muted-foreground';
   };
 
   // Don't show if synced and no recent activity
@@ -226,7 +226,7 @@ export function SyncStatusIndicator({
 
           {/* Last synced time */}
           {!compact && lastSyncedAt && status === 'synced' && !isSyncing && conflictCount === 0 && (
-            <span className="text-xs text-zinc-500 dark:text-zinc-400">
+            <span className="text-xs text-muted-foreground">
               {formatRelativeTime(lastSyncedAt)}
             </span>
           )}
@@ -245,7 +245,7 @@ export function SyncStatusIndicator({
           {failedCount > 0 && conflictCount === 0 && (
             <button
               onClick={retryFailed}
-              className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+              className="text-xs text-primary hover:underline"
             >
               Retry
             </button>
@@ -255,7 +255,7 @@ export function SyncStatusIndicator({
           {summary.pending > 0 && !isSyncing && conflictCount === 0 && (
             <button
               onClick={syncNow}
-              className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+              className="text-xs text-primary hover:underline"
             >
               Sync now
             </button>
@@ -272,7 +272,7 @@ export function SyncStatusIndicator({
   // Default variant - full status display
   return (
     <>
-      <div className={`flex items-center justify-between p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 ${className}`}>
+      <div className={`flex items-center justify-between p-3 rounded-lg bg-muted/50 ${className}`}>
         <div className="flex items-center gap-3">
           {/* Status icon */}
           <div className={`flex-shrink-0 ${getStatusColor()}`}>
@@ -321,7 +321,7 @@ export function SyncStatusIndicator({
               {getStatusText()}
             </div>
             {lastSyncedAt && conflictCount === 0 && (
-              <div className="text-xs text-zinc-500 dark:text-zinc-400">
+              <div className="text-xs text-muted-foreground">
                 Last synced: {formatRelativeTime(lastSyncedAt)}
               </div>
             )}
@@ -349,7 +349,7 @@ export function SyncStatusIndicator({
           {summary.pending > 0 && !isSyncing && conflictCount === 0 && (
             <button
               onClick={syncNow}
-              className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
+              className="px-3 py-1.5 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 rounded-md transition-colors"
             >
               Sync Now
             </button>

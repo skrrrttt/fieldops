@@ -55,13 +55,13 @@ export function DivisionList({ divisions }: DivisionListProps) {
   if (divisions.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-zinc-100 dark:bg-zinc-800 mb-4">
-          <svg className="w-7 h-7 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-muted mb-4">
+          <svg className="w-7 h-7 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
           </svg>
         </div>
-        <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-1">No divisions yet</h3>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto">
+        <h3 className="text-lg font-semibold text-foreground mb-1">No divisions yet</h3>
+        <p className="text-sm text-muted-foreground max-w-sm mx-auto">
           Divisions help organize tasks by team or department. Use the form above to create one.
         </p>
       </div>
@@ -76,7 +76,7 @@ export function DivisionList({ divisions }: DivisionListProps) {
         </div>
       )}
 
-      <div className="divide-y divide-zinc-200 dark:divide-zinc-700">
+      <div className="divide-y divide-border">
         {divisions.map((division) => (
           <div key={division.id} className="py-4">
             {editingId === division.id ? (
@@ -90,15 +90,15 @@ export function DivisionList({ divisions }: DivisionListProps) {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div
-                    className="w-6 h-6 rounded-full border border-zinc-200 dark:border-zinc-600"
+                    className="w-6 h-6 rounded-full border border-border"
                     style={{ backgroundColor: division.color }}
                   />
                   <div>
-                    <span className="font-medium text-zinc-900 dark:text-white">
+                    <span className="font-medium text-foreground">
                       {division.name}
                     </span>
                     {division.icon && (
-                      <span className="ml-2 text-sm text-zinc-500 dark:text-zinc-400">
+                      <span className="ml-2 text-sm text-muted-foreground">
                         ({division.icon})
                       </span>
                     )}
@@ -107,7 +107,7 @@ export function DivisionList({ divisions }: DivisionListProps) {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setEditingId(division.id)}
-                    className="px-3 py-1.5 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="px-3 py-1.5 text-sm text-primary hover:bg-primary/5 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     Edit
                   </button>
@@ -127,18 +127,18 @@ export function DivisionList({ divisions }: DivisionListProps) {
       {/* Delete Confirmation Dialog */}
       {deletingId && deletingDivision && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-md w-full p-6" role="dialog" aria-modal="true" aria-label="Confirm deletion">
-            <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">
+          <div className="bg-card rounded-lg shadow-xl max-w-md w-full p-6" role="dialog" aria-modal="true" aria-label="Confirm deletion">
+            <h3 className="text-lg font-semibold text-foreground mb-2">
               Delete Division
             </h3>
-            <p className="text-zinc-600 dark:text-zinc-400 mb-4">
+            <p className="text-muted-foreground mb-4">
               Are you sure you want to delete <strong>{deletingDivision.name}</strong>? This action cannot be undone.
             </p>
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setDeletingId(null)}
                 disabled={isLoading}
-                className="px-4 py-2 bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-md hover:bg-zinc-300 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 disabled:opacity-50"
+                className="px-4 py-2 bg-muted text-foreground rounded-md hover:bg-muted/80 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50"
               >
                 Cancel
               </button>

@@ -15,8 +15,6 @@ import { processPhotoOffThread } from '@/lib/photos/photo-processor';
 import { requestGpsCoordinates } from '@/lib/photos/process-photo';
 import { useOnlineStatus, queuePhotoMutation, saveToLocal, type LocalPhoto } from '@/lib/offline';
 import { toast } from 'sonner';
-// ProStreet brand constant
-const PRIMARY_COLOR = '#f97316';
 import { MobileBottomNav, MobileBottomNavSpacer } from '@/components/layout/mobile-bottom-nav';
 
 interface Task {
@@ -228,18 +226,18 @@ export default function UploadPage() {
   const selectedTask = tasks.find(t => t.id === selectedTaskId);
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900 flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-white dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700">
+      <header className="sticky top-0 z-40 bg-card border-b border-border">
         <div className="flex items-center justify-between px-4 py-3">
           <button
             onClick={() => step === 'capture' ? router.back() : resetUpload()}
-            className="flex items-center gap-1 text-zinc-600 dark:text-zinc-400"
+            className="flex items-center gap-1 text-muted-foreground"
           >
             <ChevronLeft className="w-5 h-5" />
             <span>{step === 'capture' ? 'Back' : 'Cancel'}</span>
           </button>
-          <h1 className="text-lg font-semibold text-zinc-900 dark:text-white">
+          <h1 className="text-lg font-semibold text-foreground">
             {step === 'capture' && 'Take Photo'}
             {step === 'select-task' && 'Select Task'}
             {step === 'uploading' && 'Uploading'}
@@ -279,15 +277,14 @@ export default function UploadPage() {
           <div className="flex-1 flex flex-col items-center justify-center p-6 gap-6">
             <div className="text-center mb-4">
               <div
-                className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4"
-                style={{ backgroundColor: `${PRIMARY_COLOR}15` }}
+                className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 bg-primary/10"
               >
-                <Camera className="w-12 h-12" style={{ color: PRIMARY_COLOR }} />
+                <Camera className="w-12 h-12 text-primary" />
               </div>
-              <h2 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">
+              <h2 className="text-xl font-semibold text-foreground mb-2">
                 Capture a Photo
               </h2>
-              <p className="text-zinc-500 dark:text-zinc-400 text-sm">
+              <p className="text-muted-foreground text-sm">
                 Take a new photo or select from your gallery
               </p>
             </div>
@@ -295,8 +292,7 @@ export default function UploadPage() {
             <div className="w-full max-w-xs space-y-3">
               <button
                 onClick={() => cameraInputRef.current?.click()}
-                className="w-full flex items-center justify-center gap-3 py-4 px-6 rounded-xl text-white font-semibold text-lg shadow-lg active:scale-[0.98] transition-transform"
-                style={{ backgroundColor: PRIMARY_COLOR }}
+                className="w-full flex items-center justify-center gap-3 py-4 px-6 rounded-xl bg-primary text-primary-foreground font-semibold text-lg shadow-lg active:scale-[0.98] transition-transform"
               >
                 <Camera className="w-6 h-6" />
                 Take Photo
@@ -304,7 +300,7 @@ export default function UploadPage() {
 
               <button
                 onClick={() => galleryInputRef.current?.click()}
-                className="w-full flex items-center justify-center gap-3 py-4 px-6 rounded-xl bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-semibold text-lg border border-zinc-200 dark:border-zinc-700 active:scale-[0.98] transition-transform"
+                className="w-full flex items-center justify-center gap-3 py-4 px-6 rounded-xl bg-card text-foreground font-semibold text-lg border border-border active:scale-[0.98] transition-transform"
               >
                 <ImagePlus className="w-6 h-6" />
                 Choose from Gallery
@@ -312,7 +308,7 @@ export default function UploadPage() {
             </div>
 
             {gpsCoordinates && (
-              <div className="flex items-center gap-1.5 text-xs text-zinc-400 dark:text-zinc-500">
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <MapPin className="w-3.5 h-3.5" />
                 <span>Location enabled</span>
               </div>
@@ -343,7 +339,7 @@ export default function UploadPage() {
 
             {/* Task selector */}
             <div className="flex-1 flex flex-col p-4">
-              <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+              <label className="text-sm font-medium text-foreground mb-2">
                 Which task is this for?
               </label>
 
@@ -353,17 +349,17 @@ export default function UploadPage() {
                 placeholder="Search tasks..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white mb-3 text-base"
+                className="w-full px-4 py-3 rounded-lg border border-border bg-card text-foreground mb-3 text-base"
               />
 
               {/* Task list */}
               <div className="flex-1 overflow-y-auto -mx-4 px-4 space-y-2">
                 {isLoadingTasks ? (
                   <div className="flex items-center justify-center py-8">
-                    <div className="w-8 h-8 border-2 border-zinc-300 border-t-blue-500 rounded-full animate-spin" />
+                    <div className="w-8 h-8 border-2 border-border border-t-primary rounded-full animate-spin" />
                   </div>
                 ) : filteredTasks.length === 0 ? (
-                  <div className="text-center py-8 text-zinc-500">
+                  <div className="text-center py-8 text-muted-foreground">
                     {searchQuery ? 'No tasks match your search' : 'No tasks available'}
                   </div>
                 ) : (
@@ -373,28 +369,27 @@ export default function UploadPage() {
                       onClick={() => setSelectedTaskId(task.id)}
                       className={`w-full p-4 rounded-xl text-left transition-all ${
                         selectedTaskId === task.id
-                          ? 'bg-white dark:bg-zinc-800 shadow-md'
-                          : 'bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700'
+                          ? 'bg-card shadow-md'
+                          : 'bg-card border border-border'
                       }`}
                       style={selectedTaskId === task.id ? {
-                        boxShadow: `0 0 0 2px ${PRIMARY_COLOR}`,
+                        boxShadow: `0 0 0 2px var(--primary)`,
                       } : undefined}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-medium text-zinc-900 dark:text-white truncate">
+                          <h3 className="font-medium text-foreground truncate">
                             {task.title}
                           </h3>
                           {task.division && (
-                            <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
+                            <p className="text-sm text-muted-foreground mt-0.5">
                               {task.division.icon} {task.division.name}
                             </p>
                           )}
                         </div>
                         {selectedTaskId === task.id && (
                           <div
-                            className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
-                            style={{ backgroundColor: PRIMARY_COLOR }}
+                            className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 bg-primary"
                           >
                             <Check className="w-4 h-4 text-white" />
                           </div>
@@ -416,8 +411,7 @@ export default function UploadPage() {
               <button
                 onClick={uploadPhoto}
                 disabled={!selectedTaskId}
-                className="mt-4 w-full py-4 rounded-xl text-white font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] transition-transform"
-                style={{ backgroundColor: PRIMARY_COLOR }}
+                className="mt-4 w-full py-4 rounded-xl bg-primary text-primary-foreground font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] transition-transform"
               >
                 Upload Photo
               </button>
@@ -434,7 +428,7 @@ export default function UploadPage() {
                   cx="64"
                   cy="64"
                   r="56"
-                  className="stroke-zinc-200 dark:stroke-zinc-700"
+                  className="stroke-border"
                   strokeWidth="8"
                   fill="none"
                 />
@@ -442,7 +436,7 @@ export default function UploadPage() {
                   cx="64"
                   cy="64"
                   r="56"
-                  stroke={PRIMARY_COLOR}
+                  stroke="var(--primary)"
                   strokeWidth="8"
                   fill="none"
                   strokeLinecap="round"
@@ -451,11 +445,11 @@ export default function UploadPage() {
                   className="transition-all duration-300"
                 />
               </svg>
-              <span className="absolute inset-0 flex items-center justify-center text-2xl font-bold text-zinc-900 dark:text-white">
+              <span className="absolute inset-0 flex items-center justify-center text-2xl font-bold text-foreground">
                 {Math.round(uploadProgress)}%
               </span>
             </div>
-            <p className="text-zinc-600 dark:text-zinc-400">
+            <p className="text-muted-foreground">
               {uploadProgress < 40 ? 'Processing photo...' : 'Uploading...'}
             </p>
           </div>
@@ -465,15 +459,14 @@ export default function UploadPage() {
         {step === 'done' && (
           <div className="flex-1 flex flex-col items-center justify-center p-6">
             <div
-              className="w-24 h-24 rounded-full flex items-center justify-center mb-6"
-              style={{ backgroundColor: '#10b98120' }}
+              className="w-24 h-24 rounded-full flex items-center justify-center mb-6 bg-success/10"
             >
               <Check className="w-12 h-12 text-emerald-500" />
             </div>
-            <h2 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">
+            <h2 className="text-xl font-semibold text-foreground mb-2">
               Photo Uploaded!
             </h2>
-            <p className="text-zinc-500 dark:text-zinc-400 text-center mb-2">
+            <p className="text-muted-foreground text-center mb-2">
               {isOnline
                 ? `Added to "${selectedTask?.title}"`
                 : 'Queued for upload when online'
@@ -483,14 +476,13 @@ export default function UploadPage() {
             <div className="w-full max-w-xs space-y-3 mt-6">
               <button
                 onClick={resetUpload}
-                className="w-full py-4 rounded-xl text-white font-semibold text-lg active:scale-[0.98] transition-transform"
-                style={{ backgroundColor: PRIMARY_COLOR }}
+                className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-semibold text-lg active:scale-[0.98] transition-transform"
               >
                 Take Another Photo
               </button>
               <button
                 onClick={() => router.push(`/tasks/${selectedTaskId}`)}
-                className="w-full py-4 rounded-xl bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-semibold text-lg border border-zinc-200 dark:border-zinc-700 active:scale-[0.98] transition-transform"
+                className="w-full py-4 rounded-xl bg-card text-foreground font-semibold text-lg border border-border active:scale-[0.98] transition-transform"
               >
                 View Task
               </button>

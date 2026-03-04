@@ -24,13 +24,13 @@ export default async function StatusUpdatePage({ params }: StatusUpdatePageProps
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <DetailHeader title="Update Status" backHref={`/tasks/${id}`} />
 
       {/* Task title subtitle */}
       <div className="max-w-3xl mx-auto px-4 pt-2 pb-0">
-        <p className="text-base text-zinc-500 dark:text-zinc-400 truncate">
+        <p className="text-base text-muted-foreground truncate">
           {task.title}
         </p>
       </div>

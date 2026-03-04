@@ -7,10 +7,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 
-// ProStreet brand constants
 const APP_NAME = 'ProStreet';
-const PRIMARY_COLOR = '#f97316';
-const DARK_BG = '#0f172a';
 
 // Key to track if splash has been shown this session
 const SPLASH_SHOWN_KEY = 'prostreet_splash_shown';
@@ -79,17 +76,15 @@ export function PWASplashScreen() {
       className={`fixed inset-0 z-[200] flex flex-col items-center justify-center transition-opacity duration-300 ${
         isExiting ? 'opacity-0' : 'opacity-100'
       }`}
-      style={{ backgroundColor: DARK_BG }}
+      style={{ backgroundColor: 'oklch(0.21 0.034 264)' }}
     >
       {/* ProStreet Logo */}
       <div className="animate-fade-in-up">
         <div
-          className="w-32 h-32 rounded-3xl flex items-center justify-center"
-          style={{ backgroundColor: 'rgba(249,115,22,0.15)' }}
+          className="w-32 h-32 rounded-3xl flex items-center justify-center bg-primary/15"
         >
           <span
-            className="text-6xl font-bold"
-            style={{ color: PRIMARY_COLOR }}
+            className="text-6xl font-bold text-primary"
           >
             P
           </span>
@@ -113,10 +108,8 @@ export function PWASplashScreen() {
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="w-2.5 h-2.5 rounded-full animate-bounce"
+              className="w-2.5 h-2.5 rounded-full animate-bounce bg-primary opacity-60"
               style={{
-                backgroundColor: PRIMARY_COLOR,
-                opacity: 0.6,
                 animationDelay: `${i * 150}ms`,
               }}
             />

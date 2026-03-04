@@ -110,27 +110,27 @@ export function BulkActionBar({
   };
 
   return (
-    <div className="sticky top-0 z-10 bg-blue-600 text-white px-4 py-3 flex items-center gap-4 shadow-md">
+    <div className="sticky top-0 z-10 bg-primary text-primary-foreground px-4 py-3 flex items-center gap-4 shadow-md">
       {/* Selection Count */}
       <div className="flex items-center gap-2">
         <span className="font-medium">{selectedCount} selected</span>
         <button
           onClick={onClearSelection}
-          className="text-blue-200 hover:text-white text-sm underline"
+          className="text-primary-foreground/70 hover:text-primary-foreground text-sm underline"
         >
           Clear
         </button>
       </div>
 
       {/* Divider */}
-      <div className="h-6 w-px bg-blue-400" />
+      <div className="h-6 w-px bg-primary-foreground/30" />
 
       {/* Action Buttons or Active Action UI */}
       {!activeAction && !showDeleteConfirm && (
         <div className="flex items-center gap-2">
           <button
             onClick={() => setActiveAction('assign')}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-500 hover:bg-blue-400 rounded-lg text-sm font-medium transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-foreground/10 hover:bg-primary-foreground/20 rounded-lg text-sm font-medium transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -139,7 +139,7 @@ export function BulkActionBar({
           </button>
           <button
             onClick={() => setActiveAction('status')}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-500 hover:bg-blue-400 rounded-lg text-sm font-medium transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-foreground/10 hover:bg-primary-foreground/20 rounded-lg text-sm font-medium transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -164,7 +164,7 @@ export function BulkActionBar({
           <select
             value={selectedUserId}
             onChange={(e) => setSelectedUserId(e.target.value)}
-            className="px-3 py-1.5 border border-blue-400 rounded-lg bg-blue-700 text-white text-sm focus:ring-2 focus:ring-white focus:border-transparent"
+            className="px-3 py-1.5 border border-primary-foreground/30 rounded-lg bg-primary/90 text-primary-foreground text-sm focus:ring-2 focus:ring-primary-foreground focus:border-transparent"
           >
             <option value="">Select user...</option>
             <option value="__unassign__">Unassign</option>
@@ -177,14 +177,14 @@ export function BulkActionBar({
           <button
             onClick={handleAssign}
             disabled={!selectedUserId || isProcessing}
-            className="px-3 py-1.5 bg-white text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-1.5 bg-primary-foreground text-primary rounded-lg text-sm font-medium hover:bg-primary-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isProcessing ? 'Assigning...' : 'Apply'}
           </button>
           <button
             onClick={handleCancel}
             disabled={isProcessing}
-            className="px-3 py-1.5 text-blue-200 hover:text-white text-sm"
+            className="px-3 py-1.5 text-primary-foreground/70 hover:text-primary-foreground text-sm"
           >
             Cancel
           </button>
@@ -197,7 +197,7 @@ export function BulkActionBar({
           <select
             value={selectedStatusId}
             onChange={(e) => setSelectedStatusId(e.target.value)}
-            className="px-3 py-1.5 border border-blue-400 rounded-lg bg-blue-700 text-white text-sm focus:ring-2 focus:ring-white focus:border-transparent"
+            className="px-3 py-1.5 border border-primary-foreground/30 rounded-lg bg-primary/90 text-primary-foreground text-sm focus:ring-2 focus:ring-primary-foreground focus:border-transparent"
           >
             <option value="">Select status...</option>
             {statuses.map((status) => (
@@ -209,14 +209,14 @@ export function BulkActionBar({
           <button
             onClick={handleChangeStatus}
             disabled={!selectedStatusId || isProcessing}
-            className="px-3 py-1.5 bg-white text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-1.5 bg-primary-foreground text-primary rounded-lg text-sm font-medium hover:bg-primary-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isProcessing ? 'Updating...' : 'Apply'}
           </button>
           <button
             onClick={handleCancel}
             disabled={isProcessing}
-            className="px-3 py-1.5 text-blue-200 hover:text-white text-sm"
+            className="px-3 py-1.5 text-primary-foreground/70 hover:text-primary-foreground text-sm"
           >
             Cancel
           </button>
@@ -239,7 +239,7 @@ export function BulkActionBar({
           <button
             onClick={handleCancel}
             disabled={isProcessing}
-            className="px-3 py-1.5 text-blue-200 hover:text-white text-sm"
+            className="px-3 py-1.5 text-primary-foreground/70 hover:text-primary-foreground text-sm"
           >
             Cancel
           </button>

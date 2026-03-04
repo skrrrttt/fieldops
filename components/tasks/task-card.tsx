@@ -2,8 +2,6 @@
 
 import { memo } from 'react';
 import type { TaskWithRelations } from '@/lib/tasks/actions';
-// ProStreet brand constant
-const PRIMARY_COLOR = '#f97316';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { MapPin, Calendar, ChevronRight, AlertCircle } from 'lucide-react';
@@ -57,8 +55,7 @@ export const TaskCard = memo(function TaskCard({ task, onClick }: TaskCardProps)
       className={`
         group relative bg-card rounded-xl border overflow-hidden cursor-pointer
         transition-all duration-200 ease-out
-        hover:shadow-lg hover:-translate-y-0.5
-        active:scale-[0.99] active:shadow-md
+        hover:border-border active:shadow-md
         ${isOverdue
           ? 'border-destructive/40 bg-destructive/5 dark:bg-destructive/10'
           : isComplete
@@ -69,11 +66,11 @@ export const TaskCard = memo(function TaskCard({ task, onClick }: TaskCardProps)
     >
       {/* Priority indicator stripe */}
       <div
-        className="absolute left-0 top-0 bottom-0 w-1 transition-all duration-200 group-hover:w-1.5"
+        className="absolute left-0 top-0 bottom-0 w-1"
         style={{
           backgroundColor: isOverdue
             ? 'var(--destructive)'
-            : task.status?.color || PRIMARY_COLOR
+            : task.status?.color || 'var(--primary)'
         }}
       />
 
@@ -163,11 +160,7 @@ export const TaskCard = memo(function TaskCard({ task, onClick }: TaskCardProps)
             <div className="flex items-center gap-2">
               <Avatar className="w-7 h-7 ring-2 ring-background shadow-sm">
                 <AvatarFallback
-                  className="text-xs font-bold"
-                  style={{
-                    background: `linear-gradient(135deg, ${PRIMARY_COLOR}20, ${PRIMARY_COLOR}40)`,
-                    color: PRIMARY_COLOR,
-                  }}
+                  className="text-xs font-bold bg-primary/15 text-primary"
                 >
                   {task.assigned_user.email.charAt(0).toUpperCase()}
                 </AvatarFallback>

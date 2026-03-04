@@ -8,9 +8,7 @@
 import Link from 'next/link';
 import { ConnectionIndicator } from '@/components/offline/connection-indicator';
 
-// ProStreet brand constants
 const APP_NAME = 'ProStreet';
-const PRIMARY_COLOR = '#f97316';
 
 interface AppHeaderProps {
   /** Right-side content (user info, logout button, etc.) */
@@ -34,12 +32,7 @@ export function AppHeader({
 }: AppHeaderProps) {
   return (
     <header
-      className={`shadow-sm sticky top-0 z-10 ${className}`}
-      style={
-        usePrimaryBackground
-          ? { backgroundColor: PRIMARY_COLOR }
-          : undefined
-      }
+      className={`shadow-sm sticky top-0 z-10 ${usePrimaryBackground ? 'bg-primary' : ''} ${className}`}
     >
       <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
         {/* Logo and App Name */}
@@ -50,13 +43,7 @@ export function AppHeader({
           >
             {/* ProStreet Initial */}
             <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-lg font-bold"
-              style={{
-                backgroundColor: usePrimaryBackground
-                  ? 'rgba(255,255,255,0.2)'
-                  : '#0f172a',
-                color: PRIMARY_COLOR,
-              }}
+              className={`w-8 h-8 rounded-lg flex items-center justify-center text-lg font-bold text-primary ${usePrimaryBackground ? 'bg-card/20' : 'bg-foreground'}`}
             >
               P
             </div>
@@ -65,7 +52,7 @@ export function AppHeader({
               className={`text-xl font-semibold ${
                 usePrimaryBackground
                   ? 'text-white'
-                  : 'text-zinc-900 dark:text-white'
+                  : 'text-foreground'
               }`}
             >
               {APP_NAME}
@@ -79,7 +66,7 @@ export function AppHeader({
                 className={
                   usePrimaryBackground
                     ? 'text-white/60'
-                    : 'text-zinc-400'
+                    : 'text-muted-foreground'
                 }
               >
                 /
@@ -88,7 +75,7 @@ export function AppHeader({
                 className={`text-lg ${
                   usePrimaryBackground
                     ? 'text-white/80'
-                    : 'text-zinc-600 dark:text-zinc-400'
+                    : 'text-muted-foreground'
                 }`}
               >
                 {subtitle}
@@ -122,11 +109,11 @@ interface DetailHeaderProps {
 
 export function DetailHeader({ title, backHref }: DetailHeaderProps) {
   return (
-    <header className="bg-white dark:bg-zinc-800 shadow-sm sticky top-0 z-10">
+    <header className="bg-card shadow-sm sticky top-0 z-10">
       <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-4">
         <Link
           href={backHref}
-          className="flex items-center justify-center w-12 h-12 rounded-lg active:bg-zinc-100 dark:active:bg-zinc-700 transition-colors touch-target bg-primary/10"
+          className="flex items-center justify-center w-12 h-12 rounded-lg active:bg-muted transition-colors touch-target bg-primary/10"
           aria-label="Go back"
         >
           <svg
@@ -143,7 +130,7 @@ export function DetailHeader({ title, backHref }: DetailHeaderProps) {
             />
           </svg>
         </Link>
-        <h1 className="text-xl font-semibold text-zinc-900 dark:text-white truncate flex-1">
+        <h1 className="text-xl font-semibold text-foreground truncate flex-1">
           {title}
         </h1>
       </div>

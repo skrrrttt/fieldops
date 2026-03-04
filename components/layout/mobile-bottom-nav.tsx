@@ -10,8 +10,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ClipboardCheck, ImagePlus, User } from 'lucide-react';
 
-// ProStreet brand constants
-const PRIMARY_COLOR = '#f97316';
 
 interface NavItem {
   key: string;
@@ -67,14 +65,6 @@ export function MobileBottomNav() {
     >
       {/* Glass background with gradient border */}
       <div className="glass border-t border-border/30 dark:border-border/20">
-        {/* Subtle gradient line at top */}
-        <div
-          className="absolute top-0 left-0 right-0 h-px opacity-50"
-          style={{
-            background: `linear-gradient(90deg, transparent, ${PRIMARY_COLOR}40, transparent)`,
-          }}
-        />
-
         <div className="flex justify-around items-center h-[var(--bottom-nav-height)]">
           {navItems.map((item) => {
             const active = isActive(item.href);
@@ -88,20 +78,16 @@ export function MobileBottomNav() {
                   transition-all duration-200 ease-out
                   active:scale-95
                   ${active
-                    ? ''
+                    ? 'text-primary'
                     : 'text-muted-foreground hover:text-foreground'
                   }
                 `}
-                style={active ? { color: PRIMARY_COLOR } : undefined}
                 aria-current={active ? 'page' : undefined}
               >
                 {/* Active background pill */}
                 {active && (
                   <span
-                    className="absolute inset-x-3 inset-y-2 rounded-xl -z-10 animate-scale-in"
-                    style={{
-                      backgroundColor: `${PRIMARY_COLOR}12`,
-                    }}
+                    className="absolute inset-x-3 inset-y-2 rounded-xl -z-10 animate-scale-in bg-primary/8"
                   />
                 )}
 
@@ -118,8 +104,7 @@ export function MobileBottomNav() {
                 {/* Active indicator dot */}
                 {active && (
                   <span
-                    className="absolute bottom-1 w-1 h-1 rounded-full animate-scale-in"
-                    style={{ backgroundColor: PRIMARY_COLOR }}
+                    className="absolute bottom-1 w-1 h-1 rounded-full animate-scale-in bg-primary"
                   />
                 )}
               </Link>

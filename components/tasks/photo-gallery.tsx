@@ -136,13 +136,13 @@ export function PhotoGallery({ photos }: PhotoGalleryProps) {
 
   if (isLoading) {
     return (
-      <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-4">
-        <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4">
+      <section className="bg-card rounded-lg shadow-sm border border-border p-4">
+        <h2 className="text-lg font-semibold text-foreground mb-4">
           Photos
         </h2>
         <div className="flex items-center justify-center py-8">
           <svg
-            className="w-6 h-6 animate-spin text-zinc-400"
+            className="w-6 h-6 animate-spin text-muted-foreground"
             fill="none"
             viewBox="0 0 24 24"
           >
@@ -167,15 +167,15 @@ export function PhotoGallery({ photos }: PhotoGalleryProps) {
 
   if (photosWithUrls.length === 0) {
     return (
-      <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-6">
+      <section className="bg-card rounded-lg shadow-sm border border-border p-6">
         <div className="text-center py-4">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-zinc-100 dark:bg-zinc-700 mb-4">
-            <svg className="w-7 h-7 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-muted mb-4">
+            <svg className="w-7 h-7 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
-          <h3 className="text-base font-medium text-zinc-600 dark:text-zinc-400 mb-1">No photos yet</h3>
-          <p className="text-sm text-zinc-500 dark:text-zinc-500">
+          <h3 className="text-base font-medium text-muted-foreground mb-1">No photos yet</h3>
+          <p className="text-sm text-muted-foreground">
             Tap the upload button above to add photos.
           </p>
         </div>
@@ -188,8 +188,8 @@ export function PhotoGallery({ photos }: PhotoGalleryProps) {
   return (
     <>
       {/* Thumbnail Grid Section */}
-      <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-4">
-        <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4">
+      <section className="bg-card rounded-lg shadow-sm border border-border p-4">
+        <h2 className="text-lg font-semibold text-foreground mb-4">
           Photos ({photosWithUrls.length})
         </h2>
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
@@ -198,7 +198,7 @@ export function PhotoGallery({ photos }: PhotoGalleryProps) {
               key={photo.id}
               type="button"
               onClick={() => openLightbox(index)}
-              className="relative aspect-square group cursor-pointer rounded-lg overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="relative aspect-square group cursor-pointer rounded-lg overflow-hidden focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             >
               <Image
                 src={photo.url}
@@ -336,7 +336,7 @@ export function PhotoGallery({ photos }: PhotoGalleryProps) {
               {/* Timestamp */}
               <div className="flex items-center gap-2 text-sm">
                 <svg
-                  className="w-4 h-4 text-zinc-400"
+                  className="w-4 h-4 text-muted-foreground"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -349,7 +349,7 @@ export function PhotoGallery({ photos }: PhotoGalleryProps) {
                   />
                 </svg>
                 <span>{formatTimestamp(currentPhoto.timestamp)}</span>
-                <span className="text-zinc-400">
+                <span className="text-muted-foreground">
                   ({formatRelativeTime(currentPhoto.created_at)})
                 </span>
               </div>
@@ -358,7 +358,7 @@ export function PhotoGallery({ photos }: PhotoGalleryProps) {
               {currentPhoto.gps_lat && currentPhoto.gps_lng && (
                 <div className="flex items-center gap-2 text-sm">
                   <svg
-                    className="w-4 h-4 text-zinc-400"
+                    className="w-4 h-4 text-muted-foreground"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -383,7 +383,7 @@ export function PhotoGallery({ photos }: PhotoGalleryProps) {
                     href={`https://www.google.com/maps?q=${currentPhoto.gps_lat},${currentPhoto.gps_lng}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-400 hover:text-blue-300 underline"
+                    className="text-primary hover:text-primary/70 underline"
                     onClick={(e) => e.stopPropagation()}
                   >
                     View on map
@@ -395,7 +395,7 @@ export function PhotoGallery({ photos }: PhotoGalleryProps) {
               {currentPhoto.user && (
                 <div className="flex items-center gap-2 text-sm">
                   <svg
-                    className="w-4 h-4 text-zinc-400"
+                    className="w-4 h-4 text-muted-foreground"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -409,7 +409,7 @@ export function PhotoGallery({ photos }: PhotoGalleryProps) {
                   </svg>
                   <span>Uploaded by</span>
                   <div className="flex items-center gap-1.5">
-                    <div className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center text-xs font-semibold">
+                    <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center text-xs font-semibold">
                       {currentPhoto.user.email.charAt(0).toUpperCase()}
                     </div>
                     <span>{currentPhoto.user.email}</span>

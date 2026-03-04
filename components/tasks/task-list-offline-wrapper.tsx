@@ -135,7 +135,7 @@ export function TaskListOfflineWrapper({
       />
 
       {/* Compact Sync Row */}
-      <div className="mb-3 flex items-center justify-between text-xs text-zinc-400 dark:text-zinc-500">
+      <div className="mb-3 flex items-center justify-between text-xs text-muted-foreground">
         <span>
           {state.lastSyncedAt && `Synced ${formatRelativeTime(state.lastSyncedAt)}`}
         </span>

@@ -243,7 +243,7 @@ export function TaskTable({
   const renderSortIcon = (column: string) => {
     if (sortBy !== column) {
       return (
-        <span className="ml-1 text-zinc-400">
+        <span className="ml-1 text-muted-foreground">
           <svg className="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
           </svg>
@@ -251,7 +251,7 @@ export function TaskTable({
       );
     }
     return (
-      <span className="ml-1 text-blue-600">
+      <span className="ml-1 text-primary">
         {sortOrder === 'asc' ? (
           <svg className="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
@@ -284,10 +284,10 @@ export function TaskTable({
       />
 
       {/* Header with Create Button and Export */}
-      <div className="p-4 border-b border-zinc-200 dark:border-zinc-700 flex items-center justify-between gap-4">
-        <div className="text-sm text-zinc-600 dark:text-zinc-400">
+      <div className="p-4 border-b border-border flex items-center justify-between gap-4">
+        <div className="text-sm text-muted-foreground">
           {selectedTaskIds.size > 0 ? (
-            <span className="font-medium text-blue-600 dark:text-blue-400">
+            <span className="font-medium text-primary">
               {selectedTaskIds.size} selected
             </span>
           ) : (
@@ -298,7 +298,7 @@ export function TaskTable({
           <button
             onClick={handleExportCSV}
             disabled={tasks.length === 0}
-            className="inline-flex items-center gap-2 px-4 py-2 border border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -307,7 +307,7 @@ export function TaskTable({
           </button>
           <button
             onClick={handleCreateClick}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 font-medium text-sm"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -318,12 +318,12 @@ export function TaskTable({
       </div>
 
       {/* Filters and Search */}
-      <div className="p-4 border-b border-zinc-200 dark:border-zinc-700">
+      <div className="p-4 border-b border-border">
         <div className="flex flex-wrap gap-3">
           {/* Search */}
           <form onSubmit={handleSearch} className="flex-1 min-w-[200px]">
             <div className="relative">
-              <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               <input
@@ -331,7 +331,7 @@ export function TaskTable({
                 placeholder="Search by title or description..."
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                className="w-full h-10 pl-10 pr-4 border border-zinc-200 dark:border-zinc-700 rounded-xl bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                className="w-full h-10 pl-10 pr-4 border border-border rounded-xl bg-card text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
               />
             </div>
           </form>
@@ -340,7 +340,7 @@ export function TaskTable({
           <select
             value={currentFilters.status}
             onChange={(e) => handleFilterChange('status', e.target.value)}
-            className="h-10 px-4 border border-zinc-200 dark:border-zinc-700 rounded-xl bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+            className="h-10 px-4 border border-border rounded-xl bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
           >
             <option value="">All Statuses</option>
             {statuses.map((status) => (
@@ -354,7 +354,7 @@ export function TaskTable({
           <select
             value={currentFilters.division}
             onChange={(e) => handleFilterChange('division', e.target.value)}
-            className="h-10 px-4 border border-zinc-200 dark:border-zinc-700 rounded-xl bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+            className="h-10 px-4 border border-border rounded-xl bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
           >
             <option value="">All Divisions</option>
             {divisions.map((division) => (
@@ -368,7 +368,7 @@ export function TaskTable({
           <select
             value={currentFilters.user}
             onChange={(e) => handleFilterChange('user', e.target.value)}
-            className="h-10 px-4 border border-zinc-200 dark:border-zinc-700 rounded-xl bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+            className="h-10 px-4 border border-border rounded-xl bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
           >
             <option value="">All Users</option>
             {users.map((user) => (
@@ -385,7 +385,7 @@ export function TaskTable({
             currentFilters.search) && (
             <button
               onClick={() => router.push('/admin/tasks')}
-              className="h-10 px-4 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-zinc-700 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all"
+              className="h-10 px-4 text-sm text-muted-foreground hover:text-foreground border border-border rounded-xl hover:bg-muted transition-all"
             >
               Clear Filters
             </button>
@@ -409,16 +409,16 @@ export function TaskTable({
       <div className="md:hidden">
         {tasks.length === 0 ? (
           <div className="px-4 py-12 text-center">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 mb-4">
-              <svg className="w-6 h-6 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-muted mb-4">
+              <svg className="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
             </div>
-            <p className="text-zinc-500 dark:text-zinc-400 mb-2">No tasks found</p>
-            <p className="text-sm text-zinc-400 dark:text-zinc-500 mb-4">Try adjusting your filters or create a new task</p>
+            <p className="text-muted-foreground mb-2">No tasks found</p>
+            <p className="text-sm text-muted-foreground mb-4">Try adjusting your filters or create a new task</p>
             <button
               onClick={handleCreateClick}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 font-medium text-sm"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -431,10 +431,10 @@ export function TaskTable({
             {tasks.map((task, index) => (
               <div
                 key={task.id}
-                className={`bg-white dark:bg-zinc-800 rounded-xl border shadow-sm transition-all ${
+                className={`bg-card rounded-xl border shadow-sm transition-all ${
                   selectedTaskIds.has(task.id)
-                    ? 'border-blue-500 dark:border-blue-500 ring-1 ring-blue-500/20'
-                    : 'border-zinc-200 dark:border-zinc-700'
+                    ? 'border-primary ring-1 ring-primary/20'
+                    : 'border-border'
                 }`}
               >
                 <div className="p-4">
@@ -444,11 +444,11 @@ export function TaskTable({
                       checked={selectedTaskIds.has(task.id)}
                       onChange={(e) => handleSelectTask(task.id, index, e)}
                       aria-label={`Select task ${task.title}`}
-                      className="mt-0.5 w-5 h-5 rounded border-zinc-300 dark:border-zinc-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-0"
+                      className="mt-0.5 w-5 h-5 rounded border-border text-primary focus:ring-primary focus:ring-offset-0"
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2 mb-1">
-                        <h3 className="font-semibold text-zinc-900 dark:text-white leading-snug">
+                        <h3 className="font-semibold text-foreground leading-snug">
                           {task.title}
                         </h3>
                         {task.status && (
@@ -465,7 +465,7 @@ export function TaskTable({
                         )}
                       </div>
                       {task.description && (
-                        <p className="text-sm text-zinc-500 dark:text-zinc-400 line-clamp-2 mb-3">
+                        <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
                           {task.description}
                         </p>
                       )}
@@ -485,7 +485,7 @@ export function TaskTable({
                           </span>
                         )}
                         {(task.start_date || task.end_date) && (
-                          <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300">
+                          <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium bg-muted text-muted-foreground">
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
@@ -495,7 +495,7 @@ export function TaskTable({
                           </span>
                         )}
                         {task.assigned_user && (
-                          <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300">
+                          <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium bg-muted text-muted-foreground">
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
@@ -506,10 +506,10 @@ export function TaskTable({
                     </div>
                   </div>
                 </div>
-                <div className="px-4 py-3 border-t border-zinc-100 dark:border-zinc-700/50 bg-zinc-50/50 dark:bg-zinc-800/50 rounded-b-xl">
+                <div className="px-4 py-3 border-t border-border/50 bg-muted/50 rounded-b-xl">
                   <button
                     onClick={() => handleEditClick(task)}
-                    className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
+                    className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-primary hover:bg-primary/5 rounded-lg transition-colors"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -526,7 +526,7 @@ export function TaskTable({
       {/* Desktop Table View */}
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-zinc-50 dark:bg-zinc-700">
+          <thead className="bg-muted">
             <tr>
               <th className="w-12 px-4 py-3">
                 <input
@@ -537,59 +537,59 @@ export function TaskTable({
                   }}
                   onChange={(e) => handleSelectAll(e.target.checked)}
                   aria-label="Select all tasks"
-                  className="w-4 h-4 rounded border-zinc-300 dark:border-zinc-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-0"
+                  className="w-4 h-4 rounded border-border text-primary focus:ring-primary focus:ring-offset-0"
                 />
               </th>
               <th
-                className="px-4 py-3 text-left text-sm font-semibold text-zinc-900 dark:text-white cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-600"
+                className="px-4 py-3 text-left text-sm font-semibold text-foreground cursor-pointer hover:bg-muted"
                 onClick={() => handleSort('title')}
               >
                 Title
                 {renderSortIcon('title')}
               </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-zinc-900 dark:text-white">
+              <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">
                 Status
               </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-zinc-900 dark:text-white">
+              <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">
                 Division
               </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-zinc-900 dark:text-white">
+              <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">
                 Assigned To
               </th>
               <th
-                className="px-4 py-3 text-left text-sm font-semibold text-zinc-900 dark:text-white cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-600"
+                className="px-4 py-3 text-left text-sm font-semibold text-foreground cursor-pointer hover:bg-muted"
                 onClick={() => handleSort('end_date')}
               >
                 Dates
                 {renderSortIcon('end_date')}
               </th>
               <th
-                className="px-4 py-3 text-left text-sm font-semibold text-zinc-900 dark:text-white cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-600"
+                className="px-4 py-3 text-left text-sm font-semibold text-foreground cursor-pointer hover:bg-muted"
                 onClick={() => handleSort('created_at')}
               >
                 Created
                 {renderSortIcon('created_at')}
               </th>
-              <th className="px-4 py-3 text-right text-sm font-semibold text-zinc-900 dark:text-white">
+              <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-200 dark:divide-zinc-700">
+          <tbody className="divide-y divide-border">
             {tasks.length === 0 ? (
               <tr>
                 <td colSpan={8} className="px-4 py-12">
                   <div className="text-center">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 mb-4">
-                      <svg className="w-6 h-6 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-muted mb-4">
+                      <svg className="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                       </svg>
                     </div>
-                    <p className="text-zinc-500 dark:text-zinc-400 mb-2">No tasks found</p>
-                    <p className="text-sm text-zinc-400 dark:text-zinc-500 mb-4">Try adjusting your filters or create a new task</p>
+                    <p className="text-muted-foreground mb-2">No tasks found</p>
+                    <p className="text-sm text-muted-foreground mb-4">Try adjusting your filters or create a new task</p>
                     <button
                       onClick={handleCreateClick}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 font-medium text-sm"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -603,8 +603,8 @@ export function TaskTable({
               tasks.map((task, index) => (
                 <tr
                   key={task.id}
-                  className={`hover:bg-zinc-50 dark:hover:bg-zinc-700/50 ${
-                    selectedTaskIds.has(task.id) ? 'bg-blue-50 dark:bg-blue-900/20' : ''
+                  className={`hover:bg-muted/50 ${
+                    selectedTaskIds.has(task.id) ? 'bg-primary/10' : ''
                   }`}
                 >
                   <td className="w-12 px-4 py-3">
@@ -619,15 +619,15 @@ export function TaskTable({
                         }
                       }}
                       aria-label={`Select task ${task.title}`}
-                      className="w-4 h-4 rounded border-zinc-300 dark:border-zinc-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-0"
+                      className="w-4 h-4 rounded border-border text-primary focus:ring-primary focus:ring-offset-0"
                     />
                   </td>
                   <td className="px-4 py-3">
-                    <div className="font-medium text-zinc-900 dark:text-white">
+                    <div className="font-medium text-foreground">
                       {task.title}
                     </div>
                     {task.description && (
-                      <div className="text-sm text-zinc-500 dark:text-zinc-400 truncate max-w-xs">
+                      <div className="text-sm text-muted-foreground truncate max-w-xs">
                         {task.description}
                       </div>
                     )}
@@ -644,7 +644,7 @@ export function TaskTable({
                         {task.status.name}
                       </span>
                     ) : (
-                      <span className="text-zinc-400">-</span>
+                      <span className="text-muted-foreground">-</span>
                     )}
                   </td>
                   <td className="px-4 py-3">
@@ -662,13 +662,13 @@ export function TaskTable({
                         {task.division.name}
                       </span>
                     ) : (
-                      <span className="text-zinc-400">-</span>
+                      <span className="text-muted-foreground">-</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-400">
+                  <td className="px-4 py-3 text-sm text-muted-foreground">
                     {task.assigned_user?.email || '-'}
                   </td>
-                  <td className="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-400">
+                  <td className="px-4 py-3 text-sm text-muted-foreground">
                     {task.start_date && task.end_date
                       ? `${formatDate(task.start_date)} - ${formatDate(task.end_date)}`
                       : task.end_date
@@ -677,13 +677,13 @@ export function TaskTable({
                           ? `Starts ${formatDate(task.start_date)}`
                           : '-'}
                   </td>
-                  <td className="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-400">
+                  <td className="px-4 py-3 text-sm text-muted-foreground">
                     {formatDate(task.created_at)}
                   </td>
                   <td className="px-4 py-3 text-right">
                     <button
                       onClick={() => handleEditClick(task)}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded-lg transition-colors"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -699,8 +699,8 @@ export function TaskTable({
       </div>
 
       {/* Pagination */}
-      <div className="px-4 py-3 border-t border-zinc-200 dark:border-zinc-700 flex items-center justify-between">
-        <div className="text-sm text-zinc-600 dark:text-zinc-400">
+      <div className="px-4 py-3 border-t border-border flex items-center justify-between">
+        <div className="text-sm text-muted-foreground">
           Showing {tasks.length > 0 ? (page - 1) * pageSize + 1 : 0} to{' '}
           {Math.min(page * pageSize, total)} of {total} tasks
         </div>
@@ -708,7 +708,7 @@ export function TaskTable({
           <button
             onClick={() => handlePageChange(page - 1)}
             disabled={page <= 1}
-            className="px-3 py-1 text-sm border border-zinc-300 dark:border-zinc-600 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300"
+            className="px-3 py-1 text-sm border border-border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted text-foreground"
           >
             Previous
           </button>
@@ -730,8 +730,8 @@ export function TaskTable({
                   onClick={() => handlePageChange(pageNum)}
                   className={`px-3 py-1 text-sm rounded-lg ${
                     page === pageNum
-                      ? 'bg-blue-600 text-white'
-                      : 'border border-zinc-300 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'border border-border hover:bg-muted text-foreground'
                   }`}
                 >
                   {pageNum}
@@ -742,7 +742,7 @@ export function TaskTable({
           <button
             onClick={() => handlePageChange(page + 1)}
             disabled={page >= totalPages}
-            className="px-3 py-1 text-sm border border-zinc-300 dark:border-zinc-600 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300"
+            className="px-3 py-1 text-sm border border-border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted text-foreground"
           >
             Next
           </button>

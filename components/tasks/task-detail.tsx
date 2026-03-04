@@ -15,9 +15,6 @@ import { PhotoUpload } from '@/components/tasks/photo-upload';
 import { FileUpload } from '@/components/tasks/file-upload';
 import { CustomFieldEdit } from '@/components/tasks/custom-field-edit';
 import { TaskChecklist } from '@/components/tasks/task-checklist';
-// ProStreet brand constants
-const PRIMARY_COLOR = '#f97316';
-const ACCENT_COLOR = '#64748b';
 import { ChevronDown, ChevronRight, Plus, Camera, FileText, MessageCircle, MapPin, Calendar, User, X, ClipboardList, Building2, Phone } from 'lucide-react';
 
 interface TaskDetailProps {
@@ -117,10 +114,10 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
   return (
     <div className="space-y-3 pb-4">
       {/* Consolidated Header: Title, Status, Division, Description */}
-      <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-4">
+      <section className="bg-card rounded-lg shadow-sm border border-border p-4">
         {/* Title and Status Row */}
         <div className="flex items-start justify-between gap-3 mb-2">
-          <h1 className="text-xl font-bold text-zinc-900 dark:text-white leading-tight">
+          <h1 className="text-xl font-bold text-foreground leading-tight">
             {task.title}
           </h1>
           {task.status && (
@@ -152,7 +149,7 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
           )}
           {dateRangeDisplay && (
             <span className={`inline-flex items-center gap-1 text-xs font-medium ${
-              isOverdue ? 'text-red-600 dark:text-red-400' : 'text-zinc-500 dark:text-zinc-400'
+              isOverdue ? 'text-red-600 dark:text-red-400' : 'text-muted-foreground'
             }`}>
               <Calendar className="w-3 h-3" />
               {dateRangeDisplay}
@@ -160,7 +157,7 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
             </span>
           )}
           {task.assigned_user && (
-            <span className="inline-flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
+            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
               <User className="w-3 h-3" />
               {task.assigned_user.display_name || task.assigned_user.email.split('@')[0]}
             </span>
@@ -169,7 +166,7 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
 
         {/* Description */}
         {task.description && (
-          <p className="text-sm text-zinc-600 dark:text-zinc-300 whitespace-pre-wrap">
+          <p className="text-sm text-muted-foreground whitespace-pre-wrap">
             {task.description}
           </p>
         )}
@@ -177,12 +174,12 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
 
       {/* Specifications Section - Read Only for Field Users */}
       {task.specifications && (
-        <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-4">
-          <h2 className="text-base font-semibold text-zinc-900 dark:text-white flex items-center gap-2 mb-3">
-            <ClipboardList className="w-4 h-4 text-zinc-400" />
+        <section className="bg-card rounded-lg shadow-sm border border-border p-4">
+          <h2 className="text-base font-semibold text-foreground flex items-center gap-2 mb-3">
+            <ClipboardList className="w-4 h-4 text-muted-foreground" />
             Specifications
           </h2>
-          <div className="text-sm text-zinc-600 dark:text-zinc-300 whitespace-pre-wrap bg-zinc-50 dark:bg-zinc-900 rounded-lg p-3 border border-zinc-100 dark:border-zinc-700">
+          <div className="text-sm text-muted-foreground whitespace-pre-wrap bg-muted rounded-lg p-3 border border-border">
             {task.specifications}
           </div>
         </section>
@@ -195,27 +192,27 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
 
       {/* Customer/Job Section */}
       {task.job && (
-        <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-4">
-          <h2 className="text-base font-semibold text-zinc-900 dark:text-white flex items-center gap-2 mb-3">
-            <Building2 className="w-4 h-4 text-zinc-400" />
+        <section className="bg-card rounded-lg shadow-sm border border-border p-4">
+          <h2 className="text-base font-semibold text-foreground flex items-center gap-2 mb-3">
+            <Building2 className="w-4 h-4 text-muted-foreground" />
             Customer & Job
           </h2>
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                <Building2 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              <div className="w-8 h-8 rounded bg-primary/10 flex items-center justify-center">
+                <Building2 className="w-4 h-4 text-primary" />
               </div>
               <div>
-                <p className="font-medium text-zinc-900 dark:text-white">
+                <p className="font-medium text-foreground">
                   {task.job.customer.name}
                 </p>
-                <p className="text-sm text-zinc-500">{task.job.name}</p>
+                <p className="text-sm text-muted-foreground">{task.job.name}</p>
               </div>
             </div>
             {task.job.customer.contact_phone && (
               <a
                 href={`tel:${task.job.customer.contact_phone}`}
-                className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 hover:underline ml-10"
+                className="flex items-center gap-2 text-sm text-primary hover:underline ml-10"
               >
                 <Phone className="w-3.5 h-3.5" />
                 {task.job.customer.contact_phone}
@@ -227,11 +224,11 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
 
       {/* Location Section - Compact */}
       {(task.address || hasLocation) && (
-        <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-4">
+        <section className="bg-card rounded-lg shadow-sm border border-border p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-start gap-2 flex-1 min-w-0">
-              <MapPin className="w-4 h-4 text-zinc-400 mt-0.5 flex-shrink-0" />
-              <span className="text-sm text-zinc-700 dark:text-zinc-300 truncate">
+              <MapPin className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+              <span className="text-sm text-foreground truncate">
                 {task.address || `${task.location_lat?.toFixed(4)}, ${task.location_lng?.toFixed(4)}`}
               </span>
             </div>
@@ -240,11 +237,7 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
                 href={directionsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ml-2 flex-shrink-0"
-                style={{
-                  backgroundColor: PRIMARY_COLOR,
-                  color: '#ffffff',
-                }}
+                className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ml-2 flex-shrink-0 bg-primary text-primary-foreground"
               >
                 <MapPin className="w-4 h-4" />
                 Directions
@@ -255,19 +248,15 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
       )}
 
       {/* Photos Section with Inline Add */}
-      <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 overflow-hidden">
+      <section className="bg-card rounded-lg shadow-sm border border-border overflow-hidden">
         <div className="flex items-center justify-between p-4 pb-0">
-          <h2 className="text-base font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
-            <Camera className="w-4 h-4 text-zinc-400" />
-            Photos {photos.length > 0 && <span className="text-zinc-400">({photos.length})</span>}
+          <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
+            <Camera className="w-4 h-4 text-muted-foreground" />
+            Photos {photos.length > 0 && <span className="text-muted-foreground">({photos.length})</span>}
           </h2>
           <button
             onClick={() => setShowPhotoUpload(!showPhotoUpload)}
-            className="flex items-center gap-1 px-2.5 py-1.5 text-sm font-medium rounded-lg transition-colors"
-            style={{
-              backgroundColor: showPhotoUpload ? `${PRIMARY_COLOR}20` : 'transparent',
-              color: PRIMARY_COLOR,
-            }}
+            className={`flex items-center gap-1 px-2.5 py-1.5 text-sm font-medium rounded-lg transition-colors text-primary ${showPhotoUpload ? 'bg-primary/10' : ''}`}
           >
             {showPhotoUpload ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
             {showPhotoUpload ? 'Cancel' : 'Add'}
@@ -290,7 +279,7 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
           {photos.length > 0 ? (
             <PhotoGalleryInline key={`gallery-${refreshKey}`} photos={photos} />
           ) : (
-            <div className="text-center py-6 text-zinc-400">
+            <div className="text-center py-6 text-muted-foreground">
               <Camera className="w-8 h-8 mx-auto mb-2 opacity-50" />
               <p className="text-sm">No photos yet</p>
             </div>
@@ -299,19 +288,15 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
       </section>
 
       {/* Files Section with Inline Add */}
-      <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 overflow-hidden">
+      <section className="bg-card rounded-lg shadow-sm border border-border overflow-hidden">
         <div className="flex items-center justify-between p-4 pb-0">
-          <h2 className="text-base font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
-            <FileText className="w-4 h-4 text-zinc-400" />
-            Files {files.length > 0 && <span className="text-zinc-400">({files.length})</span>}
+          <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
+            <FileText className="w-4 h-4 text-muted-foreground" />
+            Files {files.length > 0 && <span className="text-muted-foreground">({files.length})</span>}
           </h2>
           <button
             onClick={() => setShowFileUpload(!showFileUpload)}
-            className="flex items-center gap-1 px-2.5 py-1.5 text-sm font-medium rounded-lg transition-colors"
-            style={{
-              backgroundColor: showFileUpload ? `${PRIMARY_COLOR}20` : 'transparent',
-              color: PRIMARY_COLOR,
-            }}
+            className={`flex items-center gap-1 px-2.5 py-1.5 text-sm font-medium rounded-lg transition-colors text-primary ${showFileUpload ? 'bg-primary/10' : ''}`}
           >
             {showFileUpload ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
             {showFileUpload ? 'Cancel' : 'Add'}
@@ -334,7 +319,7 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
           {files.length > 0 ? (
             <FileListInline key={`filelist-${refreshKey}`} files={files} />
           ) : (
-            <div className="text-center py-6 text-zinc-400">
+            <div className="text-center py-6 text-muted-foreground">
               <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
               <p className="text-sm">No files yet</p>
             </div>
@@ -343,14 +328,14 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
       </section>
 
       {/* Comments Section - Collapsible */}
-      <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 overflow-hidden">
+      <section className="bg-card rounded-lg shadow-sm border border-border overflow-hidden">
         <button
           onClick={() => setShowComments(!showComments)}
           className="flex items-center justify-between w-full p-4 text-left"
         >
-          <h2 className="text-base font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
-            <MessageCircle className="w-4 h-4 text-zinc-400" />
-            Comments {comments.length > 0 && <span className="text-zinc-400">({comments.length})</span>}
+          <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
+            <MessageCircle className="w-4 h-4 text-muted-foreground" />
+            Comments {comments.length > 0 && <span className="text-muted-foreground">({comments.length})</span>}
           </h2>
           <div className="flex items-center gap-2">
             <button
@@ -359,18 +344,14 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
                 setShowCommentInput(!showCommentInput);
                 if (!showComments) setShowComments(true);
               }}
-              className="flex items-center gap-1 px-2.5 py-1.5 text-sm font-medium rounded-lg transition-colors"
-              style={{
-                backgroundColor: showCommentInput ? `${PRIMARY_COLOR}20` : 'transparent',
-                color: PRIMARY_COLOR,
-              }}
+              className={`flex items-center gap-1 px-2.5 py-1.5 text-sm font-medium rounded-lg transition-colors text-primary ${showCommentInput ? 'bg-primary/10' : ''}`}
             >
               {showCommentInput ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
             </button>
             {showComments ? (
-              <ChevronDown className="w-5 h-5 text-zinc-400" />
+              <ChevronDown className="w-5 h-5 text-muted-foreground" />
             ) : (
-              <ChevronRight className="w-5 h-5 text-zinc-400" />
+              <ChevronRight className="w-5 h-5 text-muted-foreground" />
             )}
           </div>
         </button>
@@ -384,13 +365,13 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
 
         {/* Comments List */}
         {showComments && comments.length > 0 && (
-          <div className="px-4 pb-4 border-t border-zinc-100 dark:border-zinc-700 pt-4">
+          <div className="px-4 pb-4 border-t border-border pt-4">
             <CommentListInline comments={comments} />
           </div>
         )}
 
         {showComments && comments.length === 0 && !showCommentInput && (
-          <div className="px-4 pb-4 text-center text-zinc-400">
+          <div className="px-4 pb-4 text-center text-muted-foreground">
             <p className="text-sm">No comments yet. Tap + to add one.</p>
           </div>
         )}
@@ -406,15 +387,11 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
       )}
 
       {/* Fixed Update Status Button at Bottom - positioned above mobile bottom nav */}
-      <div className="fixed left-0 right-0 p-4 bg-white dark:bg-zinc-800 border-t border-zinc-200 dark:border-zinc-700 shadow-lg bottom-[calc(var(--bottom-nav-height)+env(safe-area-inset-bottom,0px)+8px)] md:bottom-0">
+      <div className="fixed left-0 right-0 p-4 bg-card border-t border-border shadow-lg bottom-[calc(var(--bottom-nav-height)+env(safe-area-inset-bottom,0px)+8px)] md:bottom-0">
         <div className="max-w-3xl mx-auto">
           <Link
             href={`/tasks/${task.id}/status`}
-            className="flex items-center justify-center gap-2 w-full min-h-[56px] px-6 py-3 text-lg font-semibold rounded-lg transition-opacity hover:opacity-90"
-            style={{
-              backgroundColor: ACCENT_COLOR,
-              color: '#ffffff',
-            }}
+            className="flex items-center justify-center gap-2 w-full min-h-[56px] px-6 py-3 text-lg font-semibold rounded-lg transition-opacity hover:opacity-90 bg-primary text-primary-foreground"
           >
             <svg
               className="w-5 h-5"
@@ -463,7 +440,7 @@ const PhotoGalleryInline = memo(function PhotoGalleryInline({ photos }: { photos
           <button
             key={photo.id}
             onClick={() => setLightboxIndex(index)}
-            className="relative aspect-square rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-700"
+            className="relative aspect-square rounded-lg overflow-hidden bg-muted"
           >
             <NextImage
               src={photo.url}
@@ -555,9 +532,9 @@ const FileListInline = memo(function FileListInline({ files }: { files: FileWith
   const getFileIcon = (fileName: string) => {
     const ext = fileName.split('.').pop()?.toLowerCase() || '';
     if (ext === 'pdf') return <div className="w-8 h-8 bg-red-100 dark:bg-red-900/30 rounded flex items-center justify-center text-red-600 text-xs font-bold">PDF</div>;
-    if (['doc', 'docx'].includes(ext)) return <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded flex items-center justify-center text-blue-600 text-xs font-bold">DOC</div>;
+    if (['doc', 'docx'].includes(ext)) return <div className="w-8 h-8 bg-primary/10 rounded flex items-center justify-center text-primary text-xs font-bold">DOC</div>;
     if (['xls', 'xlsx'].includes(ext)) return <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded flex items-center justify-center text-green-600 text-xs font-bold">XLS</div>;
-    return <div className="w-8 h-8 bg-zinc-100 dark:bg-zinc-700 rounded flex items-center justify-center"><FileText className="w-4 h-4 text-zinc-400" /></div>;
+    return <div className="w-8 h-8 bg-muted rounded flex items-center justify-center"><FileText className="w-4 h-4 text-muted-foreground" /></div>;
   };
 
   const formatSize = (bytes: number) => {
@@ -572,14 +549,14 @@ const FileListInline = memo(function FileListInline({ files }: { files: FileWith
         <button
           key={file.id}
           onClick={() => handleFileClick(file)}
-          className="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700/50 transition-colors text-left"
+          className="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-muted transition-colors text-left"
         >
           {getFileIcon(file.file_name)}
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-zinc-900 dark:text-white truncate">
+            <p className="text-sm font-medium text-foreground truncate">
               {file.file_name}
             </p>
-            <p className="text-xs text-zinc-500">{formatSize(file.file_size)}</p>
+            <p className="text-xs text-muted-foreground">{formatSize(file.file_size)}</p>
           </div>
         </button>
       ))}
@@ -616,13 +593,13 @@ const CommentInputInline = memo(function CommentInputInline({ taskId, onCommentA
         onChange={(e) => setContent(e.target.value)}
         placeholder="Add a comment..."
         aria-label="Add a comment"
-        className="flex-1 px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white placeholder:text-zinc-400"
+        className="flex-1 px-3 py-2 text-sm border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground"
         disabled={isSubmitting}
       />
       <button
         type="submit"
         disabled={!content.trim() || isSubmitting}
-        className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+        className="px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isSubmitting ? '...' : 'Post'}
       </button>
@@ -667,18 +644,18 @@ const CommentListInline = memo(function CommentListInline({ comments }: { commen
               className="w-7 h-7 rounded-full object-cover flex-shrink-0"
             />
           ) : (
-            <div className="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 text-xs font-semibold flex-shrink-0">
+            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-semibold flex-shrink-0">
               {getUserInitial(comment.user)}
             </div>
           )}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300 truncate">
+              <span className="text-xs font-medium text-foreground truncate">
                 {getUserDisplayName(comment.user)}
               </span>
-              <span className="text-xs text-zinc-400">{formatTime(comment.created_at)}</span>
+              <span className="text-xs text-muted-foreground">{formatTime(comment.created_at)}</span>
             </div>
-            <p className="text-sm text-zinc-600 dark:text-zinc-300 break-words">
+            <p className="text-sm text-muted-foreground break-words">
               {comment.content}
             </p>
           </div>

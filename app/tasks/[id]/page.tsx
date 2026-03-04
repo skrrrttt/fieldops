@@ -33,7 +33,7 @@ export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900 pb-24">
+    <div className="min-h-screen bg-background pb-24">
       {/* Header */}
       <DetailHeader title="Task Details" backHref="/tasks" />
 

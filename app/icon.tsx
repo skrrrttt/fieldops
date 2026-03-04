@@ -28,14 +28,14 @@ export default function Icon() {
             left: 4,
             right: 4,
             height: 3,
-            background: 'linear-gradient(90deg, #f97316 0%, #fb923c 100%)',
+            background: 'linear-gradient(90deg, #d4863f 0%, #e0a060 100%)',
             borderRadius: 2,
           }}
         />
         {/* Bold P */}
         <span
           style={{
-            color: '#f97316',
+            color: '#d4863f',
             fontSize: 22,
             fontWeight: 900,
             fontFamily: 'system-ui, sans-serif',

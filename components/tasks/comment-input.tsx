@@ -248,8 +248,8 @@ export function CommentInput({ taskId, onCommentAdded }: CommentInputProps) {
   };
 
   return (
-    <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-4">
-      <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4">
+    <section className="bg-card rounded-lg shadow-sm border border-border p-4">
+      <h2 className="text-lg font-semibold text-foreground mb-4">
         Add Comment
       </h2>
 
@@ -262,10 +262,10 @@ export function CommentInput({ taskId, onCommentAdded }: CommentInputProps) {
             onChange={(e) => setContent(e.target.value)}
             placeholder={isRecording ? "Listening..." : "Write your comment here..."}
             rows={3}
-            className={`w-full min-h-[64px] p-3 ${speechSupported ? 'pr-14' : ''} text-base text-zinc-900 dark:text-white bg-white dark:bg-zinc-900 border rounded-lg resize-y focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-500 ${
+            className={`w-full min-h-[64px] p-3 ${speechSupported ? 'pr-14' : ''} text-base text-foreground bg-background border rounded-lg resize-y focus:ring-2 focus:ring-primary focus:border-primary outline-none placeholder:text-muted-foreground dark:placeholder:text-muted-foreground ${
               isRecording
                 ? 'border-red-500 dark:border-red-500'
-                : 'border-zinc-300 dark:border-zinc-600'
+                : 'border-border'
             }`}
             disabled={isSubmitting}
           />
@@ -279,7 +279,7 @@ export function CommentInput({ taskId, onCommentAdded }: CommentInputProps) {
               className={`absolute right-2 top-2 p-2 rounded-full transition-all ${
                 isRecording
                   ? 'bg-red-500 text-white animate-pulse'
-                  : 'bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-600'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
               } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
               title={isRecording ? 'Stop recording' : 'Start voice input'}
               aria-label={isRecording ? 'Stop recording' : 'Start voice input'}
@@ -328,7 +328,7 @@ export function CommentInput({ taskId, onCommentAdded }: CommentInputProps) {
         <button
           type="submit"
           disabled={isSubmitting || !content.trim()}
-          className="flex items-center justify-center gap-2 w-full min-h-[48px] px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+          className="flex items-center justify-center gap-2 w-full min-h-[48px] px-6 py-3 bg-primary hover:bg-primary/90 disabled:bg-primary/70 disabled:cursor-not-allowed text-primary-foreground font-medium rounded-lg transition-colors"
         >
           {isSubmitting ? (
             <>
@@ -379,7 +379,7 @@ export function CommentInput({ taskId, onCommentAdded }: CommentInputProps) {
       {toast && (
         <div
           className={`fixed bottom-24 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg shadow-lg text-white font-medium z-50 ${
-            toast.type === 'success' ? 'bg-green-600' : toast.type === 'info' ? 'bg-blue-600' : 'bg-red-600'
+            toast.type === 'success' ? 'bg-green-600' : toast.type === 'info' ? 'bg-primary' : 'bg-red-600'
           }`}
           style={{ animation: 'slideUp 0.3s ease-out' }}
         >

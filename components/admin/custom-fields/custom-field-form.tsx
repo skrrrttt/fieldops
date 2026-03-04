@@ -69,7 +69,7 @@ export function CustomFieldForm({ field, nextOrder = 0, onSubmit, onCancel, isLo
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          <label htmlFor="name" className="block text-sm font-medium text-foreground">
             Field Name <span className="text-red-500">*</span>
           </label>
           <input
@@ -78,20 +78,20 @@ export function CustomFieldForm({ field, nextOrder = 0, onSubmit, onCancel, isLo
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            className="mt-1 block w-full rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-900 dark:text-white shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-md border border-border bg-card px-3 py-2 text-foreground shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             placeholder="e.g., Equipment Type, Serial Number"
           />
         </div>
 
         <div>
-          <label htmlFor="field_type" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          <label htmlFor="field_type" className="block text-sm font-medium text-foreground">
             Field Type <span className="text-red-500">*</span>
           </label>
           <select
             id="field_type"
             value={fieldType}
             onChange={(e) => setFieldType(e.target.value as FieldType)}
-            className="mt-1 block w-full rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-900 dark:text-white shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-md border border-border bg-card px-3 py-2 text-foreground shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           >
             {FIELD_TYPES.map(type => (
               <option key={type.value} value={type.value}>
@@ -105,7 +105,7 @@ export function CustomFieldForm({ field, nextOrder = 0, onSubmit, onCancel, isLo
       {/* Options input for dropdown type */}
       {fieldType === 'dropdown' && (
         <div>
-          <label htmlFor="options" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          <label htmlFor="options" className="block text-sm font-medium text-foreground">
             Dropdown Options <span className="text-red-500">*</span>
           </label>
           <input
@@ -114,10 +114,10 @@ export function CustomFieldForm({ field, nextOrder = 0, onSubmit, onCancel, isLo
             value={optionsText}
             onChange={(e) => setOptionsText(e.target.value)}
             required={fieldType === 'dropdown'}
-            className="mt-1 block w-full rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-900 dark:text-white shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-md border border-border bg-card px-3 py-2 text-foreground shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             placeholder="Enter options separated by commas (e.g., Option A, Option B, Option C)"
           />
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="mt-1 text-sm text-muted-foreground">
             Enter each option separated by a comma.
           </p>
         </div>
@@ -125,7 +125,7 @@ export function CustomFieldForm({ field, nextOrder = 0, onSubmit, onCancel, isLo
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="order" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          <label htmlFor="order" className="block text-sm font-medium text-foreground">
             Order
           </label>
           <input
@@ -134,9 +134,9 @@ export function CustomFieldForm({ field, nextOrder = 0, onSubmit, onCancel, isLo
             value={order}
             onChange={(e) => setOrder(parseInt(e.target.value, 10) || 0)}
             min={0}
-            className="mt-1 block w-32 rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2 text-zinc-900 dark:text-white shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-1 block w-32 rounded-md border border-border bg-card px-3 py-2 text-foreground shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           />
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="mt-1 text-sm text-muted-foreground">
             Lower numbers appear first. You can also drag to reorder.
           </p>
         </div>
@@ -147,12 +147,12 @@ export function CustomFieldForm({ field, nextOrder = 0, onSubmit, onCancel, isLo
               type="checkbox"
               checked={required}
               onChange={(e) => setRequired(e.target.checked)}
-              className="w-5 h-5 rounded border-zinc-300 dark:border-zinc-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-0"
+              className="w-5 h-5 rounded border-border text-primary focus:ring-primary focus:ring-offset-0"
             />
-            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            <span className="text-sm font-medium text-foreground">
               Required field
             </span>
-            <span className="text-sm text-zinc-500 dark:text-zinc-400">
+            <span className="text-sm text-muted-foreground">
               (must be filled when creating/editing tasks)
             </span>
           </label>
@@ -163,7 +163,7 @@ export function CustomFieldForm({ field, nextOrder = 0, onSubmit, onCancel, isLo
         <button
           type="submit"
           disabled={isLoading || !name.trim() || (fieldType === 'dropdown' && !optionsText.trim())}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? 'Saving...' : field ? 'Update Field' : 'Create Field'}
         </button>
@@ -171,7 +171,7 @@ export function CustomFieldForm({ field, nextOrder = 0, onSubmit, onCancel, isLo
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-md hover:bg-zinc-300 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2"
+            className="px-4 py-2 bg-muted text-foreground rounded-md hover:bg-muted/80 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
           >
             Cancel
           </button>

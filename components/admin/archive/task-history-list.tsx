@@ -99,11 +99,11 @@ export function TaskHistoryList({ initialData, divisions }: TaskHistoryListProps
   return (
     <div className="space-y-4">
       {/* Filters */}
-      <div className="bg-zinc-50 dark:bg-zinc-800/50 rounded-lg p-4 space-y-4">
+      <div className="bg-muted/50 rounded-lg p-4 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Search */}
           <div>
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Search
             </label>
             <input
@@ -111,19 +111,19 @@ export function TaskHistoryList({ initialData, divisions }: TaskHistoryListProps
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Title, description, user..."
-              className="w-full rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
 
           {/* Division Filter */}
           <div>
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Division
             </label>
             <select
               value={divisionFilter}
               onChange={(e) => setDivisionFilter(e.target.value)}
-              className="w-full rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             >
               <option value="">All Divisions</option>
               {divisions.map((div) => (
@@ -136,35 +136,35 @@ export function TaskHistoryList({ initialData, divisions }: TaskHistoryListProps
 
           {/* Date From */}
           <div>
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               From Date
             </label>
             <input
               type="date"
               value={dateFrom}
               onChange={(e) => setDateFrom(e.target.value)}
-              className="w-full rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
 
           {/* Date To */}
           <div>
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               To Date
             </label>
             <input
               type="date"
               value={dateTo}
               onChange={(e) => setDateTo(e.target.value)}
-              className="w-full rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
         </div>
 
         {/* Active Filters & Clear */}
         {(search || divisionFilter || dateFrom || dateTo) && (
-          <div className="flex items-center justify-between pt-2 border-t border-zinc-200 dark:border-zinc-700">
-            <span className="text-sm text-zinc-500 dark:text-zinc-400">
+          <div className="flex items-center justify-between pt-2 border-t border-border">
+            <span className="text-sm text-muted-foreground">
               Showing {filteredHistory.length} of {history.length} records
             </span>
             <button
@@ -174,7 +174,7 @@ export function TaskHistoryList({ initialData, divisions }: TaskHistoryListProps
                 setDateFrom('');
                 setDateTo('');
               }}
-              className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+              className="text-sm text-primary hover:underline"
             >
               Clear filters
             </button>
@@ -197,15 +197,15 @@ export function TaskHistoryList({ initialData, divisions }: TaskHistoryListProps
       {/* Empty State */}
       {filteredHistory.length === 0 ? (
         <div className="text-center py-12">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-zinc-100 dark:bg-zinc-800 mb-4">
-            <svg className="w-7 h-7 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-muted mb-4">
+            <svg className="w-7 h-7 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
             </svg>
           </div>
-          <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-1">
+          <h3 className="text-lg font-semibold text-foreground mb-1">
             {history.length === 0 ? 'No completed tasks yet' : 'No matching records'}
           </h3>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto">
+          <p className="text-sm text-muted-foreground max-w-sm mx-auto">
             {history.length === 0
               ? 'When tasks are marked as complete, they will appear here for archival.'
               : 'Try adjusting your filters to find what you\'re looking for.'}
@@ -217,11 +217,11 @@ export function TaskHistoryList({ initialData, divisions }: TaskHistoryListProps
           {filteredHistory.map((item) => (
             <div
               key={item.id}
-              className="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg overflow-hidden"
+              className="bg-card border border-border rounded-lg overflow-hidden"
             >
               {/* Main Row */}
               <div
-                className="p-4 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-750"
+                className="p-4 cursor-pointer hover:bg-muted"
                 onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
               >
                 <div className="flex items-start justify-between gap-4">
@@ -231,7 +231,7 @@ export function TaskHistoryList({ initialData, divisions }: TaskHistoryListProps
                         className="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0"
                         style={{ backgroundColor: item.status_color || '#10B981' }}
                       />
-                      <h3 className="font-medium text-zinc-900 dark:text-white truncate">
+                      <h3 className="font-medium text-foreground truncate">
                         {item.title}
                       </h3>
                       {item.division_name && (
@@ -246,7 +246,7 @@ export function TaskHistoryList({ initialData, divisions }: TaskHistoryListProps
                         </span>
                       )}
                     </div>
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-zinc-500 dark:text-zinc-400">
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
                       <span>Completed: {formatDate(item.completed_at)}</span>
                       {item.assigned_user_email && (
                         <span>By: {item.assigned_user_email}</span>
@@ -261,7 +261,7 @@ export function TaskHistoryList({ initialData, divisions }: TaskHistoryListProps
                         handleRestore(item.id);
                       }}
                       disabled={isLoading}
-                      className="px-3 py-1.5 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md disabled:opacity-50"
+                      className="px-3 py-1.5 text-sm text-primary hover:bg-primary/5 rounded-md disabled:opacity-50"
                     >
                       Restore
                     </button>
@@ -276,7 +276,7 @@ export function TaskHistoryList({ initialData, divisions }: TaskHistoryListProps
                       Delete
                     </button>
                     <svg
-                      className={`w-5 h-5 text-zinc-400 transition-transform ${expandedId === item.id ? 'rotate-180' : ''}`}
+                      className={`w-5 h-5 text-muted-foreground transition-transform ${expandedId === item.id ? 'rotate-180' : ''}`}
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -289,28 +289,28 @@ export function TaskHistoryList({ initialData, divisions }: TaskHistoryListProps
 
               {/* Expanded Details */}
               {expandedId === item.id && (
-                <div className="px-4 pb-4 pt-2 border-t border-zinc-100 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50">
+                <div className="px-4 pb-4 pt-2 border-t border-border bg-muted/50">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     {item.description && (
                       <div className="md:col-span-2">
-                        <span className="font-medium text-zinc-700 dark:text-zinc-300">Description:</span>
-                        <p className="mt-1 text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap">
+                        <span className="font-medium text-foreground">Description:</span>
+                        <p className="mt-1 text-muted-foreground whitespace-pre-wrap">
                           {item.description}
                         </p>
                       </div>
                     )}
                     {item.address && (
                       <div>
-                        <span className="font-medium text-zinc-700 dark:text-zinc-300">Address:</span>
-                        <p className="mt-1 text-zinc-600 dark:text-zinc-400">{item.address}</p>
+                        <span className="font-medium text-foreground">Address:</span>
+                        <p className="mt-1 text-muted-foreground">{item.address}</p>
                       </div>
                     )}
                     {(item.start_date || item.end_date) && (
                       <div>
-                        <span className="font-medium text-zinc-700 dark:text-zinc-300">
+                        <span className="font-medium text-foreground">
                           {item.start_date && item.end_date ? 'Date Range:' : item.start_date ? 'Start Date:' : 'End Date:'}
                         </span>
-                        <p className="mt-1 text-zinc-600 dark:text-zinc-400">
+                        <p className="mt-1 text-muted-foreground">
                           {item.start_date && item.end_date
                             ? `${formatDate(item.start_date)} - ${formatDate(item.end_date)}`
                             : formatDate((item.start_date || item.end_date)!)}
@@ -318,14 +318,14 @@ export function TaskHistoryList({ initialData, divisions }: TaskHistoryListProps
                       </div>
                     )}
                     <div>
-                      <span className="font-medium text-zinc-700 dark:text-zinc-300">Created:</span>
-                      <p className="mt-1 text-zinc-600 dark:text-zinc-400">
+                      <span className="font-medium text-foreground">Created:</span>
+                      <p className="mt-1 text-muted-foreground">
                         {formatDate(item.task_created_at)}
                       </p>
                     </div>
                     <div>
-                      <span className="font-medium text-zinc-700 dark:text-zinc-300">Attachments:</span>
-                      <p className="mt-1 text-zinc-600 dark:text-zinc-400">
+                      <span className="font-medium text-foreground">Attachments:</span>
+                      <p className="mt-1 text-muted-foreground">
                         {item.photos_count} photos, {item.comments_count} comments, {item.files_count} files
                       </p>
                     </div>
@@ -340,18 +340,18 @@ export function TaskHistoryList({ initialData, divisions }: TaskHistoryListProps
       {/* Delete Confirmation Modal */}
       {deleteId && deletingItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-md w-full p-6">
-            <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">
+          <div className="bg-card rounded-lg shadow-xl max-w-md w-full p-6">
+            <h3 className="text-lg font-semibold text-foreground mb-2">
               Delete Record Permanently
             </h3>
-            <p className="text-zinc-600 dark:text-zinc-400 mb-4">
+            <p className="text-muted-foreground mb-4">
               Are you sure you want to permanently delete <strong>{deletingItem.title}</strong> from the archive? This cannot be undone.
             </p>
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setDeleteId(null)}
                 disabled={isLoading}
-                className="px-4 py-2 bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-md hover:bg-zinc-300 dark:hover:bg-zinc-600 disabled:opacity-50"
+                className="px-4 py-2 bg-muted text-foreground rounded-md hover:bg-muted/80 disabled:opacity-50"
               >
                 Cancel
               </button>

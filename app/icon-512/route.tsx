@@ -17,18 +17,6 @@ export async function GET() {
           position: 'relative',
         }}
       >
-        {/* Subtle inner glow */}
-        <div
-          style={{
-            position: 'absolute',
-            top: 16,
-            left: 16,
-            right: 16,
-            bottom: 16,
-            borderRadius: 84,
-            border: '2px solid rgba(249, 115, 22, 0.1)',
-          }}
-        />
         {/* Road/street accent bar at bottom */}
         <div
           style={{
@@ -37,14 +25,14 @@ export async function GET() {
             left: 64,
             right: 64,
             height: 28,
-            background: 'linear-gradient(90deg, #f97316 0%, #fb923c 100%)',
+            background: 'linear-gradient(90deg, #d4863f 0%, #e0a060 100%)',
             borderRadius: 14,
           }}
         />
         {/* Bold P */}
         <span
           style={{
-            color: '#f97316',
+            color: '#d4863f',
             fontSize: 300,
             fontWeight: 900,
             fontFamily: 'system-ui, sans-serif',

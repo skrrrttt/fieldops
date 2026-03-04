@@ -13,8 +13,6 @@ import {
   CheckSquare,
 } from 'lucide-react';
 
-// ProStreet brand constants
-const PRIMARY_COLOR = '#f97316';
 
 interface TaskChecklistProps {
   taskChecklists: TaskChecklistWithDetails[];
@@ -110,34 +108,32 @@ export function TaskChecklist({ taskChecklists }: TaskChecklistProps) {
   const isAllComplete = completedItems === totalItems && totalItems > 0;
 
   return (
-    <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 overflow-hidden">
+    <section className="bg-card rounded-lg shadow-sm border border-border overflow-hidden">
       {/* Section Header - Collapsible */}
       <button
         onClick={() => setExpandedSection(!expandedSection)}
         className="flex items-center justify-between w-full p-4 text-left min-h-[56px] touch-target"
       >
         <div className="flex items-center gap-3 flex-1 min-w-0">
-          <ListChecks className="w-5 h-5 text-zinc-400 flex-shrink-0" />
+          <ListChecks className="w-5 h-5 text-muted-foreground flex-shrink-0" />
           <div className="flex flex-col flex-1 min-w-0">
-            <h2 className="text-base font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
+            <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
               Checklists
-              <span className="text-sm font-normal text-zinc-400">
+              <span className="text-sm font-normal text-muted-foreground">
                 ({completedItems}/{totalItems})
               </span>
               {isAllComplete && (
                 <Check
-                  className="w-4 h-4 flex-shrink-0"
-                  style={{ color: PRIMARY_COLOR }}
+                  className="w-4 h-4 flex-shrink-0 text-primary"
                 />
               )}
             </h2>
             {/* Mini progress bar */}
-            <div className="mt-1.5 w-full max-w-[200px] h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+            <div className="mt-1.5 w-full max-w-[200px] h-1.5 bg-secondary rounded-full overflow-hidden">
               <div
-                className="h-full rounded-full transition-all duration-300"
+                className={`h-full rounded-full transition-all duration-300 ${isAllComplete ? 'bg-success' : 'bg-primary'}`}
                 style={{
                   width: `${progressPercent}%`,
-                  backgroundColor: isAllComplete ? '#22c55e' : PRIMARY_COLOR,
                 }}
               />
             </div>
@@ -145,9 +141,9 @@ export function TaskChecklist({ taskChecklists }: TaskChecklistProps) {
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           {expandedSection ? (
-            <ChevronDown className="w-5 h-5 text-zinc-400" />
+            <ChevronDown className="w-5 h-5 text-muted-foreground" />
           ) : (
-            <ChevronRight className="w-5 h-5 text-zinc-400" />
+            <ChevronRight className="w-5 h-5 text-muted-foreground" />
           )}
         </div>
       </button>
@@ -167,40 +163,36 @@ export function TaskChecklist({ taskChecklists }: TaskChecklistProps) {
             return (
               <div
                 key={taskChecklist.id}
-                className="border border-zinc-100 dark:border-zinc-700 rounded-lg overflow-hidden"
+                className="border border-border rounded-lg overflow-hidden"
               >
                 {/* Checklist Header */}
                 <button
                   onClick={() => toggleChecklistExpand(checklist.id)}
-                  className="flex items-center justify-between w-full p-3 text-left bg-zinc-50 dark:bg-zinc-900/50 min-h-[48px] touch-target"
+                  className="flex items-center justify-between w-full p-3 text-left bg-muted min-h-[48px] touch-target"
                 >
                   <div className="flex items-center gap-2 flex-1 min-w-0">
                     {isExpanded ? (
-                      <ChevronDown className="w-4 h-4 text-zinc-400 flex-shrink-0" />
+                      <ChevronDown className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                     ) : (
-                      <ChevronRight className="w-4 h-4 text-zinc-400 flex-shrink-0" />
+                      <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                     )}
-                    <span className="font-medium text-sm text-zinc-900 dark:text-white truncate">
+                    <span className="font-medium text-sm text-foreground truncate">
                       {checklist.name}
                     </span>
-                    <span className="text-xs text-zinc-400 flex-shrink-0">
+                    <span className="text-xs text-muted-foreground flex-shrink-0">
                       ({checklistCompleted}/{checklistTotal})
                     </span>
                   </div>
                   {/* Mini progress indicator */}
-                  <div className="w-16 h-1 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden flex-shrink-0 ml-2">
+                  <div className="w-16 h-1 bg-secondary rounded-full overflow-hidden flex-shrink-0 ml-2">
                     <div
-                      className="h-full rounded-full transition-all duration-300"
+                      className={`h-full rounded-full transition-all duration-300 ${checklistCompleted === checklistTotal ? 'bg-success' : 'bg-primary'}`}
                       style={{
                         width: `${
                           checklistTotal > 0
                             ? (checklistCompleted / checklistTotal) * 100
                             : 0
                         }%`,
-                        backgroundColor:
-                          checklistCompleted === checklistTotal
-                            ? '#22c55e'
-                            : PRIMARY_COLOR,
                       }}
                     />
                   </div>
@@ -210,7 +202,7 @@ export function TaskChecklist({ taskChecklists }: TaskChecklistProps) {
                 {isExpanded && (
                   <div className="p-2">
                     {checklist.items.length === 0 ? (
-                      <p className="text-sm text-zinc-400 text-center py-4">
+                      <p className="text-sm text-muted-foreground text-center py-4">
                         No items in this checklist
                       </p>
                     ) : (
@@ -236,7 +228,7 @@ export function TaskChecklist({ taskChecklists }: TaskChecklistProps) {
                                   ${
                                     isCompleted
                                       ? 'bg-green-50 dark:bg-green-900/20'
-                                      : 'hover:bg-zinc-50 dark:hover:bg-zinc-800'
+                                      : 'hover:bg-muted'
                                   }
                                   ${isPending ? 'opacity-60' : ''}
                                 `}
@@ -247,15 +239,15 @@ export function TaskChecklist({ taskChecklists }: TaskChecklistProps) {
                                     style={{ color: '#22c55e' }}
                                   />
                                 ) : (
-                                  <Square className="w-5 h-5 text-zinc-400 flex-shrink-0" />
+                                  <Square className="w-5 h-5 text-muted-foreground flex-shrink-0" />
                                 )}
                                 <span
                                   className={`
                                     flex-1 text-sm
                                     ${
                                       isCompleted
-                                        ? 'text-zinc-500 dark:text-zinc-400 line-through'
-                                        : 'text-zinc-700 dark:text-zinc-300'
+                                        ? 'text-muted-foreground line-through'
+                                        : 'text-foreground'
                                     }
                                   `}
                                 >

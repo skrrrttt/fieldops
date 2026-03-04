@@ -109,11 +109,11 @@ export function ProfileForm({ user }: ProfileFormProps) {
       {/* Avatar Section */}
       <div className="flex items-center gap-4">
         <div className="relative group">
-          <Avatar className="w-20 h-20 ring-2 ring-blue-500/20 ring-offset-2 ring-offset-white dark:ring-offset-zinc-800">
+          <Avatar className="w-20 h-20 ring-2 ring-primary/20 ring-offset-2 ring-offset-background">
             {user.avatar_url ? (
               <AvatarImage src={user.avatar_url} alt={user.display_name || user.email} />
             ) : null}
-            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-2xl font-semibold">
+            <AvatarFallback className="bg-primary text-primary-foreground text-2xl font-semibold">
               {getInitials()}
             </AvatarFallback>
           </Avatar>
@@ -229,8 +229,8 @@ export function ProfileForm({ user }: ProfileFormProps) {
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <div className="flex-1 py-2 px-3 bg-zinc-100 dark:bg-zinc-900 rounded-md text-zinc-900 dark:text-white">
-              {user.display_name || <span className="text-zinc-400">Not set</span>}
+            <div className="flex-1 py-2 px-3 bg-muted rounded-md text-foreground">
+              {user.display_name || <span className="text-muted-foreground">Not set</span>}
             </div>
             <Button
               type="button"
@@ -243,7 +243,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
             </Button>
           </div>
         )}
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="text-sm text-muted-foreground">
           This name will be shown instead of your email address.
         </p>
       </div>

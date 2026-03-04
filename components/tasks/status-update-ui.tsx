@@ -131,8 +131,8 @@ export function StatusUpdateUI({
   return (
     <div className="space-y-4">
       {/* Instructions */}
-      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-        <p className="text-sm text-blue-700 dark:text-blue-300">
+      <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
+        <p className="text-sm text-primary">
           Tap a status below to update this task. The current status is
           highlighted.
         </p>
@@ -155,7 +155,7 @@ export function StatusUpdateUI({
                 ${isUpdating || isPending ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
                 ${
                   isSelected
-                    ? 'ring-4 ring-offset-2 ring-zinc-900 dark:ring-white dark:ring-offset-zinc-900 scale-[1.02]'
+                    ? 'ring-4 ring-offset-2 ring-foreground dark:ring-offset-background scale-[1.02]'
                     : 'hover:scale-[1.01] hover:shadow-md'
                 }
               `}
@@ -238,7 +238,7 @@ export function StatusUpdateUI({
               toast.type === 'success'
                 ? 'bg-green-600 text-white'
                 : toast.type === 'info'
-                ? 'bg-blue-600 text-white'
+                ? 'bg-primary text-primary-foreground'
                 : 'bg-red-600 text-white'
             }
           `}

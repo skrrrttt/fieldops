@@ -9,7 +9,7 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
       data-slot="input"
       className={cn(
         // Base styles
-        "flex h-11 w-full min-w-0 rounded-lg border border-border bg-background px-4 py-2 text-base transition-all duration-200",
+        "flex h-10 w-full min-w-0 rounded-md border border-border bg-background px-3 py-2 text-base transition-colors duration-150",
         // Placeholder & file
         "placeholder:text-muted-foreground file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground",
         // Selection
@@ -52,7 +52,7 @@ function InputSearch({ className, ...props }: React.ComponentProps<"input">) {
         type="search"
         data-slot="input"
         className={cn(
-          "flex h-11 w-full min-w-0 rounded-lg border border-border bg-background pl-10 pr-4 py-2 text-base transition-all duration-200",
+          "flex h-10 w-full min-w-0 rounded-md border border-border bg-background pl-10 pr-3 py-2 text-base transition-colors duration-150",
           "placeholder:text-muted-foreground",
           "selection:bg-primary selection:text-primary-foreground",
           "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background focus:border-primary",

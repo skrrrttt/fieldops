@@ -2,8 +2,8 @@
 @import "tw-animate-css";
 
 /* ============================================
-   PROSTREET DESIGN SYSTEM
-   Bold • Dark • Electric Orange
+   FIELDOPS DESIGN SYSTEM
+   Clean • Enterprise • Minimal
    ============================================ */
 
 /* Enable class-based dark mode in Tailwind v4 */
@@ -20,19 +20,19 @@
   --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
   --safe-area-inset-top: env(safe-area-inset-top, 0px);
   --bottom-nav-height: 68px;
-  --radius: 0.75rem;
+  --radius: 0.5rem;
 
-  /* === Electric Orange Palette === */
-  --electric-50: oklch(0.98 0.02 45);
-  --electric-100: oklch(0.95 0.04 45);
-  --electric-200: oklch(0.88 0.10 45);
-  --electric-300: oklch(0.80 0.14 45);
-  --electric-400: oklch(0.75 0.16 45);
-  --electric-500: oklch(0.70 0.18 45);
-  --electric-600: oklch(0.60 0.18 45);
-  --electric-700: oklch(0.50 0.16 45);
-  --electric-800: oklch(0.40 0.12 45);
-  --electric-900: oklch(0.30 0.08 45);
+  /* === Warm Orange Palette (Desaturated) === */
+  --electric-50: oklch(0.98 0.016 45);
+  --electric-100: oklch(0.95 0.032 45);
+  --electric-200: oklch(0.88 0.08 45);
+  --electric-300: oklch(0.80 0.112 45);
+  --electric-400: oklch(0.75 0.128 45);
+  --electric-500: oklch(0.68 0.145 45);
+  --electric-600: oklch(0.60 0.145 45);
+  --electric-700: oklch(0.50 0.128 45);
+  --electric-800: oklch(0.40 0.096 45);
+  --electric-900: oklch(0.30 0.064 45);
 
   /* === Steel Blue Accent Palette === */
   --steel-50: oklch(0.97 0.02 240);
@@ -49,7 +49,7 @@
   --card-foreground: oklch(0.12 0.02 260);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.12 0.02 260);
-  --primary: oklch(0.70 0.18 45);
+  --primary: oklch(0.68 0.145 45);
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.96 0.01 260);
   --secondary-foreground: oklch(0.25 0.02 260);
@@ -65,10 +65,10 @@
   --warning-foreground: oklch(0.20 0.02 80);
   --border: oklch(0.90 0.01 260);
   --input: oklch(0.96 0.005 260);
-  --ring: oklch(0.70 0.18 45);
+  --ring: oklch(0.68 0.145 45);
 
   /* === Chart Colors === */
-  --chart-1: oklch(0.70 0.18 45);
+  --chart-1: oklch(0.68 0.145 45);
   --chart-2: oklch(0.55 0.08 240);
   --chart-3: oklch(0.60 0.18 155);
   --chart-4: oklch(0.75 0.18 80);
@@ -77,12 +77,12 @@
   /* === Sidebar (Light) === */
   --sidebar: oklch(0.98 0.005 260);
   --sidebar-foreground: oklch(0.25 0.02 260);
-  --sidebar-primary: oklch(0.70 0.18 45);
+  --sidebar-primary: oklch(0.68 0.145 45);
   --sidebar-primary-foreground: oklch(1 0 0);
   --sidebar-accent: oklch(0.95 0.03 45);
   --sidebar-accent-foreground: oklch(0.25 0.02 260);
   --sidebar-border: oklch(0.92 0.01 260);
-  --sidebar-ring: oklch(0.70 0.18 45);
+  --sidebar-ring: oklch(0.68 0.145 45);
 
   /* === Visual Hierarchy === */
   --heading-weight: 700;
@@ -92,15 +92,15 @@
   /* === Shadows === */
   --shadow-xs: 0 1px 2px oklch(0.20 0.02 260 / 0.04);
   --shadow-sm: 0 2px 4px oklch(0.20 0.02 260 / 0.06);
-  --shadow-md: 0 4px 12px oklch(0.20 0.02 260 / 0.08);
-  --shadow-lg: 0 8px 24px oklch(0.20 0.02 260 / 0.10);
-  --shadow-xl: 0 16px 48px oklch(0.20 0.02 260 / 0.12);
-  --shadow-glow: 0 0 20px oklch(0.70 0.18 45 / 0.25);
-  --shadow-glow-accent: 0 0 20px oklch(0.55 0.08 240 / 0.25);
+  --shadow-md: 0 4px 12px oklch(0.20 0.02 260 / 0.06);
+  --shadow-lg: 0 8px 24px oklch(0.20 0.02 260 / 0.08);
+  --shadow-xl: 0 16px 48px oklch(0.20 0.02 260 / 0.10);
+  --shadow-glow: 0 4px 16px oklch(0.20 0.02 260 / 0.08);
+  --shadow-glow-accent: 0 4px 16px oklch(0.20 0.02 260 / 0.08);
 }
 
 /* ============================================
-   DARK MODE (Bold & Electric Orange)
+   DARK MODE
    ============================================ */
 .dark {
   /* === Deep Slate Background === */
@@ -111,8 +111,8 @@
   --popover: oklch(0.14 0.015 260);
   --popover-foreground: oklch(0.95 0.005 260);
 
-  /* === Primary Electric Orange === */
-  --primary: oklch(0.70 0.18 45);
+  /* === Primary === */
+  --primary: oklch(0.68 0.145 45);
   --primary-foreground: oklch(0.08 0.015 260);
 
   /* === Secondary & Muted === */
@@ -136,10 +136,10 @@
   /* === Borders & Inputs === */
   --border: oklch(0.22 0.02 260);
   --input: oklch(0.16 0.015 260);
-  --ring: oklch(0.70 0.18 45);
+  --ring: oklch(0.68 0.145 45);
 
-  /* === Chart Colors (Vibrant) === */
-  --chart-1: oklch(0.70 0.18 45);
+  /* === Chart Colors === */
+  --chart-1: oklch(0.68 0.145 45);
   --chart-2: oklch(0.55 0.08 240);
   --chart-3: oklch(0.70 0.18 155);
   --chart-4: oklch(0.80 0.16 80);
@@ -148,21 +148,21 @@
   /* === Sidebar (Dark Slate) === */
   --sidebar: oklch(0.10 0.015 260);
   --sidebar-foreground: oklch(0.90 0.005 260);
-  --sidebar-primary: oklch(0.70 0.18 45);
+  --sidebar-primary: oklch(0.68 0.145 45);
   --sidebar-primary-foreground: oklch(0.08 0.015 260);
   --sidebar-accent: oklch(0.16 0.02 45);
   --sidebar-accent-foreground: oklch(0.95 0.005 260);
   --sidebar-border: oklch(0.20 0.02 260);
-  --sidebar-ring: oklch(0.70 0.18 45);
+  --sidebar-ring: oklch(0.68 0.145 45);
 
-  /* === Enhanced Shadows for Dark === */
+  /* === Shadows for Dark === */
   --shadow-xs: 0 1px 2px oklch(0 0 0 / 0.2);
   --shadow-sm: 0 2px 4px oklch(0 0 0 / 0.25);
-  --shadow-md: 0 4px 12px oklch(0 0 0 / 0.3);
-  --shadow-lg: 0 8px 24px oklch(0 0 0 / 0.35);
-  --shadow-xl: 0 16px 48px oklch(0 0 0 / 0.4);
-  --shadow-glow: 0 0 30px oklch(0.70 0.18 45 / 0.3);
-  --shadow-glow-accent: 0 0 30px oklch(0.55 0.08 240 / 0.3);
+  --shadow-md: 0 4px 12px oklch(0 0 0 / 0.28);
+  --shadow-lg: 0 8px 24px oklch(0 0 0 / 0.33);
+  --shadow-xl: 0 16px 48px oklch(0 0 0 / 0.38);
+  --shadow-glow: 0 4px 16px oklch(0 0 0 / 0.15);
+  --shadow-glow-accent: 0 4px 16px oklch(0 0 0 / 0.15);
 }
 
 /* ============================================
@@ -284,7 +284,7 @@ p, li, span, label {
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
@@ -306,7 +306,7 @@ p, li, span, label {
 @keyframes slide-in-right {
   from {
     opacity: 0;
-    transform: translateX(20px);
+    transform: translateX(12px);
   }
   to {
     opacity: 1;
@@ -316,10 +316,10 @@ p, li, span, label {
 
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 20px oklch(0.70 0.18 45 / 0.3);
+    opacity: 1;
   }
   50% {
-    box-shadow: 0 0 30px oklch(0.70 0.18 45 / 0.5);
+    opacity: 0.8;
   }
 }
 
@@ -329,19 +329,19 @@ p, li, span, label {
 }
 
 .animate-fade-in {
-  animation: fade-in 0.3s ease-out forwards;
+  animation: fade-in 0.2s ease-out forwards;
 }
 
 .animate-fade-up {
-  animation: fade-up 0.4s ease-out forwards;
+  animation: fade-up 0.25s ease-out forwards;
 }
 
 .animate-scale-in {
-  animation: scale-in 0.3s ease-out forwards;
+  animation: scale-in 0.2s ease-out forwards;
 }
 
 .animate-slide-in-right {
-  animation: slide-in-right 0.4s ease-out forwards;
+  animation: slide-in-right 0.25s ease-out forwards;
 }
 
 .animate-pulse-glow {
@@ -361,7 +361,7 @@ p, li, span, label {
    ============================================ */
 /* Smooth transitions for all interactive elements */
 button, a, [role="button"], input, select, textarea {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Focus ring enhancement */
@@ -371,60 +371,43 @@ button, a, [role="button"], input, select, textarea {
 }
 
 /* ============================================
-   GRADIENT UTILITIES
+   GRADIENT UTILITIES (Replaced with Solids)
    ============================================ */
 .gradient-electric {
-  background: linear-gradient(135deg,
-    oklch(0.70 0.18 45) 0%,
-    oklch(0.65 0.16 50) 50%,
-    oklch(0.60 0.18 45) 100%
-  );
+  background: var(--primary);
 }
 
 .gradient-electric-subtle {
-  background: linear-gradient(135deg,
-    oklch(0.70 0.18 45 / 0.1) 0%,
-    oklch(0.55 0.08 240 / 0.1) 100%
-  );
+  background: oklch(0.68 0.145 45 / 0.06);
 }
 
 .gradient-dark-radial {
-  background: radial-gradient(
-    ellipse at top,
-    oklch(0.12 0.02 260) 0%,
-    oklch(0.08 0.015 260) 100%
-  );
+  background: oklch(0.10 0.015 260);
 }
 
 .text-gradient-electric {
-  background: linear-gradient(135deg,
-    oklch(0.70 0.18 45) 0%,
-    oklch(0.75 0.16 50) 100%
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--primary);
 }
 
 /* ============================================
-   GLASS MORPHISM
+   GLASS MORPHISM (Replaced with Solid)
    ============================================ */
 .glass {
-  background: oklch(1 0 0 / 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: oklch(1 0 0 / 0.97);
+  border: 1px solid var(--border);
 }
 
 .dark .glass {
-  background: oklch(0.14 0.015 260 / 0.8);
+  background: oklch(0.14 0.015 260 / 0.97);
+  border: 1px solid var(--border);
 }
 
 .glass-border {
-  border: 1px solid oklch(1 0 0 / 0.2);
+  border: 1px solid var(--border);
 }
 
 .dark .glass-border {
-  border: 1px solid oklch(1 0 0 / 0.1);
+  border: 1px solid var(--border);
 }
 
 /* ============================================

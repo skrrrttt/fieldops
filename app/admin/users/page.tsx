@@ -13,15 +13,15 @@ export default async function AdminUsersPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">
+        <h1 className="text-2xl font-bold text-foreground">
           User Management
         </h1>
-        <p className="text-zinc-600 dark:text-zinc-400 mt-1">
+        <p className="text-muted-foreground mt-1">
           Manage users, invite new team members, and control access.
         </p>
       </div>
 
-      <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm overflow-hidden">
+      <div className="bg-card rounded-lg shadow-sm overflow-hidden">
         <UserTable users={users} currentUserId={user?.id ?? ''} />
       </div>
     </div>

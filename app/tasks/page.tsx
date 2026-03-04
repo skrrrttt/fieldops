@@ -18,13 +18,13 @@ export default async function TasksPage() {
   ]);
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
+    <div className="min-h-screen bg-background">
       <AppHeader
         subtitle="Tasks"
         href="/tasks"
-        className="bg-white dark:bg-zinc-800"
+        className="bg-card"
       >
-        <span className="text-base text-zinc-600 dark:text-zinc-400 desktop-only">
+        <span className="text-base text-muted-foreground desktop-only">
           {user.email}
         </span>
         <span className="desktop-only">

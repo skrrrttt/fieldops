@@ -19,16 +19,16 @@ export function ConnectionIndicator() {
   const getStatusConfig = () => {
     if (!isOnline) {
       return {
-        color: 'bg-zinc-400 dark:bg-zinc-500',
-        ringColor: 'ring-zinc-400/30',
+        color: 'bg-muted-foreground',
+        ringColor: 'ring-muted-foreground/30',
         icon: 'offline',
         label: 'Offline',
       };
     }
     if (isSyncing) {
       return {
-        color: 'bg-blue-500',
-        ringColor: 'ring-blue-500/30',
+        color: 'bg-primary',
+        ringColor: 'ring-primary/30',
         icon: 'syncing',
         label: 'Syncing...',
       };

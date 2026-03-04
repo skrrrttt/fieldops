@@ -10,7 +10,7 @@ interface CommentListProps {
 function getUserColor(userId: string): { bg: string; text: string } {
   // Use a hash of the user ID to pick a color
   const colors = [
-    { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-600 dark:text-blue-400' },
+    { bg: 'bg-primary/10', text: 'text-primary' },
     { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-600 dark:text-green-400' },
     { bg: 'bg-purple-100 dark:bg-purple-900/30', text: 'text-purple-600 dark:text-purple-400' },
     { bg: 'bg-orange-100 dark:bg-orange-900/30', text: 'text-orange-600 dark:text-orange-400' },
@@ -59,10 +59,10 @@ export function CommentList({ comments }: CommentListProps) {
   // Empty state when no comments exist
   if (comments.length === 0) {
     return (
-      <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-6">
+      <section className="bg-card rounded-lg shadow-sm border border-border p-6">
         <div className="text-center py-4">
           <svg
-            className="w-12 h-12 mx-auto text-zinc-300 dark:text-zinc-600 mb-3"
+            className="w-12 h-12 mx-auto text-muted-foreground mb-3"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -74,10 +74,10 @@ export function CommentList({ comments }: CommentListProps) {
               d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
             />
           </svg>
-          <h3 className="text-base font-medium text-zinc-600 dark:text-zinc-400 mb-1">
+          <h3 className="text-base font-medium text-muted-foreground mb-1">
             No comments yet
           </h3>
-          <p className="text-sm text-zinc-500 dark:text-zinc-500">
+          <p className="text-sm text-muted-foreground">
             Be the first to add a comment to this task.
           </p>
         </div>
@@ -86,8 +86,8 @@ export function CommentList({ comments }: CommentListProps) {
   }
 
   return (
-    <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-4">
-      <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4">
+    <section className="bg-card rounded-lg shadow-sm border border-border p-4">
+      <h2 className="text-lg font-semibold text-foreground mb-4">
         Comments ({comments.length})
       </h2>
       <div className="space-y-4">
@@ -97,7 +97,7 @@ export function CommentList({ comments }: CommentListProps) {
           return (
             <div
               key={comment.id}
-              className="flex gap-3 pb-4 border-b border-zinc-200 dark:border-zinc-700 last:border-b-0 last:pb-0"
+              className="flex gap-3 pb-4 border-b border-border last:border-b-0 last:pb-0"
             >
               {/* User avatar with distinct color per user */}
               <div
@@ -107,14 +107,14 @@ export function CommentList({ comments }: CommentListProps) {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm font-medium text-zinc-900 dark:text-white truncate">
+                  <span className="text-sm font-medium text-foreground truncate">
                     {comment.user?.email || 'Unknown user'}
                   </span>
-                  <span className="text-xs text-zinc-500 dark:text-zinc-400 flex-shrink-0">
+                  <span className="text-xs text-muted-foreground flex-shrink-0">
                     {formatRelativeTime(comment.created_at)}
                   </span>
                 </div>
-                <p className="text-base text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap break-words">
+                <p className="text-base text-foreground whitespace-pre-wrap break-words">
                   {comment.content}
                 </p>
               </div>

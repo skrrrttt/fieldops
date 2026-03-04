@@ -49,7 +49,7 @@ function getFileIcon(fileName: string): React.ReactNode {
 
   if (['doc', 'docx'].includes(ext)) {
     return (
-      <svg className="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+      <svg className="w-8 h-8 text-primary" fill="currentColor" viewBox="0 0 24 24">
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 2l5 5h-5V4zM8 17h8v1H8v-1zm0-2h8v1H8v-1zm0-2h8v1H8v-1z"/>
       </svg>
     );
@@ -73,7 +73,7 @@ function getFileIcon(fileName: string): React.ReactNode {
 
   // Default file icon
   return (
-    <svg className="w-8 h-8 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="w-8 h-8 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
     </svg>
   );
@@ -119,15 +119,15 @@ export function FileList({ files }: FileListProps) {
 
   if (files.length === 0) {
     return (
-      <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-6">
+      <section className="bg-card rounded-lg shadow-sm border border-border p-6">
         <div className="text-center py-4">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-zinc-100 dark:bg-zinc-700 mb-4">
-            <svg className="w-7 h-7 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-muted mb-4">
+            <svg className="w-7 h-7 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </div>
-          <h3 className="text-base font-medium text-zinc-600 dark:text-zinc-400 mb-1">No files yet</h3>
-          <p className="text-sm text-zinc-500 dark:text-zinc-500">
+          <h3 className="text-base font-medium text-muted-foreground mb-1">No files yet</h3>
+          <p className="text-sm text-muted-foreground">
             Tap the upload button above to attach files.
           </p>
         </div>
@@ -136,8 +136,8 @@ export function FileList({ files }: FileListProps) {
   }
 
   return (
-    <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-4">
-      <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4">
+    <section className="bg-card rounded-lg shadow-sm border border-border p-4">
+      <h2 className="text-lg font-semibold text-foreground mb-4">
         Files ({files.length})
       </h2>
 
@@ -145,7 +145,7 @@ export function FileList({ files }: FileListProps) {
         {files.map((file) => (
           <div
             key={file.id}
-            className="flex items-center gap-3 p-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/50 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors"
+            className="flex items-center gap-3 p-3 rounded-lg border border-border bg-muted hover:bg-muted/80 transition-colors"
           >
             {/* File icon */}
             <button
@@ -163,10 +163,10 @@ export function FileList({ files }: FileListProps) {
               onClick={() => handleFileClick(file)}
               className="flex-1 min-w-0 text-left"
             >
-              <p className="text-sm font-medium text-zinc-900 dark:text-white truncate hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+              <p className="text-sm font-medium text-foreground truncate hover:text-primary transition-colors">
                 {file.file_name}
               </p>
-              <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
                 <span>{formatFileSize(file.file_size)}</span>
                 <span>•</span>
                 <span>{formatRelativeDate(file.created_at)}</span>
@@ -183,7 +183,7 @@ export function FileList({ files }: FileListProps) {
             <button
               type="button"
               onClick={() => handleDownload(file)}
-              className="flex-shrink-0 p-2 text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-700"
+              className="flex-shrink-0 p-2 text-muted-foreground hover:text-primary transition-colors rounded-lg hover:bg-muted"
               aria-label={`Download ${file.file_name}`}
               title="Download"
             >

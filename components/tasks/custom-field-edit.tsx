@@ -56,8 +56,8 @@ export function CustomFieldEdit({ taskId, customFields, initialValues }: CustomF
   }
 
   return (
-    <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-4">
-      <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4">
+    <section className="bg-card rounded-lg shadow-sm border border-border p-4">
+      <h2 className="text-lg font-semibold text-foreground mb-4">
         Additional Information
       </h2>
 
@@ -66,7 +66,7 @@ export function CustomFieldEdit({ taskId, customFields, initialValues }: CustomF
           <div key={field.id}>
             <label
               htmlFor={`field-${field.id}`}
-              className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5"
+              className="block text-sm font-medium text-foreground mb-1.5"
             >
               {field.name}
               {field.required && <span className="text-red-500 ml-1">*</span>}
@@ -79,7 +79,7 @@ export function CustomFieldEdit({ taskId, customFields, initialValues }: CustomF
                 value={(values[field.id] as string) || ''}
                 onChange={(e) => updateValue(field.id, e.target.value)}
                 placeholder={`Enter ${field.name.toLowerCase()}`}
-                className="w-full px-3 py-3 text-base border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-3 text-base border border-border rounded-lg bg-card text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               />
             )}
 
@@ -91,7 +91,7 @@ export function CustomFieldEdit({ taskId, customFields, initialValues }: CustomF
                 value={(values[field.id] as number) ?? ''}
                 onChange={(e) => updateValue(field.id, e.target.value ? parseFloat(e.target.value) : '')}
                 placeholder={`Enter ${field.name.toLowerCase()}`}
-                className="w-full px-3 py-3 text-base border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-3 text-base border border-border rounded-lg bg-card text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               />
             )}
 
@@ -101,7 +101,7 @@ export function CustomFieldEdit({ taskId, customFields, initialValues }: CustomF
                 type="date"
                 value={(values[field.id] as string) || ''}
                 onChange={(e) => updateValue(field.id, e.target.value)}
-                className="w-full px-3 py-3 text-base border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-3 text-base border border-border rounded-lg bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               />
             )}
 
@@ -110,7 +110,7 @@ export function CustomFieldEdit({ taskId, customFields, initialValues }: CustomF
                 id={`field-${field.id}`}
                 value={(values[field.id] as string) || ''}
                 onChange={(e) => updateValue(field.id, e.target.value)}
-                className="w-full px-3 py-3 text-base border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-3 text-base border border-border rounded-lg bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               >
                 <option value="">Select {field.name.toLowerCase()}</option>
                 {(field.options as string[] | undefined)?.map((option) => (
@@ -128,9 +128,9 @@ export function CustomFieldEdit({ taskId, customFields, initialValues }: CustomF
                   type="checkbox"
                   checked={!!values[field.id]}
                   onChange={(e) => updateValue(field.id, e.target.checked)}
-                  className="w-5 h-5 rounded border-zinc-300 dark:border-zinc-600 text-blue-600 focus:ring-blue-500 focus:ring-2"
+                  className="w-5 h-5 rounded border-border text-primary focus:ring-primary focus:ring-2"
                 />
-                <span className="text-base text-zinc-700 dark:text-zinc-300">Yes</span>
+                <span className="text-base text-foreground">Yes</span>
               </label>
             )}
           </div>
@@ -141,7 +141,7 @@ export function CustomFieldEdit({ taskId, customFields, initialValues }: CustomF
           type="button"
           onClick={handleSave}
           disabled={isSaving || !hasChanges}
-          className="w-full flex items-center justify-center gap-2 min-h-[48px] px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-zinc-400 dark:disabled:bg-zinc-600 text-white font-medium rounded-lg transition-colors"
+          className="w-full flex items-center justify-center gap-2 min-h-[48px] px-4 py-3 bg-primary hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground text-primary-foreground font-medium rounded-lg transition-colors"
         >
           {isSaving ? (
             <>

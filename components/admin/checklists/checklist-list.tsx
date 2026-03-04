@@ -270,13 +270,13 @@ export function ChecklistList({ checklists: initialChecklists }: ChecklistListPr
   if (checklists.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-zinc-100 dark:bg-zinc-800 mb-4">
-          <ListChecks className="w-7 h-7 text-zinc-400" />
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-muted mb-4">
+          <ListChecks className="w-7 h-7 text-muted-foreground" />
         </div>
-        <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-1">
+        <h3 className="text-lg font-semibold text-foreground mb-1">
           No checklists yet
         </h3>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto">
+        <p className="text-sm text-muted-foreground max-w-sm mx-auto">
           Create checklists to standardize task workflows. Use the form above to
           add your first checklist.
         </p>
@@ -298,11 +298,11 @@ export function ChecklistList({ checklists: initialChecklists }: ChecklistListPr
         </div>
       )}
 
-      <p className="mb-4 text-sm text-zinc-500 dark:text-zinc-400">
+      <p className="mb-4 text-sm text-muted-foreground">
         Drag and drop to reorder checklists. Click to expand and manage items.
       </p>
 
-      <div className="divide-y divide-zinc-200 dark:divide-zinc-700">
+      <div className="divide-y divide-border">
         {checklists.map((checklist) => (
           <div
             key={checklist.id}
@@ -328,26 +328,26 @@ export function ChecklistList({ checklists: initialChecklists }: ChecklistListPr
                     className="flex items-center gap-3 flex-1 text-left"
                   >
                     {/* Drag handle */}
-                    <div className="cursor-grab text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-400">
+                    <div className="cursor-grab text-muted-foreground hover:text-foreground">
                       <GripVertical className="w-5 h-5" />
                     </div>
                     {/* Expand icon */}
                     {expandedIds.includes(checklist.id) ? (
-                      <ChevronDown className="w-5 h-5 text-zinc-400" />
+                      <ChevronDown className="w-5 h-5 text-muted-foreground" />
                     ) : (
-                      <ChevronRight className="w-5 h-5 text-zinc-400" />
+                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
                     )}
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-zinc-900 dark:text-white">
+                        <span className="font-medium text-foreground">
                           {checklist.name}
                         </span>
-                        <span className="text-xs text-zinc-400">
+                        <span className="text-xs text-muted-foreground">
                           ({checklist.items.length} items)
                         </span>
                       </div>
                       {checklist.description && (
-                        <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                        <span className="text-xs text-muted-foreground">
                           {checklist.description}
                         </span>
                       )}
@@ -356,7 +356,7 @@ export function ChecklistList({ checklists: initialChecklists }: ChecklistListPr
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setEditingId(checklist.id)}
-                      className="px-3 py-1.5 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md"
+                      className="px-3 py-1.5 text-sm text-primary hover:bg-primary/5 rounded-md"
                     >
                       Edit
                     </button>
@@ -371,7 +371,7 @@ export function ChecklistList({ checklists: initialChecklists }: ChecklistListPr
 
                 {/* Expanded Items Section */}
                 {expandedIds.includes(checklist.id) && (
-                  <div className="mt-4 ml-8 pl-4 border-l-2 border-zinc-200 dark:border-zinc-700">
+                  <div className="mt-4 ml-8 pl-4 border-l-2 border-border">
                     {/* Items List */}
                     {checklist.items.length > 0 ? (
                       <ul className="space-y-2 mb-4">
@@ -388,7 +388,7 @@ export function ChecklistList({ checklists: initialChecklists }: ChecklistListPr
                               handleItemDrop(e, checklist.id, item.id)
                             }
                           >
-                            <GripVertical className="w-4 h-4 text-zinc-300 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <GripVertical className="w-4 h-4 text-muted-foreground/50 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity" />
                             {editingItemId === item.id ? (
                               <div className="flex items-center gap-2 flex-1">
                                 <Input
@@ -428,7 +428,7 @@ export function ChecklistList({ checklists: initialChecklists }: ChecklistListPr
                             ) : (
                               <>
                                 <span
-                                  className="flex-1 text-sm text-zinc-700 dark:text-zinc-300 cursor-pointer hover:text-zinc-900 dark:hover:text-white"
+                                  className="flex-1 text-sm text-foreground cursor-pointer hover:text-foreground"
                                   onClick={() => {
                                     setEditingItemId(item.id);
                                     setEditingItemTitle(item.title);
@@ -438,7 +438,7 @@ export function ChecklistList({ checklists: initialChecklists }: ChecklistListPr
                                 </span>
                                 <button
                                   onClick={() => handleDeleteItem(item.id)}
-                                  className="p-1 text-zinc-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  className="p-1 text-muted-foreground hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
                                   disabled={itemLoading === item.id}
                                 >
                                   <Trash2 className="w-4 h-4" />
@@ -449,7 +449,7 @@ export function ChecklistList({ checklists: initialChecklists }: ChecklistListPr
                         ))}
                       </ul>
                     ) : (
-                      <p className="text-sm text-zinc-400 mb-4">
+                      <p className="text-sm text-muted-foreground mb-4">
                         No items yet. Add items below.
                       </p>
                     )}
@@ -495,11 +495,11 @@ export function ChecklistList({ checklists: initialChecklists }: ChecklistListPr
       {/* Delete Confirmation Dialog */}
       {deletingId && deletingChecklist && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-md w-full p-6">
-            <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">
+          <div className="bg-card rounded-lg shadow-xl max-w-md w-full p-6">
+            <h3 className="text-lg font-semibold text-foreground mb-2">
               Delete Checklist
             </h3>
-            <p className="text-zinc-600 dark:text-zinc-400 mb-4">
+            <p className="text-muted-foreground mb-4">
               Are you sure you want to delete{' '}
               <strong>{deletingChecklist.name}</strong>?
               {deletingChecklist.items.length > 0 && (
@@ -521,7 +521,7 @@ export function ChecklistList({ checklists: initialChecklists }: ChecklistListPr
                   setError(null);
                 }}
                 disabled={isLoading}
-                className="px-4 py-2 bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-md hover:bg-zinc-300 dark:hover:bg-zinc-600 disabled:opacity-50"
+                className="px-4 py-2 bg-muted text-foreground rounded-md hover:bg-muted/80 disabled:opacity-50"
               >
                 Cancel
               </button>

@@ -57,7 +57,7 @@ export function ConflictResolution({ onResolved }: ConflictResolutionProps) {
 
   if (loading) {
     return (
-      <div className="p-4 text-center text-gray-500">
+      <div className="p-4 text-center text-muted-foreground">
         Loading conflicts...
       </div>
     );
@@ -140,32 +140,32 @@ function ConflictItem({ mutation, onResolve, isResolving }: ConflictItemProps) {
   const conflict = mutation.conflict;
 
   return (
-    <div className="bg-white border border-amber-200 rounded-lg p-4">
+    <div className="bg-card border border-amber-200 rounded-lg p-4">
       <div className="mb-3">
-        <div className="text-sm text-gray-600 mb-1">
+        <div className="text-sm text-muted-foreground mb-1">
           {mutation.type === 'status' ? 'Status Change' : mutation.type} conflict on:
         </div>
-        <div className="font-medium text-gray-900">
+        <div className="font-medium text-foreground">
           {taskTitle || 'Loading...'}
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4 mb-4">
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-          <div className="text-xs font-medium text-blue-600 uppercase mb-1">
+        <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
+          <div className="text-xs font-medium text-primary uppercase mb-1">
             Your Change
           </div>
-          <div className="text-sm font-medium text-blue-900">
+          <div className="text-sm font-medium text-primary">
             {mutation.type === 'status' ? (
               <span className="inline-flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                <span className="w-2 h-2 rounded-full bg-primary"></span>
                 {localStatusName || 'Loading...'}
               </span>
             ) : (
               String(conflict.local_value)
             )}
           </div>
-          <div className="text-xs text-blue-600 mt-1">
+          <div className="text-xs text-primary mt-1">
             Changed {formatRelativeTime(mutation.created_at)}
           </div>
         </div>
@@ -194,7 +194,7 @@ function ConflictItem({ mutation, onResolve, isResolving }: ConflictItemProps) {
         <button
           onClick={() => onResolve(mutation.id, 'local')}
           disabled={isResolving}
-          className="flex-1 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-h-[44px]"
+          className="flex-1 px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-h-[44px]"
         >
           {isResolving ? 'Resolving...' : 'Keep My Change'}
         </button>
@@ -285,14 +285,14 @@ export function ConflictModal({ isOpen, onClose }: ConflictModalProps) {
         className="absolute inset-0 bg-black/50"
         onClick={onClose}
       />
-      <div className="relative bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[80vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b px-4 py-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">
+      <div className="relative bg-card rounded-xl shadow-xl max-w-lg w-full max-h-[80vh] overflow-y-auto">
+        <div className="sticky top-0 bg-card border-b px-4 py-3 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-foreground">
             Resolve Sync Conflicts
           </h2>
           <button
             onClick={onClose}
-            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

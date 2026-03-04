@@ -2,9 +2,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export default function TaskDetailLoading() {
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900 pb-24">
+    <div className="min-h-screen bg-background pb-24">
       {/* Header skeleton */}
-      <header className="sticky top-0 z-50 bg-white dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700">
+      <header className="sticky top-0 z-50 bg-card border-b border-border">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-3">
           <Skeleton className="h-8 w-8 rounded" />
           <Skeleton className="h-6 w-32" />
@@ -13,7 +13,7 @@ export default function TaskDetailLoading() {
 
       <main className="max-w-3xl mx-auto px-4 py-6 space-y-6">
         {/* Task header */}
-        <div className="bg-white dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700 p-4">
+        <div className="bg-card rounded-lg border border-border p-4">
           <div className="flex items-start justify-between mb-4">
             <Skeleton className="h-7 w-3/4" />
             <Skeleton className="h-6 w-20 rounded-full" />
@@ -23,7 +23,7 @@ export default function TaskDetailLoading() {
         </div>
 
         {/* Details section */}
-        <div className="bg-white dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700 p-4">
+        <div className="bg-card rounded-lg border border-border p-4">
           <Skeleton className="h-5 w-24 mb-4" />
           <div className="space-y-3">
             <div className="flex justify-between">
@@ -42,7 +42,7 @@ export default function TaskDetailLoading() {
         </div>
 
         {/* Photos section */}
-        <div className="bg-white dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700 p-4">
+        <div className="bg-card rounded-lg border border-border p-4">
           <Skeleton className="h-5 w-16 mb-4" />
           <div className="grid grid-cols-3 gap-2">
             <Skeleton className="aspect-square rounded" />
@@ -52,7 +52,7 @@ export default function TaskDetailLoading() {
         </div>
 
         {/* Comments section */}
-        <div className="bg-white dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700 p-4">
+        <div className="bg-card rounded-lg border border-border p-4">
           <Skeleton className="h-5 w-24 mb-4" />
           <div className="space-y-3">
             <div className="flex gap-3">

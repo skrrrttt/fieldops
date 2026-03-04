@@ -324,7 +324,7 @@ export function CustomerList({ customers }: CustomerListProps) {
     <div className="space-y-4">
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           type="text"
           placeholder="Search customers or jobs..."
@@ -336,7 +336,7 @@ export function CustomerList({ customers }: CustomerListProps) {
 
       {/* Customer List */}
       {filteredCustomers.length === 0 ? (
-        <div className="text-center py-12 text-zinc-500">
+        <div className="text-center py-12 text-muted-foreground">
           {searchQuery ? 'No customers match your search' : 'No customers yet. Add one to get started.'}
         </div>
       ) : (
@@ -344,30 +344,30 @@ export function CustomerList({ customers }: CustomerListProps) {
           {filteredCustomers.map((customer) => (
             <div
               key={customer.id}
-              className="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg overflow-hidden"
+              className="bg-card border border-border rounded-lg overflow-hidden"
             >
               {/* Customer Header */}
               <div className="flex items-center gap-3 p-4">
                 <button
                   onClick={() => toggleCustomer(customer.id)}
-                  className="flex-shrink-0 p-1 hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded"
+                  className="flex-shrink-0 p-1 hover:bg-muted rounded"
                 >
                   {expandedCustomers.has(customer.id) ? (
-                    <ChevronDown className="w-5 h-5 text-zinc-500" />
+                    <ChevronDown className="w-5 h-5 text-muted-foreground" />
                   ) : (
-                    <ChevronRight className="w-5 h-5 text-zinc-500" />
+                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
                   )}
                 </button>
 
-                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                  <Building2 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Building2 className="w-5 h-5 text-primary" />
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-zinc-900 dark:text-white truncate">
+                  <h3 className="font-semibold text-foreground truncate">
                     {customer.name}
                   </h3>
-                  <div className="flex flex-wrap items-center gap-3 text-sm text-zinc-500 dark:text-zinc-400">
+                  <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                     {customer.contact_phone && (
                       <span className="flex items-center gap-1">
                         <Phone className="w-3 h-3" />
@@ -380,7 +380,7 @@ export function CustomerList({ customers }: CustomerListProps) {
                         {customer.contact_email}
                       </span>
                     )}
-                    <span className="text-zinc-400">
+                    <span className="text-muted-foreground">
                       {customer.jobs.length} job{customer.jobs.length !== 1 ? 's' : ''}
                     </span>
                   </div>
@@ -415,13 +415,13 @@ export function CustomerList({ customers }: CustomerListProps) {
 
               {/* Jobs List (expanded) */}
               {expandedCustomers.has(customer.id) && (
-                <div className="border-t border-zinc-100 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50">
+                <div className="border-t border-border bg-muted/50">
                   {customer.jobs.length === 0 ? (
-                    <div className="px-4 py-6 text-center text-zinc-500 text-sm">
+                    <div className="px-4 py-6 text-center text-muted-foreground text-sm">
                       No jobs yet. Click &quot;Add Job&quot; to create one.
                     </div>
                   ) : (
-                    <div className="divide-y divide-zinc-100 dark:divide-zinc-700">
+                    <div className="divide-y divide-border">
                       {customer.jobs.map((job) => (
                         <div
                           key={job.id}
@@ -433,17 +433,17 @@ export function CustomerList({ customers }: CustomerListProps) {
 
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
-                              <span className="font-medium text-zinc-900 dark:text-white">
+                              <span className="font-medium text-foreground">
                                 {job.name}
                               </span>
                               {!job.is_active && (
-                                <span className="text-xs px-1.5 py-0.5 bg-zinc-200 dark:bg-zinc-600 text-zinc-600 dark:text-zinc-300 rounded">
+                                <span className="text-xs px-1.5 py-0.5 bg-muted text-muted-foreground rounded">
                                   Inactive
                                 </span>
                               )}
                             </div>
                             {job.address && (
-                              <p className="text-sm text-zinc-500 truncate">
+                              <p className="text-sm text-muted-foreground truncate">
                                 {job.address}
                               </p>
                             )}

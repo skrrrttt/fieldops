@@ -78,7 +78,7 @@ export function CustomFieldResponsesTable({
   // Get value component with proper styling
   const renderFieldValue = (value: unknown, fieldType: string) => {
     if (value === undefined || value === null || value === '') {
-      return <span className="text-zinc-400">—</span>;
+      return <span className="text-muted-foreground">—</span>;
     }
     if (fieldType === 'checkbox') {
       return value ? (
@@ -87,7 +87,7 @@ export function CustomFieldResponsesTable({
           Yes
         </span>
       ) : (
-        <span className="inline-flex items-center gap-1 text-zinc-400">
+        <span className="inline-flex items-center gap-1 text-muted-foreground">
           <XCircle className="w-4 h-4" />
           No
         </span>
@@ -99,10 +99,10 @@ export function CustomFieldResponsesTable({
   return (
     <div>
       {/* Filters */}
-      <div className="p-4 border-b border-zinc-200 dark:border-zinc-700 flex flex-col sm:flex-row gap-4">
+      <div className="p-4 border-b border-border flex flex-col sm:flex-row gap-4">
         <div className="flex-1">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder="Search tasks..."
               value={searchQuery}
@@ -132,44 +132,44 @@ export function CustomFieldResponsesTable({
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-zinc-50 dark:bg-zinc-900/50">
+          <thead className="bg-background/50">
             <tr>
-              <th className="px-4 py-3 text-left text-sm font-medium text-zinc-600 dark:text-zinc-400">
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
                 Task
               </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-zinc-600 dark:text-zinc-400">
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
                 Division
               </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-zinc-600 dark:text-zinc-400">
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
                 Status
               </th>
               {selectedFieldId === 'all' ? (
                 customFields.map((field) => (
                   <th
                     key={field.id}
-                    className="px-4 py-3 text-left text-sm font-medium text-zinc-600 dark:text-zinc-400"
+                    className="px-4 py-3 text-left text-sm font-medium text-muted-foreground"
                   >
                     {field.name}
                     {field.required && <span className="text-red-500 ml-1">*</span>}
                   </th>
                 ))
               ) : (
-                <th className="px-4 py-3 text-left text-sm font-medium text-zinc-600 dark:text-zinc-400">
+                <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
                   {selectedField?.name}
                   {selectedField?.required && <span className="text-red-500 ml-1">*</span>}
                 </th>
               )}
-              <th className="px-4 py-3 text-left text-sm font-medium text-zinc-600 dark:text-zinc-400 w-20">
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground w-20">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-200 dark:divide-zinc-700">
+          <tbody className="divide-y divide-border">
             {filteredTasks.length === 0 ? (
               <tr>
                 <td
                   colSpan={selectedFieldId === 'all' ? customFields.length + 4 : 5}
-                  className="px-4 py-8 text-center text-zinc-500 dark:text-zinc-400"
+                  className="px-4 py-8 text-center text-muted-foreground"
                 >
                   {searchQuery || selectedFieldId !== 'all'
                     ? 'No tasks match your filters'
@@ -178,12 +178,12 @@ export function CustomFieldResponsesTable({
               </tr>
             ) : (
               filteredTasks.map((task) => (
-                <tr key={task.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-900/30">
+                <tr key={task.id} className="hover:bg-muted">
                   <td className="px-4 py-3">
-                    <div className="font-medium text-zinc-900 dark:text-white">
+                    <div className="font-medium text-foreground">
                       {task.title}
                     </div>
-                    <div className="text-sm text-zinc-500 dark:text-zinc-400">
+                    <div className="text-sm text-muted-foreground">
                       {new Date(task.created_at).toLocaleDateString()}
                     </div>
                   </td>
@@ -201,7 +201,7 @@ export function CustomFieldResponsesTable({
                         {task.division.name}
                       </span>
                     ) : (
-                      <span className="text-zinc-400">—</span>
+                      <span className="text-muted-foreground">—</span>
                     )}
                   </td>
                   <td className="px-4 py-3">
@@ -216,17 +216,17 @@ export function CustomFieldResponsesTable({
                         {task.status.name}
                       </span>
                     ) : (
-                      <span className="text-zinc-400">—</span>
+                      <span className="text-muted-foreground">—</span>
                     )}
                   </td>
                   {selectedFieldId === 'all' ? (
                     customFields.map((field) => (
-                      <td key={field.id} className="px-4 py-3 text-sm text-zinc-900 dark:text-white">
+                      <td key={field.id} className="px-4 py-3 text-sm text-foreground">
                         {renderFieldValue(task.custom_fields?.[field.id], field.field_type)}
                       </td>
                     ))
                   ) : (
-                    <td className="px-4 py-3 text-sm text-zinc-900 dark:text-white">
+                    <td className="px-4 py-3 text-sm text-foreground">
                       {selectedField && renderFieldValue(
                         task.custom_fields?.[selectedFieldId],
                         selectedField.field_type
@@ -236,7 +236,7 @@ export function CustomFieldResponsesTable({
                   <td className="px-4 py-3">
                     <Link
                       href={`/admin/tasks?action=edit&id=${task.id}`}
-                      className="inline-flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                      className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
                     >
                       <ExternalLink className="w-3 h-3" />
                       View
@@ -250,7 +250,7 @@ export function CustomFieldResponsesTable({
       </div>
 
       {/* Summary */}
-      <div className="p-4 border-t border-zinc-200 dark:border-zinc-700 text-sm text-zinc-500 dark:text-zinc-400">
+      <div className="p-4 border-t border-border text-sm text-muted-foreground">
         Showing {filteredTasks.length} of {tasks.length} tasks
         {selectedFieldId !== 'all' && selectedField && (
           <span> with &quot;{selectedField.name}&quot; responses</span>

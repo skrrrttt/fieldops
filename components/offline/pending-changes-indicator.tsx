@@ -93,14 +93,14 @@ export function PendingChangesIndicator({
 
       {/* Expanded details */}
       {showDetails && isExpanded && summary && (
-        <div className="absolute top-full left-0 mt-2 p-3 bg-white dark:bg-zinc-800 rounded-lg shadow-lg border border-zinc-200 dark:border-zinc-700 min-w-[200px] z-50">
-          <h4 className="text-sm font-semibold text-zinc-900 dark:text-white mb-2">
+        <div className="absolute top-full left-0 mt-2 p-3 bg-card rounded-lg shadow-lg border border-border min-w-[200px] z-50">
+          <h4 className="text-sm font-semibold text-foreground mb-2">
             Pending Changes
           </h4>
-          <ul className="space-y-1 text-sm text-zinc-600 dark:text-zinc-400">
+          <ul className="space-y-1 text-sm text-muted-foreground">
             {summary.byType.status > 0 && (
               <li className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-blue-500" />
+                <span className="w-2 h-2 rounded-full bg-primary" />
                 {summary.byType.status} status update{summary.byType.status !== 1 ? 's' : ''}
               </li>
             )}
@@ -124,13 +124,13 @@ export function PendingChangesIndicator({
             )}
           </ul>
           {summary.failed > 0 && (
-            <div className="mt-2 pt-2 border-t border-zinc-200 dark:border-zinc-700">
+            <div className="mt-2 pt-2 border-t border-border">
               <p className="text-sm text-red-600 dark:text-red-400">
                 {summary.failed} failed (will retry)
               </p>
             </div>
           )}
-          <p className="mt-2 pt-2 border-t border-zinc-200 dark:border-zinc-700 text-xs text-zinc-500 dark:text-zinc-400">
+          <p className="mt-2 pt-2 border-t border-border text-xs text-muted-foreground">
             Changes will sync when online
           </p>
         </div>

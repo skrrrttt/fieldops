@@ -7,9 +7,7 @@ function Card({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card"
       className={cn(
-        "bg-card text-card-foreground flex flex-col gap-6 rounded-2xl border border-border/50 p-6 shadow-sm transition-all duration-200",
-        "hover:shadow-md hover:border-border",
-        "dark:bg-card/80 dark:border-border/30 dark:hover:border-border/50",
+        "bg-card text-card-foreground flex flex-col gap-6 rounded-xl border border-border p-6 shadow-xs transition-colors duration-150",
         className
       )}
       {...props}
@@ -81,7 +79,7 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-footer"
       className={cn(
-        "flex items-center gap-4 pt-2 border-t border-border/50",
+        "flex items-center gap-4 pt-2 border-t border-border",
         className
       )}
       {...props}
@@ -89,14 +87,13 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
-// Premium card variants
+// Clean card variants (aliases for consistency)
 function CardGlass({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card"
       className={cn(
-        "glass glass-border flex flex-col gap-6 rounded-2xl p-6 transition-all duration-200",
-        "hover:shadow-lg",
+        "bg-card text-card-foreground flex flex-col gap-6 rounded-xl border border-border p-6 shadow-xs transition-colors duration-150",
         className
       )}
       {...props}
@@ -109,10 +106,7 @@ function CardGlow({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card"
       className={cn(
-        "bg-card text-card-foreground flex flex-col gap-6 rounded-2xl border border-primary/20 p-6",
-        "shadow-lg shadow-primary/10 transition-all duration-200",
-        "hover:shadow-xl hover:shadow-primary/20 hover:border-primary/40",
-        "dark:bg-card/80 dark:border-primary/30",
+        "bg-card text-card-foreground flex flex-col gap-6 rounded-xl border border-border p-6 shadow-xs transition-colors duration-150",
         className
       )}
       {...props}

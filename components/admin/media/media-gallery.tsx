@@ -307,11 +307,11 @@ export function MediaGallery({
   return (
     <>
       {/* Filters Section */}
-      <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-4 mb-6">
+      <div className="bg-card rounded-lg shadow-sm border border-border p-4 mb-6">
         <div className="flex flex-wrap gap-4">
           {/* Task filter */}
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Task
             </label>
             <select
@@ -319,7 +319,7 @@ export function MediaGallery({
               onChange={(e) =>
                 setFilters({ ...filters, taskId: e.target.value })
               }
-              className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-border rounded-lg bg-card text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
             >
               <option value="">All Tasks</option>
               {tasks.map((task) => (
@@ -332,7 +332,7 @@ export function MediaGallery({
 
           {/* User filter */}
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Uploaded By
             </label>
             <select
@@ -340,7 +340,7 @@ export function MediaGallery({
               onChange={(e) =>
                 setFilters({ ...filters, userId: e.target.value })
               }
-              className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-border rounded-lg bg-card text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
             >
               <option value="">All Users</option>
               {users.map((user) => (
@@ -353,7 +353,7 @@ export function MediaGallery({
 
           {/* Division filter */}
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Division
             </label>
             <select
@@ -361,7 +361,7 @@ export function MediaGallery({
               onChange={(e) =>
                 setFilters({ ...filters, divisionId: e.target.value })
               }
-              className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-border rounded-lg bg-card text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
             >
               <option value="">All Divisions</option>
               {divisions.map((division) => (
@@ -374,7 +374,7 @@ export function MediaGallery({
 
           {/* Date range */}
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Start Date
             </label>
             <input
@@ -383,12 +383,12 @@ export function MediaGallery({
               onChange={(e) =>
                 setFilters({ ...filters, startDate: e.target.value })
               }
-              className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-border rounded-lg bg-card text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
             />
           </div>
 
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               End Date
             </label>
             <input
@@ -397,7 +397,7 @@ export function MediaGallery({
               onChange={(e) =>
                 setFilters({ ...filters, endDate: e.target.value })
               }
-              className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-border rounded-lg bg-card text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
             />
           </div>
         </div>
@@ -406,14 +406,14 @@ export function MediaGallery({
         <div className="flex gap-2 mt-4">
           <button
             onClick={applyFilters}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
           >
             Apply Filters
           </button>
           {hasActiveFilters && (
             <button
               onClick={clearFilters}
-              className="px-4 py-2 bg-zinc-200 dark:bg-zinc-600 text-zinc-700 dark:text-zinc-200 rounded-lg hover:bg-zinc-300 dark:hover:bg-zinc-500 transition-colors"
+              className="px-4 py-2 bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-colors"
             >
               Clear Filters
             </button>
@@ -423,7 +423,7 @@ export function MediaGallery({
 
       {/* Bulk Actions Bar */}
       {photosWithUrls.length > 0 && (
-        <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-4 mb-6 flex items-center justify-between">
+        <div className="bg-card rounded-lg shadow-sm border border-border p-4 mb-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -435,13 +435,13 @@ export function MediaGallery({
                 onChange={(e) =>
                   e.target.checked ? selectAll() : deselectAll()
                 }
-                className="w-5 h-5 rounded border-zinc-300 dark:border-zinc-600 text-blue-600 focus:ring-blue-500"
+                className="w-5 h-5 rounded border-border text-primary focus:ring-primary"
               />
-              <span className="text-sm text-zinc-700 dark:text-zinc-300">
+              <span className="text-sm text-foreground">
                 Select All
               </span>
             </label>
-            <span className="text-sm text-zinc-500 dark:text-zinc-400">
+            <span className="text-sm text-muted-foreground">
               {selectedIds.size} of {photosWithUrls.length} selected
             </span>
           </div>
@@ -449,7 +449,7 @@ export function MediaGallery({
           <button
             onClick={downloadSelectedAsZip}
             disabled={selectedIds.size === 0 || isDownloading}
-            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-zinc-400 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-muted disabled:cursor-not-allowed transition-colors"
           >
             {isDownloading ? (
               <>
@@ -498,10 +498,10 @@ export function MediaGallery({
 
       {/* Gallery Grid */}
       {isLoading ? (
-        <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-8">
+        <div className="bg-card rounded-lg shadow-sm border border-border p-8">
           <div className="flex items-center justify-center">
             <svg
-              className="w-8 h-8 animate-spin text-zinc-400"
+              className="w-8 h-8 animate-spin text-muted-foreground"
               fill="none"
               viewBox="0 0 24 24"
             >
@@ -522,17 +522,17 @@ export function MediaGallery({
           </div>
         </div>
       ) : photosWithUrls.length === 0 ? (
-        <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-8">
+        <div className="bg-card rounded-lg shadow-sm border border-border p-8">
           <div className="text-center py-4">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-zinc-100 dark:bg-zinc-700 mb-4">
-              <svg className="w-7 h-7 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-muted mb-4">
+              <svg className="w-7 h-7 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-1">
+            <h3 className="text-lg font-semibold text-foreground mb-1">
               {hasActiveFilters ? 'No matching photos' : 'No photos yet'}
             </h3>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto">
+            <p className="text-sm text-muted-foreground max-w-sm mx-auto">
               {hasActiveFilters
                 ? 'Try adjusting your filters to find photos.'
                 : 'Photos uploaded by field users will appear here.'}
@@ -540,15 +540,15 @@ export function MediaGallery({
           </div>
         </div>
       ) : (
-        <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-4">
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
+        <div className="bg-card rounded-lg shadow-sm border border-border p-4">
+          <p className="text-sm text-muted-foreground mb-4">
             {photosWithUrls.length} photo{photosWithUrls.length !== 1 ? 's' : ''}
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
             {photosWithUrls.map((photo, index) => (
               <div
                 key={photo.id}
-                className="relative group aspect-square rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-700"
+                className="relative group aspect-square rounded-lg overflow-hidden bg-muted"
               >
                 {/* Selection checkbox */}
                 <label
@@ -559,7 +559,7 @@ export function MediaGallery({
                     type="checkbox"
                     checked={selectedIds.has(photo.id)}
                     onChange={() => toggleSelection(photo.id)}
-                    className="w-5 h-5 rounded border-2 border-white shadow-md text-blue-600 focus:ring-blue-500 cursor-pointer"
+                    className="w-5 h-5 rounded border-2 border-white shadow-md text-primary focus:ring-primary cursor-pointer"
                   />
                 </label>
 
@@ -567,7 +567,7 @@ export function MediaGallery({
                 <button
                   type="button"
                   onClick={() => openLightbox(index)}
-                  className="w-full h-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full h-full focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -627,7 +627,7 @@ export function MediaGallery({
                   e.stopPropagation();
                   downloadPhoto(currentPhoto);
                 }}
-                className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                className="p-2 hover:bg-card/10 rounded-full transition-colors"
                 title="Download photo"
               >
                 <svg
@@ -648,7 +648,7 @@ export function MediaGallery({
               <button
                 type="button"
                 onClick={closeLightbox}
-                className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                className="p-2 hover:bg-card/10 rounded-full transition-colors"
                 aria-label="Close lightbox"
               >
                 <svg
@@ -740,7 +740,7 @@ export function MediaGallery({
               {currentPhoto.task && (
                 <div className="flex items-center gap-2 text-sm">
                   <svg
-                    className="w-4 h-4 text-zinc-400"
+                    className="w-4 h-4 text-muted-foreground"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -756,7 +756,7 @@ export function MediaGallery({
                     href={`/tasks/${currentPhoto.task.id}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-400 hover:text-blue-300 underline"
+                    className="text-primary hover:text-primary/70 underline"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {currentPhoto.task.title}
@@ -778,7 +778,7 @@ export function MediaGallery({
               {/* Timestamp */}
               <div className="flex items-center gap-2 text-sm">
                 <svg
-                  className="w-4 h-4 text-zinc-400"
+                  className="w-4 h-4 text-muted-foreground"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -791,7 +791,7 @@ export function MediaGallery({
                   />
                 </svg>
                 <span>{formatTimestamp(currentPhoto.timestamp)}</span>
-                <span className="text-zinc-400">
+                <span className="text-muted-foreground">
                   ({formatRelativeTime(currentPhoto.created_at)})
                 </span>
               </div>
@@ -800,7 +800,7 @@ export function MediaGallery({
               {currentPhoto.gps_lat && currentPhoto.gps_lng && (
                 <div className="flex items-center gap-2 text-sm">
                   <svg
-                    className="w-4 h-4 text-zinc-400"
+                    className="w-4 h-4 text-muted-foreground"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -826,7 +826,7 @@ export function MediaGallery({
                     href={`https://www.google.com/maps?q=${currentPhoto.gps_lat},${currentPhoto.gps_lng}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-400 hover:text-blue-300 underline"
+                    className="text-primary hover:text-primary/70 underline"
                     onClick={(e) => e.stopPropagation()}
                   >
                     View on map
@@ -838,7 +838,7 @@ export function MediaGallery({
               {currentPhoto.user && (
                 <div className="flex items-center gap-2 text-sm">
                   <svg
-                    className="w-4 h-4 text-zinc-400"
+                    className="w-4 h-4 text-muted-foreground"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -852,7 +852,7 @@ export function MediaGallery({
                   </svg>
                   <span>Uploaded by</span>
                   <div className="flex items-center gap-1.5">
-                    <div className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center text-xs font-semibold">
+                    <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center text-xs font-semibold">
                       {currentPhoto.user.email.charAt(0).toUpperCase()}
                     </div>
                     <span>{currentPhoto.user.email}</span>

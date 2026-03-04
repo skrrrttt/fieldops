@@ -22,31 +22,31 @@ export default async function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900 pb-24">
+    <div className="min-h-screen bg-background pb-24">
       <DetailHeader title="Profile" backHref="/tasks" />
       <main className="max-w-3xl mx-auto px-4 py-6">
-        <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm p-6 space-y-6">
+        <div className="bg-card rounded-lg shadow-sm p-6 space-y-6">
           {/* Profile Customization */}
           <div>
-            <h3 className="text-lg font-medium text-zinc-900 dark:text-white mb-4">
+            <h3 className="text-lg font-medium text-foreground mb-4">
               Your Profile
             </h3>
             <ProfileForm user={user} />
           </div>
 
           {/* Account Info */}
-          <div className="border-t border-zinc-200 dark:border-zinc-700 pt-6">
-            <h3 className="text-lg font-medium text-zinc-900 dark:text-white mb-4">
+          <div className="border-t border-border pt-6">
+            <h3 className="text-lg font-medium text-foreground mb-4">
               Account
             </h3>
             <div className="space-y-3">
-              <div className="flex justify-between items-center py-3 border-b border-zinc-100 dark:border-zinc-700">
-                <span className="text-base text-zinc-700 dark:text-zinc-300">Email</span>
-                <span className="text-base text-zinc-900 dark:text-white">{authUser.email}</span>
+              <div className="flex justify-between items-center py-3 border-b border-border">
+                <span className="text-base text-muted-foreground">Email</span>
+                <span className="text-base text-foreground">{authUser.email}</span>
               </div>
-              <div className="flex justify-between items-center py-3 border-b border-zinc-100 dark:border-zinc-700">
-                <span className="text-base text-zinc-700 dark:text-zinc-300">Role</span>
-                <span className="text-base text-zinc-900 dark:text-white capitalize">
+              <div className="flex justify-between items-center py-3 border-b border-border">
+                <span className="text-base text-muted-foreground">Role</span>
+                <span className="text-base text-foreground capitalize">
                   {authUser.role?.replace('_', ' ') || 'Field User'}
                 </span>
               </div>
@@ -54,15 +54,15 @@ export default async function ProfilePage() {
           </div>
 
           {/* Appearance Settings */}
-          <div className="border-t border-zinc-200 dark:border-zinc-700 pt-6">
-            <h3 className="text-lg font-medium text-zinc-900 dark:text-white mb-4">
+          <div className="border-t border-border pt-6">
+            <h3 className="text-lg font-medium text-foreground mb-4">
               Settings
             </h3>
             <ThemeToggle />
           </div>
 
           {/* Sign Out */}
-          <div className="border-t border-zinc-200 dark:border-zinc-700 pt-6">
+          <div className="border-t border-border pt-6">
             <form action={signOut}>
               <button
                 type="submit"

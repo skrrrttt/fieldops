@@ -13,24 +13,24 @@ export default async function AdminArchivePage() {
   return (
     <div className="max-w-6xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">
+        <h1 className="text-2xl font-bold text-foreground">
           Job Archive
         </h1>
-        <p className="text-zinc-600 dark:text-zinc-400 mt-1">
+        <p className="text-muted-foreground mt-1">
           View and manage completed jobs. Restore tasks to reopen them or delete records permanently.
         </p>
       </div>
 
       {/* Stats Summary */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 border border-zinc-200 dark:border-zinc-700">
-          <div className="text-2xl font-bold text-zinc-900 dark:text-white">
+        <div className="bg-card rounded-lg p-4 border border-border">
+          <div className="text-2xl font-bold text-foreground">
             {history.length}
           </div>
-          <div className="text-sm text-zinc-500 dark:text-zinc-400">Total Archived</div>
+          <div className="text-sm text-muted-foreground">Total Archived</div>
         </div>
-        <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 border border-zinc-200 dark:border-zinc-700">
-          <div className="text-2xl font-bold text-zinc-900 dark:text-white">
+        <div className="bg-card rounded-lg p-4 border border-border">
+          <div className="text-2xl font-bold text-foreground">
             {history.filter(h => {
               const completed = new Date(h.completed_at);
               const weekAgo = new Date();
@@ -38,10 +38,10 @@ export default async function AdminArchivePage() {
               return completed >= weekAgo;
             }).length}
           </div>
-          <div className="text-sm text-zinc-500 dark:text-zinc-400">This Week</div>
+          <div className="text-sm text-muted-foreground">This Week</div>
         </div>
-        <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 border border-zinc-200 dark:border-zinc-700">
-          <div className="text-2xl font-bold text-zinc-900 dark:text-white">
+        <div className="bg-card rounded-lg p-4 border border-border">
+          <div className="text-2xl font-bold text-foreground">
             {history.filter(h => {
               const completed = new Date(h.completed_at);
               const monthAgo = new Date();
@@ -49,18 +49,18 @@ export default async function AdminArchivePage() {
               return completed >= monthAgo;
             }).length}
           </div>
-          <div className="text-sm text-zinc-500 dark:text-zinc-400">This Month</div>
+          <div className="text-sm text-muted-foreground">This Month</div>
         </div>
-        <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 border border-zinc-200 dark:border-zinc-700">
-          <div className="text-2xl font-bold text-zinc-900 dark:text-white">
+        <div className="bg-card rounded-lg p-4 border border-border">
+          <div className="text-2xl font-bold text-foreground">
             {divisions.length}
           </div>
-          <div className="text-sm text-zinc-500 dark:text-zinc-400">Divisions</div>
+          <div className="text-sm text-muted-foreground">Divisions</div>
         </div>
       </div>
 
       {/* Archive List */}
-      <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm p-6">
+      <div className="bg-card rounded-lg shadow-sm p-6">
         <TaskHistoryList initialData={history} divisions={divisions} />
       </div>
     </div>

@@ -114,8 +114,8 @@ export function UserTable({ users, currentUserId }: UserTableProps) {
       />
 
       {/* Header with Invite Button */}
-      <div className="p-4 border-b border-zinc-200 dark:border-zinc-700 flex items-center justify-between">
-        <div className="text-sm text-zinc-600 dark:text-zinc-400">
+      <div className="p-4 border-b border-border flex items-center justify-between">
+        <div className="text-sm text-muted-foreground">
           {users.length} {users.length === 1 ? 'user' : 'users'} total
           {inactiveUsers.length > 0 && (
             <span className="ml-2 text-amber-600 dark:text-amber-400">
@@ -125,7 +125,7 @@ export function UserTable({ users, currentUserId }: UserTableProps) {
         </div>
         <button
           onClick={() => setIsInviteModalOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 font-medium text-sm"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -154,42 +154,42 @@ export function UserTable({ users, currentUserId }: UserTableProps) {
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-zinc-50 dark:bg-zinc-700">
+          <thead className="bg-muted">
             <tr>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-zinc-900 dark:text-white">
+              <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">
                 Email
               </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-zinc-900 dark:text-white">
+              <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">
                 Role
               </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-zinc-900 dark:text-white">
+              <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">
                 Last Active
               </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-zinc-900 dark:text-white">
+              <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">
                 Status
               </th>
-              <th className="px-4 py-3 text-right text-sm font-semibold text-zinc-900 dark:text-white">
+              <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-200 dark:divide-zinc-700">
+          <tbody className="divide-y divide-border">
             {users.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-4 py-12">
                   <div className="text-center">
-                    <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-zinc-100 dark:bg-zinc-800 mb-4">
-                      <svg className="w-7 h-7 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-muted mb-4">
+                      <svg className="w-7 h-7 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                       </svg>
                     </div>
-                    <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-1">No users yet</h3>
-                    <p className="text-sm text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto mb-4">
+                    <h3 className="text-lg font-semibold text-foreground mb-1">No users yet</h3>
+                    <p className="text-sm text-muted-foreground max-w-sm mx-auto mb-4">
                       Invite team members to start collaborating on tasks.
                     </p>
                     <button
                       onClick={() => setIsInviteModalOpen(true)}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 font-medium text-sm"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
@@ -203,7 +203,7 @@ export function UserTable({ users, currentUserId }: UserTableProps) {
               users.map((user) => (
                 <tr
                   key={user.id}
-                  className={`hover:bg-zinc-50 dark:hover:bg-zinc-700/50 ${
+                  className={`hover:bg-muted/50 ${
                     !user.is_active ? 'opacity-60' : ''
                   }`}
                 >
@@ -211,21 +211,21 @@ export function UserTable({ users, currentUserId }: UserTableProps) {
                     <div className="flex items-center gap-3">
                       <div
                         className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium ${
-                          user.is_active ? 'bg-blue-600' : 'bg-zinc-400'
+                          user.is_active ? 'bg-primary' : 'bg-muted-foreground'
                         }`}
                       >
                         {user.email.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <div className="font-medium text-zinc-900 dark:text-white">
+                        <div className="font-medium text-foreground">
                           {user.email}
                           {user.id === currentUserId && (
-                            <span className="ml-2 text-xs text-zinc-500 dark:text-zinc-400">
+                            <span className="ml-2 text-xs text-muted-foreground">
                               (You)
                             </span>
                           )}
                         </div>
-                        <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                        <div className="text-xs text-muted-foreground">
                           Joined {new Date(user.created_at).toLocaleDateString()}
                         </div>
                       </div>
@@ -237,7 +237,7 @@ export function UserTable({ users, currentUserId }: UserTableProps) {
                         <select
                           value={editingRole}
                           onChange={(e) => setEditingRole(e.target.value as UserRole)}
-                          className="px-2 py-1 text-sm border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white"
+                          className="px-2 py-1 text-sm border border-border rounded bg-card text-foreground"
                           disabled={isLoading === user.id}
                         >
                           <option value="admin">Admin</option>
@@ -253,7 +253,7 @@ export function UserTable({ users, currentUserId }: UserTableProps) {
                         <button
                           onClick={handleCancelEdit}
                           disabled={isLoading === user.id}
-                          className="px-2 py-1 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
+                          className="px-2 py-1 text-sm text-muted-foreground hover:text-foreground"
                         >
                           Cancel
                         </button>
@@ -263,14 +263,14 @@ export function UserTable({ users, currentUserId }: UserTableProps) {
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           user.role === 'admin'
                             ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400'
-                            : 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
+                            : 'bg-primary/10 text-primary'
                         }`}
                       >
                         {user.role === 'admin' ? 'Admin' : 'Field User'}
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-400">
+                  <td className="px-4 py-3 text-sm text-muted-foreground">
                     {formatDate(user.last_active_at)}
                   </td>
                   <td className="px-4 py-3">
@@ -278,7 +278,7 @@ export function UserTable({ users, currentUserId }: UserTableProps) {
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         user.is_active
                           ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                          : 'bg-zinc-100 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-400'
+                          : 'bg-muted text-muted-foreground'
                       }`}
                     >
                       {user.is_active ? 'Active' : 'Deactivated'}
@@ -290,7 +290,7 @@ export function UserTable({ users, currentUserId }: UserTableProps) {
                         <button
                           onClick={() => handleEditRole(user)}
                           disabled={user.id === currentUserId}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                           title={user.id === currentUserId ? "You can't change your own role" : 'Edit role'}
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -307,7 +307,7 @@ export function UserTable({ users, currentUserId }: UserTableProps) {
 
                       {confirmDeactivate === user.id ? (
                         <div className="flex items-center gap-2">
-                          <span className="text-sm text-zinc-600 dark:text-zinc-400">
+                          <span className="text-sm text-muted-foreground">
                             Confirm?
                           </span>
                           <button
@@ -320,7 +320,7 @@ export function UserTable({ users, currentUserId }: UserTableProps) {
                           <button
                             onClick={() => setConfirmDeactivate(null)}
                             disabled={isLoading === user.id}
-                            className="px-2 py-1 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
+                            className="px-2 py-1 text-sm text-muted-foreground hover:text-foreground"
                           >
                             No
                           </button>

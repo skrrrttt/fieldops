@@ -4,10 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { setSentryUser, setSyncContext, updateSyncContextOnNetworkChange } from '@/lib/monitoring/sentry';
-// ProStreet brand constants
 const APP_NAME = 'ProStreet';
-const PRIMARY_COLOR = '#f97316';
-const DARK_BG = '#0f172a';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -86,28 +83,26 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-zinc-900 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-md">
-        <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-8">
+        <div className="bg-card rounded-lg shadow-lg p-8">
           <div className="text-center mb-8">
             {/* App Icon */}
             <div className="flex justify-center mb-4">
               <div
-                className="w-16 h-16 rounded-xl flex items-center justify-center"
-                style={{ backgroundColor: DARK_BG }}
+                className="w-16 h-16 rounded-xl flex items-center justify-center bg-foreground"
               >
                 <span
-                  className="text-2xl font-bold"
-                  style={{ color: PRIMARY_COLOR }}
+                  className="text-2xl font-bold text-primary"
                 >
                   P
                 </span>
               </div>
             </div>
-            <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">
+            <h1 className="text-2xl font-bold text-foreground">
               {APP_NAME}
             </h1>
-            <p className="text-zinc-600 dark:text-zinc-400 mt-3">
+            <p className="text-muted-foreground mt-3">
               Sign in to your account
             </p>
           </div>
@@ -122,7 +117,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-base font-medium text-zinc-700 dark:text-zinc-300 mb-2"
+                className="block text-base font-medium text-foreground mb-2"
               >
                 Email address
               </label>
@@ -133,7 +128,7 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoComplete="email"
-                className="w-full px-4 py-3 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white placeholder-zinc-500 dark:placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
+                className="w-full px-4 py-3 border border-border rounded-md bg-card text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-base"
                 placeholder="you@example.com"
               />
             </div>
@@ -141,7 +136,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-base font-medium text-zinc-700 dark:text-zinc-300 mb-2"
+                className="block text-base font-medium text-foreground mb-2"
               >
                 Password
               </label>
@@ -152,7 +147,7 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 autoComplete="current-password"
-                className="w-full px-4 py-3 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white placeholder-zinc-500 dark:placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
+                className="w-full px-4 py-3 border border-border rounded-md bg-card text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-base"
                 placeholder="••••••••"
               />
             </div>
@@ -163,11 +158,11 @@ export default function LoginPage() {
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-zinc-300 dark:border-zinc-600 rounded cursor-pointer"
+                className="h-5 w-5 text-primary focus:ring-primary border-border rounded cursor-pointer"
               />
               <label
                 htmlFor="remember-me"
-                className="ml-3 text-base text-zinc-700 dark:text-zinc-300 cursor-pointer"
+                className="ml-3 text-base text-foreground cursor-pointer"
               >
                 Remember me for 30 days
               </label>
@@ -176,11 +171,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 px-4 text-white font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-zinc-800 text-base touch-target disabled:opacity-50 mt-2"
-              style={{
-                backgroundColor: PRIMARY_COLOR,
-                color: '#ffffff'
-              }}
+              className="w-full py-3.5 px-4 bg-primary text-primary-foreground font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 dark:focus:ring-offset-background text-base touch-target disabled:opacity-50 mt-2"
             >
               {loading ? 'Signing in...' : 'Sign in'}
             </button>

@@ -83,8 +83,8 @@ export function TaskList({ tasks, statuses, divisions }: TaskListProps) {
               onClick={() => setStatusFilter(btn.key)}
               className={`px-4 py-2.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
                 statusFilter === btn.key
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 active:bg-zinc-50 dark:active:bg-zinc-700'
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'bg-card text-muted-foreground border border-border active:bg-muted'
               }`}
             >
               {btn.label}
@@ -98,7 +98,7 @@ export function TaskList({ tasks, statuses, divisions }: TaskListProps) {
         <select
           value={divisionFilter}
           onChange={(e) => setDivisionFilter(e.target.value)}
-          className="flex-1 min-w-0 px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="flex-1 min-w-0 px-3 py-2 rounded-lg border border-border bg-card text-foreground text-sm focus:ring-2 focus:ring-ring focus:border-primary"
         >
           <option value="all">All Divisions</option>
           {divisions.map((division) => (
@@ -107,7 +107,7 @@ export function TaskList({ tasks, statuses, divisions }: TaskListProps) {
             </option>
           ))}
         </select>
-        <span className="text-sm text-zinc-500 dark:text-zinc-400 whitespace-nowrap">
+        <span className="text-sm text-muted-foreground whitespace-nowrap">
           {filteredTasks.length} {filteredTasks.length === 1 ? 'task' : 'tasks'}
         </span>
       </div>
@@ -115,9 +115,9 @@ export function TaskList({ tasks, statuses, divisions }: TaskListProps) {
       {/* Task Cards */}
       {filteredTasks.length === 0 ? (
         <div className="text-center py-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-zinc-100 dark:bg-zinc-700 mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
             <svg
-              className="w-8 h-8 text-zinc-400"
+              className="w-8 h-8 text-muted-foreground"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -130,8 +130,8 @@ export function TaskList({ tasks, statuses, divisions }: TaskListProps) {
               />
             </svg>
           </div>
-          <p className="text-zinc-600 dark:text-zinc-400 font-medium">No tasks found</p>
-          <p className="text-zinc-500 dark:text-zinc-500 text-sm mt-1">
+          <p className="text-muted-foreground font-medium">No tasks found</p>
+          <p className="text-muted-foreground text-sm mt-1">
             Try adjusting your filters
           </p>
         </div>

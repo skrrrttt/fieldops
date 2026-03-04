@@ -121,12 +121,12 @@ export function PullToRefresh({
           opacity: pullProgress > 0.1 || isRefreshing ? 1 : 0,
         }}
       >
-        <div className="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
           {isRefreshing ? (
             <>
               {/* Spinning loader */}
               <svg
-                className="w-5 h-5 animate-spin text-blue-600 dark:text-blue-400"
+                className="w-5 h-5 animate-spin text-primary"
                 fill="none"
                 viewBox="0 0 24 24"
               >

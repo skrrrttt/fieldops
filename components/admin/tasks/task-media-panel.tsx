@@ -258,7 +258,7 @@ export function TaskMediaPanel({ taskId }: TaskMediaPanelProps) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <Loader2 className="w-6 h-6 animate-spin text-zinc-400" />
+        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -312,7 +312,7 @@ export function TaskMediaPanel({ taskId }: TaskMediaPanelProps) {
             <p className="text-sm text-muted-foreground text-center py-4">No comments yet</p>
           ) : (
             comments.map((comment) => (
-              <div key={comment.id} className="flex items-start gap-3 p-3 bg-zinc-50 dark:bg-zinc-900 rounded-lg">
+              <div key={comment.id} className="flex items-start gap-3 p-3 bg-background rounded-lg">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-medium text-sm">{comment.user?.email || 'Unknown'}</span>
@@ -426,8 +426,8 @@ export function TaskMediaPanel({ taskId }: TaskMediaPanelProps) {
             <p className="text-sm text-muted-foreground text-center py-4">No files yet</p>
           ) : (
             files.map((file) => (
-              <div key={file.id} className="flex items-center gap-3 p-3 bg-zinc-50 dark:bg-zinc-900 rounded-lg">
-                <FileText className="w-8 h-8 text-zinc-400 flex-shrink-0" />
+              <div key={file.id} className="flex items-center gap-3 p-3 bg-background rounded-lg">
+                <FileText className="w-8 h-8 text-muted-foreground flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <a
                     href={getFileUrl(file.storage_path)}

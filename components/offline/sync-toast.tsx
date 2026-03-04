@@ -68,7 +68,7 @@ export function SyncToast({ message, onDismiss }: SyncToastProps) {
     const colors = {
       success: 'bg-green-600 dark:bg-green-700',
       error: 'bg-red-600 dark:bg-red-700',
-      info: 'bg-blue-600 dark:bg-blue-700',
+      info: 'bg-primary dark:bg-primary/80',
     };
 
     const icons = {

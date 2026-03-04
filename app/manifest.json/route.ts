@@ -12,7 +12,7 @@ export async function GET() {
     start_url: '/',
     display: 'standalone',
     background_color: '#0f172a',
-    theme_color: '#f97316',
+    theme_color: '#d4863f',
     orientation: 'any',
     icons: [
       {

@@ -61,7 +61,7 @@ export function OfflineIndicator({ isFromCache = false, lastSyncedAt }: OfflineI
           ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200'
           : isOnline
           ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200'
-          : 'bg-zinc-700 dark:bg-zinc-800 text-white'
+          : 'bg-muted text-white'
       }`}
       role="status"
       aria-live="polite"

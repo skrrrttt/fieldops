@@ -78,7 +78,7 @@ function getFileIcon(fileName: string): React.ReactNode {
 
   if (['doc', 'docx'].includes(ext)) {
     return (
-      <svg className="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+      <svg className="w-8 h-8 text-primary" fill="currentColor" viewBox="0 0 24 24">
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 2l5 5h-5V4zM8 17h8v1H8v-1zm0-2h8v1H8v-1zm0-2h8v1H8v-1z"/>
       </svg>
     );
@@ -102,7 +102,7 @@ function getFileIcon(fileName: string): React.ReactNode {
 
   // Default file icon
   return (
-    <svg className="w-8 h-8 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="w-8 h-8 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
     </svg>
   );
@@ -319,8 +319,8 @@ export function FileUpload({ taskId, onUploadComplete }: FileUploadProps) {
   };
 
   return (
-    <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-4">
-      <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4">
+    <section className="bg-card rounded-lg shadow-sm border border-border p-4">
+      <h2 className="text-lg font-semibold text-foreground mb-4">
         Upload Files
       </h2>
 
@@ -361,7 +361,7 @@ export function FileUpload({ taskId, onUploadComplete }: FileUploadProps) {
         Choose Files
       </button>
 
-      <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400 text-center">
+      <p className="mt-2 text-sm text-muted-foreground text-center">
         PDF, DOC, DOCX, XLS, XLSX, or images up to 25MB
       </p>
 
@@ -374,7 +374,7 @@ export function FileUpload({ taskId, onUploadComplete }: FileUploadProps) {
               className={`flex items-center gap-3 p-3 rounded-lg border ${
                 selectedFile.error
                   ? 'border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20'
-                  : 'border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/50'
+                  : 'border-border bg-muted'
               }`}
             >
               {/* File icon */}
@@ -384,10 +384,10 @@ export function FileUpload({ taskId, onUploadComplete }: FileUploadProps) {
 
               {/* File info */}
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-zinc-900 dark:text-white truncate">
+                <p className="text-sm font-medium text-foreground truncate">
                   {selectedFile.name}
                 </p>
-                <p className={`text-xs ${selectedFile.error ? 'text-red-600 dark:text-red-400' : 'text-zinc-500 dark:text-zinc-400'}`}>
+                <p className={`text-xs ${selectedFile.error ? 'text-red-600 dark:text-red-400' : 'text-muted-foreground'}`}>
                   {selectedFile.error || formatFileSize(selectedFile.size)}
                 </p>
               </div>
@@ -430,7 +430,7 @@ export function FileUpload({ taskId, onUploadComplete }: FileUploadProps) {
                           cx="20"
                           cy="20"
                           r="16"
-                          className="stroke-zinc-200 dark:stroke-zinc-700"
+                          className="stroke-border"
                           strokeWidth="3"
                           fill="none"
                         />
@@ -445,7 +445,7 @@ export function FileUpload({ taskId, onUploadComplete }: FileUploadProps) {
                           strokeDashoffset={100.53 - (100.53 * uploadProgress[selectedFile.id]) / 100}
                         />
                       </svg>
-                      <span className="absolute inset-0 flex items-center justify-center text-xs font-medium text-zinc-600 dark:text-zinc-300">
+                      <span className="absolute inset-0 flex items-center justify-center text-xs font-medium text-muted-foreground">
                         {Math.round(uploadProgress[selectedFile.id])}%
                       </span>
                     </div>
@@ -458,7 +458,7 @@ export function FileUpload({ taskId, onUploadComplete }: FileUploadProps) {
                 <button
                   type="button"
                   onClick={() => removeFile(selectedFile.id)}
-                  className="flex-shrink-0 p-1 text-zinc-400 hover:text-red-500 transition-colors"
+                  className="flex-shrink-0 p-1 text-muted-foreground hover:text-red-500 transition-colors"
                   aria-label="Remove file"
                 >
                   <svg
@@ -544,7 +544,7 @@ export function FileUpload({ taskId, onUploadComplete }: FileUploadProps) {
       {success && (
         <div className={`mt-4 p-3 border rounded-lg text-sm ${
           successMessage.includes('queued')
-            ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400'
+            ? 'bg-primary/5 border-primary/20 text-primary'
             : 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-700 dark:text-green-400'
         }`}>
           {successMessage}

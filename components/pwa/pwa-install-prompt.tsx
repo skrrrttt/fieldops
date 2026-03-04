@@ -9,10 +9,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { X, Download, Loader2, Sparkles } from 'lucide-react';
 
-// ProStreet brand constants
 const APP_NAME = 'ProStreet';
-const PRIMARY_COLOR = '#f97316';
-const ACCENT_COLOR = '#64748b';
 
 // Extended Window interface for PWA install prompt
 interface BeforeInstallPromptEvent extends Event {
@@ -168,28 +165,18 @@ export function PWAInstallPrompt() {
       style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 1rem)' }}
     >
       <div
-        className="relative max-w-lg mx-auto rounded-2xl shadow-2xl overflow-hidden"
-        style={{
-          background: `linear-gradient(135deg, ${PRIMARY_COLOR}, ${PRIMARY_COLOR}dd)`,
-        }}
+        className="relative max-w-lg mx-auto rounded-2xl shadow-2xl overflow-hidden bg-primary"
       >
-        {/* Decorative glow */}
-        <div
-          className="absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl opacity-30"
-          style={{ backgroundColor: ACCENT_COLOR }}
-        />
 
         <div className="relative p-5">
           <div className="flex items-start gap-4">
             {/* App icon */}
             <div className="flex-shrink-0">
               <div
-                className="w-16 h-16 rounded-2xl flex items-center justify-center ring-2 ring-white/20"
-                style={{ backgroundColor: '#0f172a' }}
+                className="w-16 h-16 rounded-2xl flex items-center justify-center ring-2 ring-white/20 bg-foreground"
               >
                 <span
-                  className="text-3xl font-bold"
-                  style={{ color: PRIMARY_COLOR }}
+                  className="text-3xl font-bold text-primary"
                 >
                   P
                 </span>
@@ -227,8 +214,7 @@ export function PWAInstallPrompt() {
             onClick={handleInstall}
             disabled={isInstalling}
             size="lg"
-            className="w-full mt-5 bg-white hover:bg-white/95 shadow-lg font-bold text-base h-14 rounded-xl transition-all active:scale-[0.98]"
-            style={{ color: PRIMARY_COLOR }}
+            className="w-full mt-5 bg-white hover:bg-white/95 shadow-lg font-bold text-base h-14 rounded-xl transition-all active:scale-[0.98] text-primary"
           >
             {isInstalling ? (
               <>

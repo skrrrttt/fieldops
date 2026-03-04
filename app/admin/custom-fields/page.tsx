@@ -11,25 +11,25 @@ export default async function AdminCustomFieldsPage() {
   return (
     <div className="max-w-4xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">
+        <h1 className="text-2xl font-bold text-foreground">
           Custom Fields
         </h1>
-        <p className="text-zinc-600 dark:text-zinc-400 mt-1">
+        <p className="text-muted-foreground mt-1">
           Add custom fields to tasks for industry-specific data. These fields will appear on task create/edit forms.
         </p>
       </div>
 
       {/* Create Custom Field Form */}
-      <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4">
+      <div className="bg-card rounded-lg shadow-sm p-6">
+        <h3 className="text-lg font-semibold text-foreground mb-4">
           Create New Field
         </h3>
         <CreateCustomFieldForm nextOrder={nextOrder} />
       </div>
 
       {/* Existing Custom Fields List */}
-      <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4">
+      <div className="bg-card rounded-lg shadow-sm p-6">
+        <h3 className="text-lg font-semibold text-foreground mb-4">
           Existing Fields ({fields.length})
         </h3>
         <CustomFieldList fields={fields} />

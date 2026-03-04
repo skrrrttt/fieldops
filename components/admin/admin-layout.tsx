@@ -10,10 +10,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { AdminSidebar } from './admin-sidebar';
 import { LogoutButton } from '@/components/auth/logout-button';
 import { ThemeToggleCompact } from '@/components/theme/theme-toggle';
-// ProStreet brand constants
 const APP_NAME = 'ProStreet';
-const PRIMARY_COLOR = '#f97316';
-const DARK_BG = '#0f172a';
 import { Menu, Search, X } from 'lucide-react';
 
 interface AdminUser {
@@ -121,7 +118,7 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
       {/* Mobile Sidebar Overlay */}
       {showMobileMenu && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 lg:hidden animate-fade-in"
+          className="fixed inset-0 bg-black/60 z-30 lg:hidden animate-fade-in"
           onClick={() => setShowMobileMenu(false)}
         >
           <div
@@ -142,7 +139,7 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
         style={{ '--sidebar-width': `${sidebarWidth}px` } as React.CSSProperties}
       >
         {/* Top header bar */}
-        <header className="bg-card/80 backdrop-blur-md border-b border-border/50 sticky top-0 z-10">
+        <header className="bg-card border-b border-border sticky top-0 z-10">
           <div className="px-4 sm:px-6 lg:px-10 py-3 sm:py-4 flex items-center justify-between gap-3">
             {/* Mobile menu button */}
             <button
@@ -156,8 +153,7 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
             {/* Logo and app name (mobile only - sidebar shows on desktop) */}
             <div className="flex items-center gap-2 lg:hidden flex-shrink-0">
               <div
-                className="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-bold"
-                style={{ backgroundColor: DARK_BG, color: PRIMARY_COLOR }}
+                className="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-bold bg-foreground text-primary"
               >
                 P
               </div>
@@ -200,7 +196,7 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
       {/* Keyboard Shortcuts Modal */}
       {showShortcutsModal && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in"
+          className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 animate-fade-in"
           onClick={() => setShowShortcutsModal(false)}
         >
           <div
@@ -240,7 +236,7 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
       {/* Search Modal */}
       {showSearchModal && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-start justify-center z-50 pt-[15vh] animate-fade-in"
+          className="fixed inset-0 bg-black/60 flex items-start justify-center z-50 pt-[15vh] animate-fade-in"
           onClick={() => setShowSearchModal(false)}
         >
           <div

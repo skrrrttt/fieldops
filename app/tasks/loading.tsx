@@ -2,9 +2,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export default function TasksLoading() {
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
+    <div className="min-h-screen bg-background">
       {/* Header skeleton */}
-      <header className="sticky top-0 z-50 bg-white dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700">
+      <header className="sticky top-0 z-50 bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <Skeleton className="h-8 w-32" />
           <Skeleton className="h-8 w-24" />
@@ -23,7 +23,7 @@ export default function TasksLoading() {
           {Array.from({ length: 6 }).map((_, i) => (
             <div
               key={i}
-              className="bg-white dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700 p-4"
+              className="bg-card rounded-lg border border-border p-4"
             >
               <div className="flex items-start justify-between mb-3">
                 <Skeleton className="h-5 w-3/4" />

@@ -306,8 +306,8 @@ export function PhotoUpload({ taskId, onUploadComplete }: PhotoUploadProps) {
   };
 
   return (
-    <section className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-4">
-      <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4">
+    <section className="bg-card rounded-lg shadow-sm border border-border p-4">
+      <h2 className="text-lg font-semibold text-foreground mb-4">
         Upload Photos
       </h2>
 
@@ -343,7 +343,7 @@ export function PhotoUpload({ taskId, onUploadComplete }: PhotoUploadProps) {
           type="button"
           onClick={handleCameraClick}
           disabled={isUploading || isProcessing}
-          className="flex-1 flex items-center justify-center gap-2 min-h-[64px] px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-lg transition-colors"
+          className="flex-1 flex items-center justify-center gap-2 min-h-[64px] px-4 py-3 bg-primary hover:bg-primary/90 disabled:bg-primary/70 text-primary-foreground font-medium rounded-lg transition-colors"
         >
           <svg
             className="w-6 h-6"
@@ -371,7 +371,7 @@ export function PhotoUpload({ taskId, onUploadComplete }: PhotoUploadProps) {
           type="button"
           onClick={handleGalleryClick}
           disabled={isUploading || isProcessing}
-          className="flex-1 flex items-center justify-center gap-2 min-h-[64px] px-4 py-3 bg-zinc-600 hover:bg-zinc-700 disabled:bg-zinc-400 text-white font-medium rounded-lg transition-colors"
+          className="flex-1 flex items-center justify-center gap-2 min-h-[64px] px-4 py-3 bg-secondary hover:bg-secondary/80 disabled:bg-secondary/50 text-white font-medium rounded-lg transition-colors"
         >
           <svg
             className="w-6 h-6"
@@ -553,7 +553,7 @@ export function PhotoUpload({ taskId, onUploadComplete }: PhotoUploadProps) {
       {success && (
         <div className={`mt-4 p-3 border rounded-lg text-sm ${
           successMessage.includes('queued')
-            ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400'
+            ? 'bg-primary/5 border-primary/20 text-primary'
             : 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-700 dark:text-green-400'
         }`}>
           {successMessage}

@@ -145,13 +145,13 @@ export function CustomFieldList({ fields: initialFields }: CustomFieldListProps)
   if (fields.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-zinc-100 dark:bg-zinc-800 mb-4">
-          <svg className="w-7 h-7 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-muted mb-4">
+          <svg className="w-7 h-7 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
           </svg>
         </div>
-        <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-1">No custom fields yet</h3>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto">
+        <h3 className="text-lg font-semibold text-foreground mb-1">No custom fields yet</h3>
+        <p className="text-sm text-muted-foreground max-w-sm mx-auto">
           Custom fields let you capture additional data on tasks. Use the form above to create one.
         </p>
       </div>
@@ -166,11 +166,11 @@ export function CustomFieldList({ fields: initialFields }: CustomFieldListProps)
         </div>
       )}
 
-      <p className="mb-4 text-sm text-zinc-500 dark:text-zinc-400">
+      <p className="mb-4 text-sm text-muted-foreground">
         Drag and drop to reorder fields.
       </p>
 
-      <div className="divide-y divide-zinc-200 dark:divide-zinc-700">
+      <div className="divide-y divide-border">
         {fields.map((field) => (
           <div
             key={field.id}
@@ -192,18 +192,18 @@ export function CustomFieldList({ fields: initialFields }: CustomFieldListProps)
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   {/* Drag handle */}
-                  <div className="cursor-grab text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-400">
+                  <div className="cursor-grab text-muted-foreground hover:text-foreground">
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
                     </svg>
                   </div>
                   {/* Type icon */}
-                  <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                     {FIELD_TYPE_ICONS[field.field_type]}
                   </div>
                   <div className="flex flex-col">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-zinc-900 dark:text-white">
+                      <span className="font-medium text-foreground">
                         {field.name}
                       </span>
                       {field.required && (
@@ -212,7 +212,7 @@ export function CustomFieldList({ fields: initialFields }: CustomFieldListProps)
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <span>{FIELD_TYPE_LABELS[field.field_type]}</span>
                       {field.field_type === 'dropdown' && field.options && (
                         <span className="text-xs">
@@ -225,7 +225,7 @@ export function CustomFieldList({ fields: initialFields }: CustomFieldListProps)
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setEditingId(field.id)}
-                    className="px-3 py-1.5 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="px-3 py-1.5 text-sm text-primary hover:bg-primary/5 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     Edit
                   </button>
@@ -245,11 +245,11 @@ export function CustomFieldList({ fields: initialFields }: CustomFieldListProps)
       {/* Delete Confirmation Dialog */}
       {deletingId && deletingField && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-md w-full p-6">
-            <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">
+          <div className="bg-card rounded-lg shadow-xl max-w-md w-full p-6">
+            <h3 className="text-lg font-semibold text-foreground mb-2">
               Delete Custom Field
             </h3>
-            <p className="text-zinc-600 dark:text-zinc-400 mb-4">
+            <p className="text-muted-foreground mb-4">
               Are you sure you want to delete <strong>{deletingField.name}</strong>?
               {deletingField.required && (
                 <span className="block mt-2 text-yellow-600 dark:text-yellow-400">
@@ -261,7 +261,7 @@ export function CustomFieldList({ fields: initialFields }: CustomFieldListProps)
               <button
                 onClick={() => setDeletingId(null)}
                 disabled={isLoading}
-                className="px-4 py-2 bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-md hover:bg-zinc-300 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 disabled:opacity-50"
+                className="px-4 py-2 bg-muted text-foreground rounded-md hover:bg-muted/80 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50"
               >
                 Cancel
               </button>

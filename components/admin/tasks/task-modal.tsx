@@ -593,7 +593,7 @@ export function TaskModal({
                     {customFields.map((field) => (
                       <label
                         key={field.id}
-                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer"
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted cursor-pointer"
                       >
                         <Checkbox
                           checked={assignedFieldIds.includes(field.id)}
@@ -725,7 +725,7 @@ export function TaskModal({
                     {checklists.map((checklist) => (
                       <label
                         key={checklist.id}
-                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer"
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted cursor-pointer"
                       >
                         <Checkbox
                           checked={selectedChecklistIds.includes(checklist.id)}
