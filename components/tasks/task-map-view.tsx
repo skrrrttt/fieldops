@@ -1,8 +1,8 @@
 'use client';
 
-import { useRef, useState, useCallback, useMemo } from 'react';
+import { useRef, useState, useCallback, useMemo, useEffect } from 'react';
 import Map, { Source, Layer, GeolocateControl, type MapRef } from 'react-map-gl/mapbox';
-import { ArrowLeft, CheckCircle2, Circle, X } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Circle, X, MapPin } from 'lucide-react';
 import Link from 'next/link';
 import type { TaskSegmentAssignmentWithSegment, StripeType } from '@/lib/maps/types';
 import { STRIPE_TYPE_CONFIG } from '@/lib/maps/types';
@@ -21,8 +21,11 @@ interface TaskMapViewProps {
 
 export function TaskMapView({ taskId, assignments, isOnline, onToggleComplete }: TaskMapViewProps) {
   const mapRef = useRef<MapRef>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const geolocateRef = useRef<any>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isToggling, setIsToggling] = useState(false);
+  const [placeName, setPlaceName] = useState<string | null>(null);
 
   const selectedAssignment = assignments.find(a => a.id === selectedId) ?? null;
 
@@ -58,6 +61,23 @@ export function TaskMapView({ taskId, assignments, isOnline, onToggleComplete }:
       geometry: a.segment.geometry,
     })),
   };
+
+  // Reverse geocode the center of segments to get city/town name
+  useEffect(() => {
+    if (!bounds || !MAPBOX_TOKEN) return;
+    const centerLng = (bounds[0][0] + bounds[1][0]) / 2;
+    const centerLat = (bounds[0][1] + bounds[1][1]) / 2;
+    fetch(
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${centerLng},${centerLat}.json?types=place,locality,neighborhood&limit=1&access_token=${MAPBOX_TOKEN}`
+    )
+      .then(r => r.json())
+      .then(data => {
+        if (data.features?.[0]) {
+          setPlaceName(data.features[0].place_name || data.features[0].text);
+        }
+      })
+      .catch(() => {});
+  }, [bounds]);
 
   const completedCount = assignments.filter(a => a.is_complete).length;
   const totalCount = assignments.length;
@@ -107,6 +127,10 @@ export function TaskMapView({ taskId, assignments, isOnline, onToggleComplete }:
         }}
         mapStyle="mapbox://styles/mapbox/satellite-v9"
         onClick={handleMapClick}
+        onLoad={() => {
+          // Auto-trigger geolocation after map loads
+          setTimeout(() => geolocateRef.current?.trigger(), 500);
+        }}
         interactiveLayerIds={['task-segments-hit', 'task-segments-line']}
       >
         <Source id="task-segments" type="geojson" data={geojson}>
@@ -201,6 +225,7 @@ export function TaskMapView({ taskId, assignments, isOnline, onToggleComplete }:
         </Source>
 
         <GeolocateControl
+          ref={geolocateRef}
           positionOptions={{ enableHighAccuracy: true }}
           trackUserLocation
           showUserHeading
@@ -208,13 +233,23 @@ export function TaskMapView({ taskId, assignments, isOnline, onToggleComplete }:
         />
       </Map>
 
-      {/* Back button */}
-      <Link
-        href={`/tasks/${taskId}`}
-        className="absolute top-4 left-4 p-2 bg-card/95 backdrop-blur rounded-lg shadow-lg border border-border text-foreground"
-      >
-        <ArrowLeft className="w-5 h-5" />
-      </Link>
+      {/* Back button + place name */}
+      <div className="absolute top-4 left-4 flex items-center gap-2">
+        <Link
+          href={`/tasks/${taskId}`}
+          className="p-2 bg-card/95 backdrop-blur rounded-lg shadow-lg border border-border text-foreground"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </Link>
+        {placeName && (
+          <div className="flex items-center gap-1.5 px-3 py-2 bg-card/95 backdrop-blur rounded-lg shadow-lg border border-border">
+            <MapPin className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+            <span className="text-sm font-medium text-foreground truncate max-w-[200px]">
+              {placeName}
+            </span>
+          </div>
+        )}
+      </div>
 
       {/* Progress bar */}
       <div className="absolute bottom-0 left-0 right-0 bg-card/95 backdrop-blur border-t border-border safe-area-pb">
