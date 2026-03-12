@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState, useCallback, useMemo } from 'react';
-import Map, { Source, Layer, type MapRef } from 'react-map-gl/mapbox';
+import Map, { Source, Layer, GeolocateControl, type MapRef } from 'react-map-gl/mapbox';
 import { ArrowLeft, CheckCircle2, Circle, X } from 'lucide-react';
 import Link from 'next/link';
 import type { TaskSegmentAssignmentWithSegment, StripeType } from '@/lib/maps/types';
@@ -64,7 +64,7 @@ export function TaskMapView({ taskId, assignments, isOnline, onToggleComplete }:
 
   const handleMapClick = useCallback((e: mapboxgl.MapMouseEvent) => {
     const features = mapRef.current?.queryRenderedFeatures(e.point, {
-      layers: ['task-segments-line'],
+      layers: ['task-segments-hit', 'task-segments-line'],
     });
     if (features && features.length > 0) {
       setSelectedId(features[0].properties?.id ?? null);
@@ -177,6 +177,13 @@ export function TaskMapView({ taskId, assignments, isOnline, onToggleComplete }:
             }}
           />
         </Source>
+
+        <GeolocateControl
+          positionOptions={{ enableHighAccuracy: true }}
+          trackUserLocation
+          showUserHeading
+          position="top-right"
+        />
       </Map>
 
       {/* Back button */}
