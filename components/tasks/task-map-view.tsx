@@ -153,6 +153,8 @@ export function TaskMapView({ taskId, assignments, isOnline, onToggleComplete }:
           zoom: 15,
         }}
         mapStyle="mapbox://styles/mapbox/satellite-streets-v12"
+        attributionControl={false}
+        logoPosition="bottom-right"
         onClick={handleMapClick}
         onLoad={() => {
           // Auto-trigger geolocation after map loads
@@ -257,6 +259,7 @@ export function TaskMapView({ taskId, assignments, isOnline, onToggleComplete }:
           trackUserLocation
           showUserHeading
           position="top-right"
+          style={{ display: 'none' }}
         />
       </Map>
 
@@ -289,7 +292,15 @@ export function TaskMapView({ taskId, assignments, isOnline, onToggleComplete }:
       {showList && (
         <div className="absolute inset-0 z-20 bg-background/95 backdrop-blur overflow-y-auto pb-24">
           <div className="pt-16 px-4">
-            <h2 className="text-lg font-semibold text-foreground mb-1">Segments</h2>
+            <div className="flex items-center justify-between mb-1">
+              <h2 className="text-lg font-semibold text-foreground">Segments</h2>
+              <button
+                onClick={() => setShowList(false)}
+                className="p-2 -mr-1 rounded-lg hover:bg-muted text-muted-foreground"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
             <p className="text-sm text-muted-foreground mb-4">
               {totalCount} segments &middot; {formatLength(
                 assignments.reduce((sum, a) => sum + segmentLengthFeet(a.segment.geometry.coordinates), 0)
