@@ -411,17 +411,17 @@ export function MapEditor({
                 '\n', {},
                 ['get', 'type_label'], { 'font-scale': 0.8, 'text-font': ['literal', ['DIN Pro Medium', 'Arial Unicode MS Regular']], 'text-color': ['get', 'color'] },
               ],
-              'text-size': ['interpolate', ['linear'], ['zoom'], 11, 10, 14, 12, 18, 14],
+              'text-size': ['interpolate', ['linear'], ['zoom'], 11, 14, 14, 18, 18, 22],
               'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
-              'text-radial-offset': ['interpolate', ['linear'], ['zoom'], 11, 0.8, 16, 1.2],
+              'text-radial-offset': ['interpolate', ['linear'], ['zoom'], 11, 1.0, 16, 1.5],
               'text-justify': 'auto',
               'text-allow-overlap': false,
-              'text-padding': 8,
+              'text-padding': 12,
             }}
             paint={{
               'text-color': '#FFFFFF',
-              'text-halo-color': 'rgba(0,0,0,0.85)',
-              'text-halo-width': 2.5,
+              'text-halo-color': 'rgba(0,0,0,0.9)',
+              'text-halo-width': 3,
             }}
           />
         </Source>
