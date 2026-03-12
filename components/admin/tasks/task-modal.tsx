@@ -6,6 +6,8 @@ import type { TaskWithRelations } from '@/lib/tasks/actions';
 import type { Status, Division, User, CustomFieldDefinition, ChecklistWithItems, JobWithCustomer, Customer } from '@/lib/database.types';
 import { createTask, updateTask, deleteTask } from '@/lib/tasks/actions';
 import { syncTaskChecklists } from '@/lib/checklists/actions';
+import { assignAllMapSegmentsToTask, removeSegmentsFromTask, getTaskStripingMapId } from '@/lib/maps/actions';
+import type { StripingMap } from '@/lib/maps/types';
 import {
   Dialog,
   DialogContent,
@@ -37,7 +39,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Separator } from '@/components/ui/separator';
-import { Loader2, Trash2 } from 'lucide-react';
+import { Loader2, Trash2, Map } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TaskMediaPanel } from './task-media-panel';
 import { JobSearch } from './job-search';
@@ -56,6 +58,7 @@ interface TaskModalProps {
   customers?: Customer[];
   checklists?: ChecklistWithItems[];
   initialChecklistIds?: string[];
+  stripingMaps?: StripingMap[];
 }
 
 export function TaskModal({
@@ -71,6 +74,7 @@ export function TaskModal({
   customers = [],
   checklists = [],
   initialChecklistIds = [],
+  stripingMaps = [],
 }: TaskModalProps) {
   const router = useRouter();
   const [, startTransition] = useTransition();
@@ -81,6 +85,8 @@ export function TaskModal({
   const [customFieldErrors, setCustomFieldErrors] = useState<Record<string, string>>({});
   const [selectedJob, setSelectedJob] = useState<JobWithCustomer | null>(null);
   const [showQuickAddJob, setShowQuickAddJob] = useState(false);
+  const [selectedStripingMapId, setSelectedStripingMapId] = useState<string>('none');
+  const [initialStripingMapId, setInitialStripingMapId] = useState<string>('none');
 
   const isEditing = !!task;
 
@@ -226,6 +232,17 @@ export function TaskModal({
     }
     // Initialize selected checklists
     setSelectedChecklistIds(task ? initialChecklistIds : []);
+    // Load striping map assignment for existing task
+    if (task && isOpen) {
+      getTaskStripingMapId(task.id).then((mapId) => {
+        const value = mapId || 'none';
+        setSelectedStripingMapId(value);
+        setInitialStripingMapId(value);
+      });
+    } else {
+      setSelectedStripingMapId('none');
+      setInitialStripingMapId('none');
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [task, isOpen, defaultStatusId, statuses, customFields, initialChecklistIds]);
 
@@ -331,8 +348,19 @@ export function TaskModal({
         const taskId = result.data.id;
         const syncResult = await syncTaskChecklists(taskId, selectedChecklistIds);
         if (!syncResult.success) {
-          // Log error but don't fail the whole operation
           console.error('Failed to sync checklists:', syncResult.error);
+        }
+      }
+
+      // Sync striping map assignment
+      if (result.data && selectedStripingMapId !== initialStripingMapId) {
+        const taskId = result.data.id;
+        if (selectedStripingMapId === 'none') {
+          // Remove all segment assignments
+          await removeSegmentsFromTask(taskId);
+        } else {
+          // Assign all segments from the selected map
+          await assignAllMapSegmentsToTask(taskId, selectedStripingMapId);
         }
       }
 
@@ -580,6 +608,36 @@ export function TaskModal({
                   </div>
                 </div>
               </div>
+
+              {/* Striping Map section */}
+              {stripingMaps.length > 0 && (
+                <div className="pt-4">
+                  <Separator className="mb-4" />
+                  <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
+                    <Map className="w-4 h-4" />
+                    Striping Map
+                  </h3>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Link a striping map to assign all its segments to this task.
+                  </p>
+                  <Select
+                    value={selectedStripingMapId}
+                    onValueChange={setSelectedStripingMapId}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="No striping map" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">None</SelectItem>
+                      {stripingMaps.map((m) => (
+                        <SelectItem key={m.id} value={m.id}>
+                          {m.name}{m.version_label ? ` (${m.version_label})` : ''}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               {/* Custom Fields Assignment section */}
               {customFields.length > 0 && (

@@ -16,6 +16,7 @@ interface MapEditorProps {
   onAddSegment: (geometry: GeoJSONLineString, stripeType: StripeType) => void;
   center?: [number, number];
   zoom: number;
+  onMapRef?: (ref: MapRef | null) => void;
 }
 
 export function MapEditor({
@@ -25,6 +26,7 @@ export function MapEditor({
   onAddSegment,
   center,
   zoom,
+  onMapRef,
 }: MapEditorProps) {
   const mapRef = useRef<MapRef>(null);
   const [drawMode, setDrawMode] = useState<DrawMode>('select');
@@ -154,7 +156,10 @@ export function MapEditor({
   return (
     <div className="relative w-full h-full">
       <Map
-        ref={mapRef}
+        ref={(ref) => {
+          (mapRef as React.MutableRefObject<MapRef | null>).current = ref;
+          onMapRef?.(ref);
+        }}
         mapboxAccessToken={MAPBOX_TOKEN}
         initialViewState={{
           longitude: center?.[0] ?? -98.5795,

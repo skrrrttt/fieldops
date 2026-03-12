@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useCallback, useRef, useTransition } from 'react';
 import type { TaskWithRelations } from '@/lib/tasks/actions';
 import type { Status, Division, User, CustomFieldDefinition, ChecklistWithItems, JobWithCustomer, Customer } from '@/lib/database.types';
+import type { StripingMap } from '@/lib/maps/types';
 import { TaskModal } from './task-modal';
 import { BulkActionBar } from './bulk-action-bar';
 import { getTaskChecklistIds } from '@/lib/checklists/actions';
@@ -30,6 +31,7 @@ interface TaskTableProps {
   jobs: JobWithCustomer[];
   customers: Customer[];
   checklists: ChecklistWithItems[];
+  stripingMaps: StripingMap[];
 }
 
 export function TaskTable({
@@ -49,6 +51,7 @@ export function TaskTable({
   jobs,
   customers,
   checklists,
+  stripingMaps,
 }: TaskTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -281,6 +284,7 @@ export function TaskTable({
         customers={customers}
         checklists={checklists}
         initialChecklistIds={editingTaskChecklistIds}
+        stripingMaps={stripingMaps}
       />
 
       {/* Header with Create Button and Export */}

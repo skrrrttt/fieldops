@@ -427,6 +427,70 @@ export async function taskHasSegments(taskId: string): Promise<boolean> {
 }
 
 /**
+ * Assign ALL segments from a map to a task (removes existing assignments first)
+ */
+export async function assignAllMapSegmentsToTask(
+  taskId: string,
+  mapId: string
+): Promise<ActionResult> {
+  await requireAdmin();
+  const supabase = await createClient();
+
+  // Get all segment IDs for this map
+  const { data: segments, error: segError } = await supabase
+    .from('striping_segments')
+    .select('id')
+    .eq('map_id', mapId);
+
+  if (segError || !segments || segments.length === 0) {
+    return { success: false, error: 'No segments found for this map' };
+  }
+
+  // Remove existing segment assignments for this task
+  await supabase
+    .from('task_segment_assignments')
+    .delete()
+    .eq('task_id', taskId);
+
+  // Assign all segments from the map
+  const rows = (segments as Array<{ id: string }>).map(seg => ({
+    task_id: taskId,
+    segment_id: seg.id,
+    is_complete: false,
+  }));
+
+  const { error } = await supabase
+    .from('task_segment_assignments')
+    .insert(rows as never);
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath(`/tasks/${taskId}`);
+  return { success: true };
+}
+
+/**
+ * Get the striping map ID linked to a task (via segment assignments)
+ */
+export async function getTaskStripingMapId(taskId: string): Promise<string | null> {
+  await requireAuth();
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('task_segment_assignments')
+    .select('segment:striping_segments(map_id)')
+    .eq('task_id', taskId)
+    .limit(1);
+
+  if (error || !data || data.length === 0) return null;
+
+  const row = data[0] as { segment: { map_id: string } | null };
+  return row.segment?.map_id ?? null;
+}
+
+/**
  * Get all tasks for segment assignment dialog
  */
 export async function getTasksForAssignment(): Promise<Array<{ id: string; title: string }>> {

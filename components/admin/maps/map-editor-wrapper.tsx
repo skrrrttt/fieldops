@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Save } from 'lucide-react';
 import Link from 'next/link';
+import type { MapRef } from 'react-map-gl/mapbox';
 import type { StripingMapWithSegments, StripingSegment, StripeType, GeoJSONLineString, SegmentAttributes } from '@/lib/maps/types';
 import { updateStripingMap, upsertSegments } from '@/lib/maps/actions';
 import { MapEditor } from './map-editor';
@@ -23,6 +24,7 @@ export function MapEditorWrapper({ map, tasks }: MapEditorWrapperProps) {
   const [hasChanges, setHasChanges] = useState(false);
   const [showAssignment, setShowAssignment] = useState(false);
   const [mapName, setMapName] = useState(map.name);
+  const mapInstanceRef = useRef<MapRef | null>(null);
 
   const selectedSegment = segments.find(s => s.id === selectedSegmentId) ?? null;
 
@@ -59,9 +61,21 @@ export function MapEditorWrapper({ map, tasks }: MapEditorWrapperProps) {
   const handleSave = async () => {
     setIsSaving(true);
 
-    // Update map name if changed
+    // Capture current viewport from map
+    const mapUpdate: Parameters<typeof updateStripingMap>[1] = {};
     if (mapName !== map.name) {
-      await updateStripingMap(map.id, { name: mapName });
+      mapUpdate.name = mapName;
+    }
+    const mapInstance = mapInstanceRef.current;
+    if (mapInstance) {
+      const center = mapInstance.getCenter();
+      const zoom = mapInstance.getZoom();
+      mapUpdate.center_lng = center.lng;
+      mapUpdate.center_lat = center.lat;
+      mapUpdate.zoom = zoom;
+    }
+    if (Object.keys(mapUpdate).length > 0) {
+      await updateStripingMap(map.id, mapUpdate);
     }
 
     // Save segments
@@ -136,6 +150,7 @@ export function MapEditorWrapper({ map, tasks }: MapEditorWrapperProps) {
             onAddSegment={handleAddSegment}
             center={map.center_lng && map.center_lat ? [map.center_lng, map.center_lat] : undefined}
             zoom={map.zoom ?? 17}
+            onMapRef={(ref) => { mapInstanceRef.current = ref; }}
           />
         </div>
         <SegmentPanel
