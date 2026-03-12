@@ -176,10 +176,6 @@ export function TaskMapView({ taskId, assignments, isOnline, onToggleComplete }:
         mapStyle="mapbox://styles/mapbox/satellite-streets-v12"
         attributionControl={false}
         logoPosition="bottom-right"
-        scrollZoom={false}
-        touchZoomRotate={false}
-        doubleClickZoom={false}
-        boxZoom={false}
         onClick={handleMapClick}
         onLoad={() => {
           // Auto-trigger geolocation after map loads
@@ -438,71 +434,98 @@ export function TaskMapView({ taskId, assignments, isOnline, onToggleComplete }:
 
       {/* Progress bar */}
       <div className="absolute bottom-0 left-0 right-0 bg-card/95 backdrop-blur border-t border-border safe-area-pb">
-        {/* Selected segment bottom sheet */}
-        {selectedAssignment && (
-          <div className="p-4 border-b border-border">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex-1 min-w-0">
-                {selectedAssignment.segment.name && (
-                  <p className="font-medium text-foreground">
-                    {selectedAssignment.segment.name}
-                  </p>
-                )}
-                <p className={`${selectedAssignment.segment.name ? 'text-sm text-muted-foreground' : 'font-medium text-foreground'}`}>
-                  {STRIPE_TYPE_CONFIG[selectedAssignment.segment.stripe_type as StripeType]?.label ?? selectedAssignment.segment.stripe_type}
-                </p>
-                {selectedAssignment.segment.notes && (
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {selectedAssignment.segment.notes}
-                  </p>
-                )}
-                {selectedAssignment.segment.attributes && (() => {
-                  const attrs = selectedAssignment.segment.attributes as Record<string, unknown>;
-                  return (
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {attrs.width_inches ? (
-                        <span className="text-xs bg-muted px-2 py-0.5 rounded">
-                          {String(attrs.width_inches)}&quot; wide
-                        </span>
-                      ) : null}
-                      {attrs.reflective ? (
-                        <span className="text-xs bg-muted px-2 py-0.5 rounded">Reflective</span>
-                      ) : null}
-                      {attrs.paint_type ? (
-                        <span className="text-xs bg-muted px-2 py-0.5 rounded">
-                          {String(attrs.paint_type)}
-                        </span>
-                      ) : null}
-                    </div>
-                  );
-                })()}
-              </div>
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <button
-                  onClick={handleToggle}
-                  disabled={isToggling}
-                  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors min-h-[44px] ${
-                    selectedAssignment.is_complete
-                      ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
-                      : 'bg-primary text-primary-foreground'
-                  }`}
-                >
-                  {selectedAssignment.is_complete ? (
-                    <><CheckCircle2 className="w-4 h-4" /> Done</>
-                  ) : (
-                    <><Circle className="w-4 h-4" /> Mark Done</>
-                  )}
-                </button>
+        {/* Selected segment bottom sheet — large and clear */}
+        {selectedAssignment && (() => {
+          const config = STRIPE_TYPE_CONFIG[selectedAssignment.segment.stripe_type as StripeType];
+          const attrs = selectedAssignment.segment.attributes as Record<string, unknown> | null;
+          const length = segmentLengthFeet(selectedAssignment.segment.geometry.coordinates);
+          return (
+            <div className="px-5 pt-5 pb-4 border-b border-border">
+              {/* Header row with close button */}
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-xl font-bold text-foreground leading-tight">
+                    {selectedAssignment.segment.name || 'Unnamed Segment'}
+                  </h3>
+                </div>
                 <button
                   onClick={() => setSelectedId(null)}
-                  className="p-2 rounded-lg hover:bg-muted text-muted-foreground"
+                  className="p-2 -mt-1 -mr-1 rounded-lg hover:bg-muted text-muted-foreground"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-5 h-5" />
                 </button>
               </div>
+
+              {/* Color + type row */}
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-2">
+                  {selectedAssignment.segment.stripe_type === 'yellow_and_white' ? (
+                    <div className="flex flex-col gap-0.5">
+                      <span className="w-10 h-2 rounded-full" style={{ backgroundColor: '#FFD600' }} />
+                      <span className="w-10 h-2 rounded-full border border-gray-300" style={{ backgroundColor: '#FFFFFF' }} />
+                    </div>
+                  ) : (
+                    <span
+                      className="w-10 h-3 rounded-full"
+                      style={{
+                        backgroundColor: config?.color ?? '#888',
+                        border: config?.color === '#FFFFFF' ? '2px solid #d1d5db' : undefined,
+                      }}
+                    />
+                  )}
+                  <span className="text-base font-semibold text-foreground">
+                    {config?.label ?? selectedAssignment.segment.stripe_type}
+                  </span>
+                </div>
+                <span className="text-base text-muted-foreground">&middot;</span>
+                <span className="text-base font-medium text-muted-foreground">
+                  {formatLength(length)}
+                </span>
+              </div>
+
+              {/* Attributes */}
+              {(attrs?.width_inches || attrs?.reflective || attrs?.paint_type || selectedAssignment.segment.notes) && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {attrs?.width_inches ? (
+                    <span className="text-sm bg-muted px-3 py-1 rounded-lg font-medium">
+                      {String(attrs.width_inches)}&quot; wide
+                    </span>
+                  ) : null}
+                  {attrs?.reflective ? (
+                    <span className="text-sm bg-muted px-3 py-1 rounded-lg font-medium">Reflective</span>
+                  ) : null}
+                  {attrs?.paint_type ? (
+                    <span className="text-sm bg-muted px-3 py-1 rounded-lg font-medium">
+                      {String(attrs.paint_type)}
+                    </span>
+                  ) : null}
+                  {selectedAssignment.segment.notes && (
+                    <p className="w-full text-sm text-muted-foreground mt-1">
+                      {selectedAssignment.segment.notes}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Large action button */}
+              <button
+                onClick={handleToggle}
+                disabled={isToggling}
+                className={`w-full flex items-center justify-center gap-3 px-6 py-4 text-lg font-semibold rounded-xl transition-colors ${
+                  selectedAssignment.is_complete
+                    ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-2 border-green-300 dark:border-green-800'
+                    : 'bg-primary text-primary-foreground'
+                }`}
+              >
+                {selectedAssignment.is_complete ? (
+                  <><CheckCircle2 className="w-6 h-6" /> Completed</>
+                ) : (
+                  <><Circle className="w-6 h-6" /> Mark as Complete</>
+                )}
+              </button>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* Progress summary */}
         <div className="px-4 py-3">
