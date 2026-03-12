@@ -2,7 +2,7 @@
 
 import { useRef, useState, useCallback, useMemo, useEffect } from 'react';
 import Map, { Source, Layer, GeolocateControl, type MapRef } from 'react-map-gl/mapbox';
-import { ArrowLeft, CheckCircle2, Circle, X, MapPin } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Circle, X, MapPin, List, Map as MapIcon } from 'lucide-react';
 import Link from 'next/link';
 import type { TaskSegmentAssignmentWithSegment, StripeType } from '@/lib/maps/types';
 import { STRIPE_TYPE_CONFIG } from '@/lib/maps/types';
@@ -11,6 +11,32 @@ import { queueSegmentCompleteMutation } from '@/lib/offline/mutation-queue';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || '';
+
+/** Haversine distance between two [lng, lat] coords, returns feet */
+function segmentLengthFeet(coords: [number, number][]): number {
+  let totalMeters = 0;
+  for (let i = 1; i < coords.length; i++) {
+    const [lng1, lat1] = coords[i - 1];
+    const [lng2, lat2] = coords[i];
+    const R = 6371000; // earth radius in meters
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLng = (lng2 - lng1) * (Math.PI / 180);
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(lat1 * (Math.PI / 180)) *
+        Math.cos(lat2 * (Math.PI / 180)) *
+        Math.sin(dLng / 2) ** 2;
+    totalMeters += R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+  return totalMeters * 3.28084;
+}
+
+function formatLength(feet: number): string {
+  if (feet >= 5280) {
+    return `${(feet / 5280).toFixed(2)} mi`;
+  }
+  return `${Math.round(feet).toLocaleString()} ft`;
+}
 
 interface TaskMapViewProps {
   taskId: string;
@@ -26,6 +52,7 @@ export function TaskMapView({ taskId, assignments, isOnline, onToggleComplete }:
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isToggling, setIsToggling] = useState(false);
   const [placeName, setPlaceName] = useState<string | null>(null);
+  const [showList, setShowList] = useState(false);
 
   const selectedAssignment = assignments.find(a => a.id === selectedId) ?? null;
 
@@ -233,7 +260,7 @@ export function TaskMapView({ taskId, assignments, isOnline, onToggleComplete }:
         />
       </Map>
 
-      {/* Back button + place name */}
+      {/* Back button + place name + list toggle */}
       <div className="absolute top-4 left-4 flex items-center gap-2">
         <Link
           href={`/tasks/${taskId}`}
@@ -249,7 +276,91 @@ export function TaskMapView({ taskId, assignments, isOnline, onToggleComplete }:
             </span>
           </div>
         )}
+        <button
+          onClick={() => setShowList(!showList)}
+          className="p-2 bg-card/95 backdrop-blur rounded-lg shadow-lg border border-border text-foreground"
+          title={showList ? 'Show map' : 'Show segment list'}
+        >
+          {showList ? <MapIcon className="w-5 h-5" /> : <List className="w-5 h-5" />}
+        </button>
       </div>
+
+      {/* Segment list panel */}
+      {showList && (
+        <div className="absolute inset-0 z-20 bg-background/95 backdrop-blur overflow-y-auto pb-24">
+          <div className="pt-16 px-4">
+            <h2 className="text-lg font-semibold text-foreground mb-1">Segments</h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              {totalCount} segments &middot; {formatLength(
+                assignments.reduce((sum, a) => sum + segmentLengthFeet(a.segment.geometry.coordinates), 0)
+              )} total
+            </p>
+            <div className="space-y-2">
+              {assignments.map((a) => {
+                const length = segmentLengthFeet(a.segment.geometry.coordinates);
+                const config = STRIPE_TYPE_CONFIG[a.segment.stripe_type as StripeType];
+                return (
+                  <button
+                    key={a.id}
+                    onClick={() => {
+                      setSelectedId(a.id);
+                      setShowList(false);
+                      // Fly to this segment
+                      const coords = a.segment.geometry.coordinates;
+                      const midIdx = Math.floor(coords.length / 2);
+                      mapRef.current?.flyTo({
+                        center: coords[midIdx],
+                        zoom: 17,
+                        duration: 1000,
+                      });
+                    }}
+                    className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-colors text-left ${
+                      a.is_complete
+                        ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-900/40'
+                        : 'bg-card border-border hover:bg-muted/50'
+                    }`}
+                  >
+                    {/* Color indicator */}
+                    <div className="flex flex-col gap-1 flex-shrink-0">
+                      {a.segment.stripe_type === 'yellow_and_white' ? (
+                        <>
+                          <span className="w-8 h-1.5 rounded-full" style={{ backgroundColor: '#FFD600' }} />
+                          <span className="w-8 h-1.5 rounded-full" style={{ backgroundColor: '#FFFFFF', border: '1px solid #e5e7eb' }} />
+                        </>
+                      ) : (
+                        <span
+                          className="w-8 h-1.5 rounded-full"
+                          style={{
+                            backgroundColor: config?.color ?? '#888',
+                            border: config?.color === '#FFFFFF' ? '1px solid #e5e7eb' : undefined,
+                          }}
+                        />
+                      )}
+                    </div>
+
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">
+                        {a.segment.name || 'Unnamed segment'}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {config?.label} &middot; {formatLength(length)}
+                      </p>
+                    </div>
+
+                    {/* Status */}
+                    {a.is_complete ? (
+                      <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
+                    ) : (
+                      <Circle className="w-5 h-5 text-muted-foreground/40 flex-shrink-0" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Progress bar */}
       <div className="absolute bottom-0 left-0 right-0 bg-card/95 backdrop-blur border-t border-border safe-area-pb">
