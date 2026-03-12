@@ -267,6 +267,7 @@ export async function processPhotoInContext(options: {
   timestamp?: Date;
   gpsCoordinates?: { lat: number; lng: number } | null;
   useOffscreen: boolean;
+  mimeType?: string;
 }): Promise<ProcessedPhoto> {
   const {
     buffer,
@@ -275,19 +276,25 @@ export async function processPhotoInContext(options: {
     timestamp = new Date(),
     gpsCoordinates = null,
     useOffscreen,
+    mimeType,
   } = options;
 
   // Read EXIF orientation
   const orientation = getExifOrientation(buffer);
 
+  // Use MIME type hint when creating Blobs from raw buffers — critical for
+  // iOS Safari HEIC decoding where the browser needs the type to select the
+  // correct decoder.
+  const blobType = mimeType || 'image/jpeg';
+
   try {
     if (useOffscreen) {
       return await processWithOffscreenCanvas(
-        buffer, orientation, maxSize, quality, timestamp, gpsCoordinates
+        buffer, orientation, maxSize, quality, timestamp, gpsCoordinates, blobType
       );
     } else {
       return await processWithRegularCanvas(
-        buffer, orientation, maxSize, quality, timestamp, gpsCoordinates
+        buffer, orientation, maxSize, quality, timestamp, gpsCoordinates, blobType
       );
     }
   } catch (error) {
@@ -298,7 +305,7 @@ export async function processPhotoInContext(options: {
     let width = 0;
     let height = 0;
     try {
-      const bitmap = await createImageBitmap(new Blob([buffer]));
+      const bitmap = await createImageBitmap(new Blob([buffer], { type: blobType }));
       width = bitmap.width;
       height = bitmap.height;
       bitmap.close();
@@ -307,7 +314,7 @@ export async function processPhotoInContext(options: {
     }
 
     return {
-      blob: new Blob([buffer], { type: 'image/jpeg' }),
+      blob: new Blob([buffer], { type: blobType }),
       width,
       height,
       timestamp: timestamp.toISOString(),
@@ -326,9 +333,10 @@ async function processWithOffscreenCanvas(
   maxSize: number,
   quality: number,
   timestamp: Date,
-  gpsCoordinates: { lat: number; lng: number } | null
+  gpsCoordinates: { lat: number; lng: number } | null,
+  blobType: string = 'image/jpeg'
 ): Promise<ProcessedPhoto> {
-  const bitmap = await createImageBitmap(new Blob([buffer]));
+  const bitmap = await createImageBitmap(new Blob([buffer], { type: blobType }));
 
   const isRotated = orientation >= 5 && orientation <= 8;
   const sourceWidth = isRotated ? bitmap.height : bitmap.width;
@@ -383,9 +391,10 @@ async function processWithRegularCanvas(
   maxSize: number,
   quality: number,
   timestamp: Date,
-  gpsCoordinates: { lat: number; lng: number } | null
+  gpsCoordinates: { lat: number; lng: number } | null,
+  blobType: string = 'image/jpeg'
 ): Promise<ProcessedPhoto> {
-  const blob = new Blob([buffer]);
+  const blob = new Blob([buffer], { type: blobType });
   const objectUrl = URL.createObjectURL(blob);
 
   return new Promise<ProcessedPhoto>((resolve, reject) => {

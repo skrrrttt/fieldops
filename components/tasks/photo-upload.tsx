@@ -230,6 +230,14 @@ export function PhotoUpload({ taskId, onUploadComplete }: PhotoUploadProps) {
         toast.loading(`Uploading photo ${i + 1} of ${total}...`, { id: 'photo-processing' });
         setUploadProgress(prev => ({ ...prev, [photo.id]: 20 }));
 
+        // Validate processed blob is not empty
+        if (!processed.blob || processed.blob.size === 0) {
+          console.error('Photo processing returned empty blob');
+          failCount++;
+          setUploadProgress(prev => ({ ...prev, [photo.id]: -1 }));
+          continue;
+        }
+
         // Generate unique file path (always use .jpg since we convert to JPEG)
         const fileName = `${taskId}/${Date.now()}-${Math.random().toString(36).substr(2, 9)}.jpg`;
 

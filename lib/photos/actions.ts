@@ -268,3 +268,24 @@ export async function deletePhoto(photoId: string): Promise<ActionResult> {
 
   return { success: true };
 }
+
+/**
+ * Delete orphaned storage files by path (admin only)
+ */
+export async function deleteStorageFiles(paths: string[]): Promise<ActionResult> {
+  const supabase = await createClient();
+  const user = await getCurrentUser();
+
+  if (!user || user.role !== 'admin') {
+    return { success: false, error: 'Not authorized' };
+  }
+
+  const { error } = await supabase.storage.from('photos').remove(paths);
+
+  if (error) {
+    console.error('Error deleting storage files:', error);
+    return { success: false, error: 'Failed to delete storage files' };
+  }
+
+  return { success: true };
+}

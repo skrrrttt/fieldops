@@ -14,6 +14,7 @@ declare const self: DedicatedWorkerGlobalScope;
 interface WorkerRequest {
   id: string;
   buffer: ArrayBuffer;
+  mimeType?: string;
   options: {
     maxSize?: number;
     quality?: number;
@@ -37,7 +38,7 @@ interface WorkerResponse {
 }
 
 self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
-  const { id, buffer, options } = event.data;
+  const { id, buffer, mimeType, options } = event.data;
 
   try {
     const result = await processPhotoInContext({
@@ -47,6 +48,7 @@ self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
       timestamp: new Date(options.timestamp),
       gpsCoordinates: options.gpsCoordinates,
       useOffscreen: true,
+      mimeType,
     });
 
     // Convert result blob to ArrayBuffer for zero-copy transfer

@@ -4,7 +4,6 @@
  */
 
 import Link from 'next/link';
-import Image from 'next/image';
 import type { DashboardStats } from '@/lib/dashboard/actions';
 import { formatDistanceToNow } from '@/lib/utils/date';
 import {
@@ -258,13 +257,17 @@ export function DashboardContent({ stats, photoUrls }: DashboardContentProps) {
                   href={`/admin/media?photo=${upload.id}`}
                   className="group relative aspect-square rounded-xl overflow-hidden bg-secondary"
                 >
-                  <Image
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src={publicUrl}
                     alt={`Photo from ${upload.task_title}`}
-                    fill
-                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 12.5vw"
-                    className="object-cover transition-transform duration-300 group-hover:scale-110"
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    loading="lazy"
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
                   />
+                  <div className="absolute inset-0 flex items-center justify-center text-muted-foreground pointer-events-none">
+                    <ImageIcon className="w-6 h-6 opacity-30" />
+                  </div>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     <div className="absolute bottom-3 left-3 right-3">
                       <p className="text-xs text-white font-medium truncate">

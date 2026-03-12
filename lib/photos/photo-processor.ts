@@ -75,7 +75,8 @@ let _requestCounter = 0;
 function processViaWorker(
   worker: Worker,
   buffer: ArrayBuffer,
-  options: PhotoProcessingOptions
+  options: PhotoProcessingOptions,
+  mimeType?: string
 ): Promise<ProcessedPhoto> {
   return new Promise((resolve, reject) => {
     const id = String(++_requestCounter);
@@ -111,6 +112,7 @@ function processViaWorker(
     worker.postMessage({
       id,
       buffer,
+      mimeType,
       options: {
         maxSize: options.maxSize,
         quality: options.quality,
@@ -127,7 +129,8 @@ function processViaWorker(
 
 async function processOnMainThread(
   buffer: ArrayBuffer,
-  options: PhotoProcessingOptions
+  options: PhotoProcessingOptions,
+  mimeType?: string
 ): Promise<ProcessedPhoto> {
   return processPhotoInContext({
     buffer,
@@ -136,6 +139,7 @@ async function processOnMainThread(
     timestamp: options.timestamp,
     gpsCoordinates: options.gpsCoordinates,
     useOffscreen: false,
+    mimeType,
   });
 }
 
@@ -146,6 +150,7 @@ async function processOnMainThread(
 export interface PhotoProcessRequest {
   file: File;
   options?: PhotoProcessingOptions;
+  mimeType?: string;
 }
 
 /**
@@ -158,22 +163,38 @@ export async function processPhotoOffThread(
   request: PhotoProcessRequest
 ): Promise<ProcessedPhoto> {
   const { file, options = {} } = request;
+  // Detect MIME type: prefer file.type, fall back to extension for iOS Safari
+  // where file.type can be empty for HEIC photos.
+  const mimeType = file.type || mimeFromExtension(file.name);
   const buffer = await file.arrayBuffer();
 
   const worker = getWorker();
 
   if (worker) {
     try {
-      return await processViaWorker(worker, buffer, options);
+      return await processViaWorker(worker, buffer, options, mimeType);
     } catch (error) {
-      // Worker crash: auto-retry on main thread seamlessly
+      // Worker crash: auto-retry on main thread seamlessly.
+      // IMPORTANT: Re-read from file because the original buffer was
+      // transferred (zero-copy) to the worker and is now neutered (0 bytes).
       console.warn('Worker processing failed, retrying on main thread:', error);
-      return processOnMainThread(buffer, options);
+      const freshBuffer = await file.arrayBuffer();
+      return processOnMainThread(freshBuffer, options, mimeType);
     }
   }
 
   // Silent fallback — user not informed
-  return processOnMainThread(buffer, options);
+  return processOnMainThread(buffer, options, mimeType);
+}
+
+function mimeFromExtension(name: string): string {
+  const ext = name.split('.').pop()?.toLowerCase() || '';
+  const map: Record<string, string> = {
+    jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png',
+    gif: 'image/gif', webp: 'image/webp', heic: 'image/heic',
+    heif: 'image/heif', bmp: 'image/bmp', tiff: 'image/tiff', tif: 'image/tiff',
+  };
+  return map[ext] || 'image/jpeg';
 }
 
 /**

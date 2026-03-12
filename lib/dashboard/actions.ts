@@ -98,9 +98,10 @@ export async function getRecentUploads(limit: number = 8): Promise<RecentUpload[
       storage_path,
       created_at,
       task_id,
-      task:tasks!inner(title),
+      task:tasks!inner(title, deleted_at),
       user:users(email)
     `)
+    .is('task.deleted_at', null)
     .order('created_at', { ascending: false })
     .limit(limit);
 
