@@ -82,7 +82,7 @@ export function MapEditor({
     if (drawMode === 'select') {
       // Check if clicked on a segment
       const features = mapRef.current?.queryRenderedFeatures(e.point, {
-        layers: ['segments-line'],
+        layers: ['segments-hit', 'segments-line'],
       });
       if (features && features.length > 0) {
         onSelectSegment(features[0].properties?.id ?? null);
@@ -169,10 +169,20 @@ export function MapEditor({
         mapStyle="mapbox://styles/mapbox/satellite-streets-v12"
         cursor={cursorStyle}
         onClick={handleMapClick}
-        interactiveLayerIds={drawMode === 'select' ? ['segments-line'] : undefined}
+        interactiveLayerIds={drawMode === 'select' ? ['segments-hit', 'segments-line'] : undefined}
       >
         {/* Existing segments */}
         <Source id="segments" type="geojson" data={segmentsGeoJSON}>
+          {/* Invisible wide hit area for easier tap/click selection */}
+          <Layer
+            id="segments-hit"
+            type="line"
+            paint={{
+              'line-color': 'transparent',
+              'line-width': 24,
+              'line-opacity': 0,
+            }}
+          />
           <Layer
             id="segments-line"
             type="line"
@@ -234,44 +244,44 @@ export function MapEditor({
       </Map>
 
       {/* Toolbar */}
-      <div className="absolute top-4 left-4 flex flex-col gap-1 bg-card/95 backdrop-blur rounded-lg shadow-lg border border-border p-1">
+      <div className="absolute top-4 left-4 flex flex-col gap-1 bg-card/95 backdrop-blur rounded-lg shadow-lg border border-border p-1.5">
         <ToolbarButton
           active={drawMode === 'select'}
           onClick={() => { setDrawMode('select'); setWaypoints([]); }}
           title="Select (Esc)"
-          icon={<MousePointer2 className="w-4 h-4" />}
+          icon={<MousePointer2 className="w-5 h-5" />}
         />
         <ToolbarButton
           active={drawMode === 'snap_draw'}
           onClick={() => setDrawMode('snap_draw')}
           title="Snap to Road"
-          icon={<Route className="w-4 h-4" />}
+          icon={<Route className="w-5 h-5" />}
         />
         <ToolbarButton
           active={drawMode === 'freeform_draw'}
           onClick={() => setDrawMode('freeform_draw')}
           title="Freeform Draw"
-          icon={<Pencil className="w-4 h-4" />}
+          icon={<Pencil className="w-5 h-5" />}
         />
       </div>
 
       {/* Stripe type selector (visible in draw mode) */}
       {drawMode !== 'select' && (
-        <div className="absolute top-4 left-16 bg-card/95 backdrop-blur rounded-lg shadow-lg border border-border p-2">
+        <div className="absolute top-4 left-[4.5rem] bg-card/95 backdrop-blur rounded-lg shadow-lg border border-border p-2">
           <p className="text-xs text-muted-foreground mb-1.5 px-1">Stripe Type</p>
           <div className="flex flex-col gap-0.5">
             {STRIPE_TYPES.map((type) => (
               <button
                 key={type}
                 onClick={() => setDrawStripeType(type)}
-                className={`flex items-center gap-2 px-2 py-1.5 rounded text-xs text-left transition-colors ${
+                className={`flex items-center gap-2 px-3 py-2.5 rounded text-sm text-left transition-colors touch-target ${
                   drawStripeType === type
                     ? 'bg-primary/10 text-foreground font-medium'
                     : 'text-muted-foreground hover:bg-muted'
                 }`}
               >
                 <span
-                  className="w-4 h-1 rounded-full flex-shrink-0"
+                  className="w-5 h-1.5 rounded-full flex-shrink-0"
                   style={{ backgroundColor: STRIPE_TYPE_CONFIG[type].color }}
                 />
                 {STRIPE_TYPE_CONFIG[type].label}
@@ -281,28 +291,34 @@ export function MapEditor({
         </div>
       )}
 
-      {/* Drawing instructions */}
+      {/* Drawing instructions + actions */}
       {drawMode !== 'select' && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-card/95 backdrop-blur rounded-lg shadow-lg border border-border px-4 py-2 text-sm text-muted-foreground">
-          {waypoints.length === 0
-            ? 'Click to place waypoints'
-            : `${waypoints.length} points — Press Enter to finish, Esc to cancel`}
-          {isSnapping && (
-            <span className="ml-2 text-primary font-medium">Snapping to road...</span>
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-card/95 backdrop-blur rounded-lg shadow-lg border border-border px-4 py-2">
+          <span className="text-sm text-muted-foreground">
+            {waypoints.length === 0
+              ? 'Tap to place waypoints'
+              : `${waypoints.length} points`}
+            {isSnapping && (
+              <span className="ml-2 text-primary font-medium">Snapping...</span>
+            )}
+          </span>
+          {waypoints.length >= 2 && (
+            <button
+              onClick={finishDrawing}
+              disabled={isSnapping}
+              className="ml-2 px-4 py-2 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-50 transition-opacity touch-target"
+            >
+              {isSnapping ? 'Snapping...' : 'Done'}
+            </button>
           )}
-        </div>
-      )}
-
-      {/* Finish drawing button */}
-      {waypoints.length >= 2 && (
-        <div className="absolute bottom-4 right-4">
-          <button
-            onClick={finishDrawing}
-            disabled={isSnapping}
-            className="px-4 py-2 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-50 shadow-lg transition-opacity"
-          >
-            {isSnapping ? 'Snapping...' : 'Finish Segment'}
-          </button>
+          {waypoints.length > 0 && (
+            <button
+              onClick={() => { setWaypoints([]); setDrawMode('select'); }}
+              className="px-3 py-2 text-sm font-medium rounded-lg border border-border text-muted-foreground hover:bg-muted transition-colors touch-target"
+            >
+              Cancel
+            </button>
+          )}
         </div>
       )}
 
@@ -331,7 +347,7 @@ function ToolbarButton({
     <button
       onClick={onClick}
       title={title}
-      className={`p-2 rounded-lg transition-colors ${
+      className={`p-3 rounded-lg transition-colors touch-target ${
         active
           ? 'bg-primary text-primary-foreground'
           : 'text-muted-foreground hover:bg-muted hover:text-foreground'

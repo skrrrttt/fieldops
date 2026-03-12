@@ -277,9 +277,9 @@ export async function upsertSegments(
       .eq('map_id', mapId);
   }
 
-  // Upsert all segments
-  const rows = segments.map(s => ({
-    ...(s.id ? { id: s.id } : {}),
+  // Split into existing (update) and new (insert) segments
+  const existingRows = segments.filter(s => s.id).map(s => ({
+    id: s.id!,
     map_id: mapId,
     geometry: s.geometry,
     stripe_type: s.stripe_type,
@@ -289,17 +289,46 @@ export async function upsertSegments(
     updated_at: new Date().toISOString(),
   }));
 
-  const { data, error } = await supabase
-    .from('striping_segments')
-    .upsert(rows as never, { onConflict: 'id' })
-    .select();
+  const newRows = segments.filter(s => !s.id).map(s => ({
+    map_id: mapId,
+    geometry: s.geometry,
+    stripe_type: s.stripe_type,
+    attributes: s.attributes || null,
+    notes: s.notes || null,
+    order: s.order,
+  }));
 
-  if (error) {
-    return { success: false, error: error.message };
+  let allData: StripingSegment[] = [];
+
+  // Update existing segments
+  if (existingRows.length > 0) {
+    const { data: updated, error: updateError } = await supabase
+      .from('striping_segments')
+      .upsert(existingRows as never, { onConflict: 'id' })
+      .select();
+    if (updateError) {
+      return { success: false, error: updateError.message };
+    }
+    allData = (updated ?? []) as StripingSegment[];
   }
 
+  // Insert new segments
+  if (newRows.length > 0) {
+    const { data: inserted, error: insertError } = await supabase
+      .from('striping_segments')
+      .insert(newRows as never)
+      .select();
+    if (insertError) {
+      return { success: false, error: insertError.message };
+    }
+    allData = [...allData, ...((inserted ?? []) as StripingSegment[])];
+  }
+
+  // Sort by order to return in correct sequence
+  allData.sort((a, b) => a.order - b.order);
+
   revalidatePath(`/admin/maps/${mapId}`);
-  return { success: true, data: (data ?? []) as StripingSegment[] };
+  return { success: true, data: allData };
 }
 
 /**

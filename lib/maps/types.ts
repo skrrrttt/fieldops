@@ -5,8 +5,6 @@
 export type StripeType =
   | 'yellow_centerline'
   | 'white_edge_line'
-  | 'double_yellow'
-  | 'dashed_white'
   | 'yellow_and_white';
 
 export interface StripeTypeConfig {
@@ -25,17 +23,6 @@ export const STRIPE_TYPE_CONFIG: Record<StripeType, StripeTypeConfig> = {
   white_edge_line: {
     label: 'White Edge Line',
     color: '#FFFFFF',
-    width: 3,
-  },
-  double_yellow: {
-    label: 'Double Yellow',
-    color: '#FFD600',
-    width: 6,
-  },
-  dashed_white: {
-    label: 'Dashed White',
-    color: '#FFFFFF',
-    dashArray: [8, 6],
     width: 3,
   },
   yellow_and_white: {
