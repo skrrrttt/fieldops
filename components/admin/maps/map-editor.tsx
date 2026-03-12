@@ -311,6 +311,17 @@ export function MapEditor({
               'line-opacity': 0,
             }}
           />
+          {/* Outer glow for visibility against basemap roads */}
+          <Layer
+            id="segments-glow"
+            type="line"
+            paint={{
+              'line-color': ['get', 'color'],
+              'line-width': ['+', ['get', 'width'], 14],
+              'line-opacity': 0.25,
+              'line-blur': 6,
+            }}
+          />
           {/* Dark casing for contrast against satellite imagery */}
           <Layer
             id="segments-casing"
@@ -320,12 +331,13 @@ export function MapEditor({
               'line-width': [
                 'case',
                 ['get', 'selected'],
-                ['*', ['get', 'width'], 2.8],
-                ['+', ['get', 'width'], 4],
+                ['*', ['get', 'width'], 3],
+                ['+', ['get', 'width'], 6],
               ],
-              'line-opacity': 0.6,
+              'line-opacity': 0.8,
             }}
           />
+          {/* Segment lines — thick and bold */}
           <Layer
             id="segments-line"
             type="line"
@@ -334,8 +346,8 @@ export function MapEditor({
               'line-width': [
                 'case',
                 ['get', 'selected'],
-                ['*', ['get', 'width'], 2],
-                ['get', 'width'],
+                ['*', ['get', 'width'], 2.5],
+                ['*', ['get', 'width'], 1.6],
               ],
               'line-opacity': 1,
             }}
@@ -351,16 +363,16 @@ export function MapEditor({
               'line-opacity': 0.4,
             }}
           />
-          {/* Segment name labels */}
+          {/* Segment name labels — visible from further out */}
           <Layer
             id="segments-label"
             type="symbol"
             filter={['!=', ['get', 'name'], '']}
-            minzoom={14}
+            minzoom={11}
             layout={{
               'symbol-placement': 'line-center',
               'text-field': ['get', 'name'],
-              'text-size': ['interpolate', ['linear'], ['zoom'], 14, 11, 18, 14],
+              'text-size': ['interpolate', ['linear'], ['zoom'], 11, 10, 14, 12, 18, 14],
               'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
               'text-anchor': 'center',
               'text-allow-overlap': false,

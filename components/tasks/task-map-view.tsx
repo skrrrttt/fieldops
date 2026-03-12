@@ -173,22 +173,38 @@ export function TaskMapView({ taskId, assignments, isOnline, onToggleComplete }:
               'line-opacity': 0,
             }}
           />
+          {/* Outer glow for visibility against basemap roads */}
+          <Layer
+            id="task-segments-glow"
+            type="line"
+            paint={{
+              'line-color': ['get', 'color'],
+              'line-width': ['+', ['get', 'width'], 14],
+              'line-opacity': [
+                'case',
+                ['get', 'is_complete'],
+                0.08,
+                0.25,
+              ],
+              'line-blur': 6,
+            }}
+          />
           {/* Dark casing for contrast against satellite imagery */}
           <Layer
             id="task-segments-casing"
             type="line"
             paint={{
               'line-color': '#000000',
-              'line-width': ['+', ['get', 'width'], 4],
+              'line-width': ['+', ['get', 'width'], 6],
               'line-opacity': [
                 'case',
                 ['get', 'is_complete'],
-                0.25,
-                0.6,
+                0.3,
+                0.8,
               ],
             }}
           />
-          {/* Segment lines */}
+          {/* Segment lines — thick and bold */}
           <Layer
             id="task-segments-line"
             type="line"
@@ -197,8 +213,8 @@ export function TaskMapView({ taskId, assignments, isOnline, onToggleComplete }:
               'line-width': [
                 'case',
                 ['get', 'selected'],
-                ['*', ['get', 'width'], 2],
-                ['get', 'width'],
+                ['*', ['get', 'width'], 2.5],
+                ['*', ['get', 'width'], 1.6],
               ],
               'line-opacity': [
                 'case',
@@ -230,16 +246,16 @@ export function TaskMapView({ taskId, assignments, isOnline, onToggleComplete }:
               'line-dasharray': [2, 4],
             }}
           />
-          {/* Road name labels — appear when zoomed in */}
+          {/* Road name labels — visible from further out */}
           <Layer
             id="task-segments-label"
             type="symbol"
             filter={['!=', ['get', 'name'], '']}
-            minzoom={14}
+            minzoom={11}
             layout={{
               'symbol-placement': 'line-center',
               'text-field': ['get', 'name'],
-              'text-size': ['interpolate', ['linear'], ['zoom'], 14, 12, 18, 16],
+              'text-size': ['interpolate', ['linear'], ['zoom'], 11, 10, 14, 13, 18, 16],
               'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
               'text-anchor': 'center',
               'text-allow-overlap': false,
