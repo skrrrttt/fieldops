@@ -49,7 +49,7 @@ export function useBackgroundSync(): UseBackgroundSyncResult {
     synced: 0,
     failed: 0,
     conflict: 0,
-    byType: { status: 0, comment: 0, photo: 0, file: 0 },
+    byType: { status: 0, comment: 0, photo: 0, file: 0, segment_complete: 0 },
   });
 
   // Prevent multiple sync operations

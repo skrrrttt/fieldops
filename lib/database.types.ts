@@ -523,6 +523,111 @@ export interface Database {
           updated_at?: string;
         };
       };
+      striping_maps: {
+        Row: {
+          id: string;
+          name: string;
+          description: string | null;
+          center_lng: number | null;
+          center_lat: number | null;
+          zoom: number | null;
+          version_label: string | null;
+          cloned_from_id: string | null;
+          created_by: string | null;
+          deleted_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          description?: string | null;
+          center_lng?: number | null;
+          center_lat?: number | null;
+          zoom?: number | null;
+          version_label?: string | null;
+          cloned_from_id?: string | null;
+          created_by?: string | null;
+          deleted_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          description?: string | null;
+          center_lng?: number | null;
+          center_lat?: number | null;
+          zoom?: number | null;
+          version_label?: string | null;
+          cloned_from_id?: string | null;
+          created_by?: string | null;
+          deleted_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      striping_segments: {
+        Row: {
+          id: string;
+          map_id: string;
+          geometry: Record<string, unknown>;
+          stripe_type: string;
+          attributes: Record<string, unknown> | null;
+          notes: string | null;
+          order: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          map_id: string;
+          geometry: Record<string, unknown>;
+          stripe_type: string;
+          attributes?: Record<string, unknown> | null;
+          notes?: string | null;
+          order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          map_id?: string;
+          geometry?: Record<string, unknown>;
+          stripe_type?: string;
+          attributes?: Record<string, unknown> | null;
+          notes?: string | null;
+          order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      task_segment_assignments: {
+        Row: {
+          id: string;
+          task_id: string;
+          segment_id: string;
+          is_complete: boolean;
+          completed_at: string | null;
+          completed_by: string | null;
+        };
+        Insert: {
+          id?: string;
+          task_id: string;
+          segment_id: string;
+          is_complete?: boolean;
+          completed_at?: string | null;
+          completed_by?: string | null;
+        };
+        Update: {
+          id?: string;
+          task_id?: string;
+          segment_id?: string;
+          is_complete?: boolean;
+          completed_at?: string | null;
+          completed_by?: string | null;
+        };
+      };
     };
   };
 }
@@ -595,3 +700,14 @@ export type TaskHistoryUpdate = Database['public']['Tables']['task_history']['Up
 export type ChecklistUpdate = Database['public']['Tables']['checklists']['Update'];
 export type ChecklistItemUpdate = Database['public']['Tables']['checklist_items']['Update'];
 export type TaskChecklistUpdate = Database['public']['Tables']['task_checklists']['Update'];
+
+// Striping Maps types
+export type StripingMapRow = Database['public']['Tables']['striping_maps']['Row'];
+export type StripingMapInsert = Database['public']['Tables']['striping_maps']['Insert'];
+export type StripingMapUpdate = Database['public']['Tables']['striping_maps']['Update'];
+export type StripingSegmentRow = Database['public']['Tables']['striping_segments']['Row'];
+export type StripingSegmentInsert = Database['public']['Tables']['striping_segments']['Insert'];
+export type StripingSegmentUpdate = Database['public']['Tables']['striping_segments']['Update'];
+export type TaskSegmentAssignmentRow = Database['public']['Tables']['task_segment_assignments']['Row'];
+export type TaskSegmentAssignmentInsert = Database['public']['Tables']['task_segment_assignments']['Insert'];
+export type TaskSegmentAssignmentUpdate = Database['public']['Tables']['task_segment_assignments']['Update'];

@@ -66,7 +66,7 @@ export interface SyncMeta {
 /**
  * Mutation types for offline queue
  */
-export type MutationType = 'status' | 'comment' | 'photo' | 'file';
+export type MutationType = 'status' | 'comment' | 'photo' | 'file' | 'segment_complete';
 
 /**
  * Mutation status in the queue
@@ -140,13 +140,22 @@ export interface FileMutationPayload {
 }
 
 /**
+ * Segment complete mutation payload
+ */
+export interface SegmentCompleteMutationPayload {
+  assignment_id: string;
+  is_complete: boolean;
+}
+
+/**
  * Union type for all mutation payloads
  */
 export type MutationPayload =
   | StatusMutationPayload
   | CommentMutationPayload
   | PhotoMutationPayload
-  | FileMutationPayload;
+  | FileMutationPayload
+  | SegmentCompleteMutationPayload;
 
 /**
  * Pending mutation with typed payload
@@ -171,6 +180,11 @@ export interface PendingFileMutation extends PendingMutation {
   payload: FileMutationPayload;
 }
 
+export interface PendingSegmentCompleteMutation extends PendingMutation {
+  type: 'segment_complete';
+  payload: SegmentCompleteMutationPayload;
+}
+
 /**
  * Union type for all pending mutations with their payloads
  */
@@ -178,7 +192,8 @@ export type TypedPendingMutation =
   | PendingStatusMutation
   | PendingCommentMutation
   | PendingPhotoMutation
-  | PendingFileMutation;
+  | PendingFileMutation
+  | PendingSegmentCompleteMutation;
 
 /**
  * FieldOps offline database class
@@ -253,6 +268,21 @@ class FieldOpsDB extends Dexie {
       custom_field_definitions: 'id, order, created_at',
       sync_meta: 'id, table_name, last_synced_at',
       pending_mutations: 'id, type, status, created_at',
+    });
+
+    // Version 4 - add striping map tables for offline support
+    this.version(4).stores({
+      tasks: 'id, status_id, division_id, assigned_user_id, start_date, end_date, created_at, updated_at, deleted_at',
+      divisions: 'id, name, created_at',
+      statuses: 'id, order, is_default, created_at',
+      comments: 'id, task_id, user_id, created_at',
+      photos: 'id, task_id, user_id, created_at',
+      files: 'id, task_id, user_id, created_at',
+      custom_field_definitions: 'id, order, created_at',
+      sync_meta: 'id, table_name, last_synced_at',
+      pending_mutations: 'id, type, status, created_at',
+      striping_segments: 'id, map_id',
+      task_segment_assignments: 'id, task_id, segment_id',
     });
   }
 }

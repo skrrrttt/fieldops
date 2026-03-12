@@ -6,6 +6,7 @@ import { getTaskFiles } from '@/lib/files/actions';
 import { getTaskComments } from '@/lib/comments/actions';
 import { getCustomFields } from '@/lib/custom-fields/actions';
 import { getTaskChecklists } from '@/lib/checklists/actions';
+import { taskHasSegments } from '@/lib/maps/actions';
 import { TaskDetailOfflineWrapper } from '@/components/tasks/task-detail-offline-wrapper';
 import { DetailHeader } from '@/components/layout/app-header';
 import { MobileBottomNav, MobileBottomNavSpacer } from '@/components/layout/mobile-bottom-nav';
@@ -19,13 +20,14 @@ export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
   const { id } = await params;
 
   // Fetch all data in a single parallel batch to eliminate waterfall
-  const [task, customFields, photos, files, comments, taskChecklists] = await Promise.all([
+  const [task, customFields, photos, files, comments, taskChecklists, hasStripingMap] = await Promise.all([
     getTask(id),
     getCustomFields(),
     getTaskPhotos(id),
     getTaskFiles(id),
     getTaskComments(id),
     getTaskChecklists(id),
+    taskHasSegments(id),
   ]);
 
   if (!task) {
@@ -47,6 +49,7 @@ export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
           comments={comments}
           customFields={customFields}
           taskChecklists={taskChecklists}
+          hasStripingMap={hasStripingMap}
         />
       </main>
 

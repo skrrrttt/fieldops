@@ -24,6 +24,7 @@ interface TaskDetailOfflineWrapperProps {
   comments: CommentWithUser[];
   customFields: CustomFieldDefinition[];
   taskChecklists: TaskChecklistWithDetails[];
+  hasStripingMap?: boolean;
 }
 
 export function TaskDetailOfflineWrapper({
@@ -34,6 +35,7 @@ export function TaskDetailOfflineWrapper({
   comments: serverComments,
   customFields,
   taskChecklists,
+  hasStripingMap,
 }: TaskDetailOfflineWrapperProps) {
   // Use offline hook for task data
   const {
@@ -99,6 +101,7 @@ export function TaskDetailOfflineWrapper({
         comments={comments}
         customFields={customFields}
         taskChecklists={taskChecklists}
+        hasStripingMap={hasStripingMap}
       />
     </>
   );

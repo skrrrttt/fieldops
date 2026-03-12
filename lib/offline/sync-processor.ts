@@ -21,6 +21,7 @@ import {
   type PendingCommentMutation,
   type PendingPhotoMutation,
   type PendingFileMutation,
+  type PendingSegmentCompleteMutation,
   type LocalTask,
   type LocalComment,
   type LocalPhoto,
@@ -321,6 +322,41 @@ async function processFileMutation(
 }
 
 /**
+ * Process a segment complete mutation - toggle segment completion in Supabase
+ */
+async function processSegmentCompleteMutation(
+  mutation: PendingSegmentCompleteMutation
+): Promise<SyncResult> {
+  const supabase = createClient();
+  const { assignment_id, is_complete } = mutation.payload;
+
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return { success: false, mutationId: mutation.id, error: 'Not authenticated' };
+    }
+
+    const { error } = await supabase
+      .from('task_segment_assignments')
+      .update({
+        is_complete,
+        completed_at: is_complete ? new Date().toISOString() : null,
+        completed_by: is_complete ? user.id : null,
+      } as never)
+      .eq('id', assignment_id);
+
+    if (error) {
+      return { success: false, mutationId: mutation.id, error: error.message };
+    }
+
+    return { success: true, mutationId: mutation.id };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    return { success: false, mutationId: mutation.id, error: message };
+  }
+}
+
+/**
  * Process a single mutation based on its type
  */
 async function processMutation(mutation: TypedPendingMutation): Promise<SyncResult> {
@@ -333,6 +369,8 @@ async function processMutation(mutation: TypedPendingMutation): Promise<SyncResu
       return processPhotoMutation(mutation);
     case 'file':
       return processFileMutation(mutation);
+    case 'segment_complete':
+      return processSegmentCompleteMutation(mutation);
   }
 }
 

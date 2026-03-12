@@ -13,10 +13,12 @@ import {
   type PendingCommentMutation,
   type PendingPhotoMutation,
   type PendingFileMutation,
+  type PendingSegmentCompleteMutation,
   type StatusMutationPayload,
   type CommentMutationPayload,
   type PhotoMutationPayload,
   type FileMutationPayload,
+  type SegmentCompleteMutationPayload,
   type ConflictInfo,
 } from './db';
 
@@ -105,6 +107,28 @@ export async function queueFileMutation(
   const mutation: PendingFileMutation = {
     id: generateMutationId(),
     type: 'file',
+    status: 'pending',
+    created_at: new Date().toISOString(),
+    retry_count: 0,
+    payload,
+  };
+
+  await db.pending_mutations.put(mutation);
+  return mutation;
+}
+
+/**
+ * Queue a segment completion mutation
+ */
+export async function queueSegmentCompleteMutation(
+  payload: SegmentCompleteMutationPayload
+): Promise<PendingSegmentCompleteMutation | null> {
+  if (!isIndexedDBAvailable()) return null;
+
+  const db = getDB();
+  const mutation: PendingSegmentCompleteMutation = {
+    id: generateMutationId(),
+    type: 'segment_complete',
     status: 'pending',
     created_at: new Date().toISOString(),
     retry_count: 0,
@@ -326,6 +350,7 @@ export interface MutationsSummary {
     comment: number;
     photo: number;
     file: number;
+    segment_complete: number;
   };
 }
 
@@ -338,7 +363,7 @@ export async function getMutationsSummary(): Promise<MutationsSummary> {
       synced: 0,
       failed: 0,
       conflict: 0,
-      byType: { status: 0, comment: 0, photo: 0, file: 0 },
+      byType: { status: 0, comment: 0, photo: 0, file: 0, segment_complete: 0 },
     };
   }
 
@@ -352,7 +377,7 @@ export async function getMutationsSummary(): Promise<MutationsSummary> {
     synced: 0,
     failed: 0,
     conflict: 0,
-    byType: { status: 0, comment: 0, photo: 0, file: 0 },
+    byType: { status: 0, comment: 0, photo: 0, file: 0, segment_complete: 0 },
   };
 
   for (const mutation of all) {

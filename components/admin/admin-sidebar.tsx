@@ -24,6 +24,7 @@ import {
   ListChecks,
   Building2,
   BarChart3,
+  Map,
 } from 'lucide-react';
 
 const APP_NAME = 'ProStreet';
@@ -70,6 +71,11 @@ const navItems: NavItem[] = [
     label: 'Reports',
     href: '/admin/reports',
     icon: <BarChart3 className="w-5 h-5" />,
+  },
+  {
+    label: 'Striping Maps',
+    href: '/admin/maps',
+    icon: <Map className="w-5 h-5" />,
   },
   {
     label: 'Configuration',

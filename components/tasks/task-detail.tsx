@@ -15,7 +15,7 @@ import { PhotoUpload } from '@/components/tasks/photo-upload';
 import { FileUpload } from '@/components/tasks/file-upload';
 import { CustomFieldEdit } from '@/components/tasks/custom-field-edit';
 import { TaskChecklist } from '@/components/tasks/task-checklist';
-import { ChevronDown, ChevronRight, Plus, Camera, FileText, MessageCircle, MapPin, Calendar, User, X, ClipboardList, Building2, Phone } from 'lucide-react';
+import { ChevronDown, ChevronRight, Plus, Camera, FileText, MessageCircle, MapPin, Calendar, User, X, ClipboardList, Building2, Phone, Map } from 'lucide-react';
 
 interface TaskDetailProps {
   task: TaskWithRelations;
@@ -24,9 +24,10 @@ interface TaskDetailProps {
   comments: CommentWithUser[];
   customFields: CustomFieldDefinition[];
   taskChecklists: TaskChecklistWithDetails[];
+  hasStripingMap?: boolean;
 }
 
-export function TaskDetail({ task, photos, files, comments: initialComments, customFields, taskChecklists }: TaskDetailProps) {
+export function TaskDetail({ task, photos, files, comments: initialComments, customFields, taskChecklists, hasStripingMap }: TaskDetailProps) {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [refreshKey, setRefreshKey] = useState(0);
@@ -244,6 +245,19 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
               </a>
             )}
           </div>
+        </section>
+      )}
+
+      {/* Striping Map Button */}
+      {hasStripingMap && (
+        <section className="bg-card rounded-lg shadow-sm border border-border p-4">
+          <Link
+            href={`/tasks/${task.id}/map`}
+            className="flex items-center justify-center gap-2 w-full min-h-[48px] px-4 py-3 text-sm font-semibold rounded-lg transition-opacity hover:opacity-90 bg-primary/10 text-primary border border-primary/20"
+          >
+            <Map className="w-5 h-5" />
+            View Striping Map
+          </Link>
         </section>
       )}
 
