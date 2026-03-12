@@ -104,12 +104,37 @@ export function TaskMapView({ taskId, assignments, isOnline, onToggleComplete }:
           latitude: bounds ? (bounds[0][1] + bounds[1][1]) / 2 : 39.83,
           zoom: 15,
         }}
-        mapStyle="mapbox://styles/mapbox/satellite-streets-v12"
+        mapStyle="mapbox://styles/mapbox/satellite-v9"
         onClick={handleMapClick}
-        interactiveLayerIds={['task-segments-line']}
+        interactiveLayerIds={['task-segments-hit', 'task-segments-line']}
       >
         <Source id="task-segments" type="geojson" data={geojson}>
-          {/* Completed segments with lower opacity */}
+          {/* Invisible wide hit area for easier tap selection */}
+          <Layer
+            id="task-segments-hit"
+            type="line"
+            paint={{
+              'line-color': 'transparent',
+              'line-width': 24,
+              'line-opacity': 0,
+            }}
+          />
+          {/* Dark casing for contrast against satellite imagery */}
+          <Layer
+            id="task-segments-casing"
+            type="line"
+            paint={{
+              'line-color': '#000000',
+              'line-width': ['+', ['get', 'width'], 4],
+              'line-opacity': [
+                'case',
+                ['get', 'is_complete'],
+                0.25,
+                0.6,
+              ],
+            }}
+          />
+          {/* Segment lines */}
           <Layer
             id="task-segments-line"
             type="line"
@@ -125,7 +150,7 @@ export function TaskMapView({ taskId, assignments, isOnline, onToggleComplete }:
                 'case',
                 ['get', 'is_complete'],
                 0.4,
-                0.9,
+                1,
               ],
             }}
           />
@@ -136,8 +161,8 @@ export function TaskMapView({ taskId, assignments, isOnline, onToggleComplete }:
             filter={['==', ['get', 'selected'], true]}
             paint={{
               'line-color': '#3B82F6',
-              'line-width': ['+', ['get', 'width'], 8],
-              'line-opacity': 0.3,
+              'line-width': ['+', ['get', 'width'], 10],
+              'line-opacity': 0.4,
             }}
           />
           {/* Completion checkmarks as circles at midpoint */}

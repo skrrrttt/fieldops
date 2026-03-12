@@ -166,7 +166,7 @@ export function MapEditor({
           latitude: center?.[1] ?? 39.8283,
           zoom: zoom,
         }}
-        mapStyle="mapbox://styles/mapbox/satellite-streets-v12"
+        mapStyle="mapbox://styles/mapbox/satellite-v9"
         cursor={cursorStyle}
         onClick={handleMapClick}
         interactiveLayerIds={drawMode === 'select' ? ['segments-hit', 'segments-line'] : undefined}
@@ -183,6 +183,21 @@ export function MapEditor({
               'line-opacity': 0,
             }}
           />
+          {/* Dark casing for contrast against satellite imagery */}
+          <Layer
+            id="segments-casing"
+            type="line"
+            paint={{
+              'line-color': '#000000',
+              'line-width': [
+                'case',
+                ['get', 'selected'],
+                ['*', ['get', 'width'], 2.8],
+                ['+', ['get', 'width'], 4],
+              ],
+              'line-opacity': 0.6,
+            }}
+          />
           <Layer
             id="segments-line"
             type="line"
@@ -191,15 +206,10 @@ export function MapEditor({
               'line-width': [
                 'case',
                 ['get', 'selected'],
-                ['*', ['get', 'width'], 1.8],
+                ['*', ['get', 'width'], 2],
                 ['get', 'width'],
               ],
-              'line-opacity': [
-                'case',
-                ['get', 'selected'],
-                1,
-                0.8,
-              ],
+              'line-opacity': 1,
             }}
           />
           {/* Selection halo */}
@@ -209,8 +219,8 @@ export function MapEditor({
             filter={['==', ['get', 'selected'], true]}
             paint={{
               'line-color': '#3B82F6',
-              'line-width': ['+', ['get', 'width'], 6],
-              'line-opacity': 0.35,
+              'line-width': ['+', ['get', 'width'], 10],
+              'line-opacity': 0.4,
             }}
           />
         </Source>
