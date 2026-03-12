@@ -191,6 +191,7 @@ export function MapEditor({
           type: 'Feature' as const,
           properties: {
             name: seg.name,
+            type_label: STRIPE_TYPE_CONFIG[seg.stripe_type as StripeType]?.label ?? seg.stripe_type,
             color: STRIPE_TYPE_CONFIG[seg.stripe_type as StripeType]?.color ?? '#888',
           },
           geometry: { type: 'Point' as const, coordinates: mid },
@@ -404,9 +405,13 @@ export function MapEditor({
             type="symbol"
             minzoom={11}
             layout={{
-              'text-field': ['get', 'name'],
+              'text-field': [
+                'format',
+                ['get', 'name'], { 'font-scale': 1.0, 'text-font': ['literal', ['DIN Pro Bold', 'Arial Unicode MS Bold']] },
+                '\n', {},
+                ['get', 'type_label'], { 'font-scale': 0.8, 'text-font': ['literal', ['DIN Pro Medium', 'Arial Unicode MS Regular']], 'text-color': ['get', 'color'] },
+              ],
               'text-size': ['interpolate', ['linear'], ['zoom'], 11, 10, 14, 12, 18, 14],
-              'text-font': ['DIN Pro Bold', 'Arial Unicode MS Bold'],
               'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
               'text-radial-offset': ['interpolate', ['linear'], ['zoom'], 11, 0.8, 16, 1.2],
               'text-justify': 'auto',
