@@ -179,6 +179,25 @@ export function MapEditor({
     })),
   };
 
+  // Build midpoint GeoJSON for floating labels
+  const midpointsGeoJSON: GeoJSON.FeatureCollection = {
+    type: 'FeatureCollection',
+    features: segments
+      .filter(seg => seg.name)
+      .map((seg) => {
+        const coords = seg.geometry.coordinates;
+        const mid = coords[Math.floor(coords.length / 2)];
+        return {
+          type: 'Feature' as const,
+          properties: {
+            name: seg.name,
+            color: STRIPE_TYPE_CONFIG[seg.stripe_type as StripeType]?.color ?? '#888',
+          },
+          geometry: { type: 'Point' as const, coordinates: mid },
+        };
+      }),
+  };
+
   // Build GeoJSON for current drawing waypoints
   const drawingGeoJSON: GeoJSON.FeatureCollection = {
     type: 'FeatureCollection',
@@ -363,25 +382,41 @@ export function MapEditor({
               'line-opacity': 0.4,
             }}
           />
-          {/* Segment name labels — visible from further out */}
+        </Source>
+
+        {/* Floating callout labels at segment midpoints */}
+        <Source id="midpoints" type="geojson" data={midpointsGeoJSON}>
+          {/* Pin dot on the road */}
           <Layer
-            id="segments-label"
+            id="label-pin"
+            type="circle"
+            minzoom={11}
+            paint={{
+              'circle-radius': ['interpolate', ['linear'], ['zoom'], 11, 3, 16, 5],
+              'circle-color': '#FFFFFF',
+              'circle-stroke-width': 2,
+              'circle-stroke-color': '#000000',
+            }}
+          />
+          {/* Floating name label */}
+          <Layer
+            id="label-text"
             type="symbol"
-            filter={['!=', ['get', 'name'], '']}
             minzoom={11}
             layout={{
-              'symbol-placement': 'line-center',
               'text-field': ['get', 'name'],
               'text-size': ['interpolate', ['linear'], ['zoom'], 11, 10, 14, 12, 18, 14],
-              'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
-              'text-anchor': 'center',
+              'text-font': ['DIN Pro Bold', 'Arial Unicode MS Bold'],
+              'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
+              'text-radial-offset': ['interpolate', ['linear'], ['zoom'], 11, 0.8, 16, 1.2],
+              'text-justify': 'auto',
               'text-allow-overlap': false,
-              'text-ignore-placement': false,
+              'text-padding': 8,
             }}
             paint={{
               'text-color': '#FFFFFF',
-              'text-halo-color': '#000000',
-              'text-halo-width': 2,
+              'text-halo-color': 'rgba(0,0,0,0.85)',
+              'text-halo-width': 2.5,
             }}
           />
         </Source>
