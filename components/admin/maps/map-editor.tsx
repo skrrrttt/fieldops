@@ -2,12 +2,139 @@
 
 import { useRef, useState, useCallback, useEffect } from 'react';
 import Map, { Source, Layer, type MapRef, type MapMouseEvent } from 'react-map-gl/mapbox';
-import { MousePointer2, Route, Pencil } from 'lucide-react';
+import { MousePointer2, Route, Pencil, Search, X, MapPin } from 'lucide-react';
 import type { StripingSegment, StripeType, GeoJSONLineString, DrawMode } from '@/lib/maps/types';
 import { STRIPE_TYPE_CONFIG, STRIPE_TYPES } from '@/lib/maps/types';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || '';
+
+// ── Location Search Bar ─────────────────────────────────────────────
+interface SearchResult {
+  id: string;
+  place_name: string;
+  center: [number, number];
+  bbox?: [number, number, number, number];
+}
+
+function MapSearchBar({ mapRef }: { mapRef: React.RefObject<MapRef | null> }) {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  const searchPlaces = useCallback(async (q: string) => {
+    if (!q.trim() || !MAPBOX_TOKEN) {
+      setResults([]);
+      return;
+    }
+    setIsSearching(true);
+    try {
+      const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(q)}.json?access_token=${MAPBOX_TOKEN}&types=place,locality,neighborhood,address,poi&limit=5&country=us`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.features) {
+        setResults(data.features.map((f: { id: string; place_name: string; center: [number, number]; bbox?: [number, number, number, number] }) => ({
+          id: f.id,
+          place_name: f.place_name,
+          center: f.center,
+          bbox: f.bbox,
+        })));
+        setIsOpen(true);
+      }
+    } catch {
+      setResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
+
+  const handleInputChange = (value: string) => {
+    setQuery(value);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => searchPlaces(value), 300);
+  };
+
+  const handleSelect = (result: SearchResult) => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    if (result.bbox) {
+      map.fitBounds(
+        [
+          [result.bbox[0], result.bbox[1]],
+          [result.bbox[2], result.bbox[3]],
+        ],
+        { padding: 60, duration: 1500 }
+      );
+    } else {
+      map.flyTo({ center: result.center, zoom: 15, duration: 1500 });
+    }
+
+    setQuery(result.place_name.split(',')[0]);
+    setIsOpen(false);
+  };
+
+  return (
+    <div ref={containerRef} className="absolute top-4 right-4 z-10 w-72">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+        <input
+          ref={inputRef}
+          type="text"
+          value={query}
+          onChange={(e) => handleInputChange(e.target.value)}
+          onFocus={() => results.length > 0 && setIsOpen(true)}
+          placeholder="Search for a town or address..."
+          className="w-full pl-9 pr-8 py-2.5 text-sm bg-card/95 backdrop-blur border border-border rounded-lg shadow-lg text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/50"
+        />
+        {query && (
+          <button
+            onClick={() => { setQuery(''); setResults([]); setIsOpen(false); }}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-muted text-muted-foreground"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        )}
+      </div>
+
+      {isOpen && results.length > 0 && (
+        <div className="mt-1 bg-card/95 backdrop-blur border border-border rounded-lg shadow-lg overflow-hidden">
+          {results.map((r) => (
+            <button
+              key={r.id}
+              onClick={() => handleSelect(r)}
+              className="w-full flex items-start gap-2.5 px-3 py-2.5 text-left text-sm hover:bg-muted/80 transition-colors border-b border-border/50 last:border-b-0"
+            >
+              <MapPin className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+              <span className="text-foreground leading-snug">{r.place_name}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {isOpen && isSearching && results.length === 0 && (
+        <div className="mt-1 bg-card/95 backdrop-blur border border-border rounded-lg shadow-lg px-3 py-2.5 text-sm text-muted-foreground">
+          Searching...
+        </div>
+      )}
+    </div>
+  );
+}
 
 interface MapEditorProps {
   segments: StripingSegment[];
@@ -275,6 +402,9 @@ export function MapEditor({
         </Source>
       </Map>
 
+      {/* Location search */}
+      <MapSearchBar mapRef={mapRef} />
+
       {/* Toolbar */}
       <div className="absolute top-4 left-4 flex flex-col gap-1 bg-card/95 backdrop-blur rounded-lg shadow-lg border border-border p-1.5">
         <ToolbarButton
@@ -356,7 +486,7 @@ export function MapEditor({
 
       {/* No token warning */}
       {!MAPBOX_TOKEN && (
-        <div className="absolute top-4 right-4 bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 text-xs px-3 py-2 rounded-lg border border-red-200 dark:border-red-900 max-w-64">
+        <div className="absolute top-16 right-4 bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 text-xs px-3 py-2 rounded-lg border border-red-200 dark:border-red-900 max-w-64">
           Set <code className="font-mono">NEXT_PUBLIC_MAPBOX_TOKEN</code> in your .env to enable the map.
         </div>
       )}
