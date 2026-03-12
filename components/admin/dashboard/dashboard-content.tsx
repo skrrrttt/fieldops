@@ -6,6 +6,7 @@
 import Link from 'next/link';
 import type { DashboardStats } from '@/lib/dashboard/actions';
 import { formatDistanceToNow } from '@/lib/utils/date';
+import { MiniCalendar } from '@/components/calendar/mini-calendar';
 import {
   ClipboardList,
   CheckCircle2,
@@ -162,6 +163,9 @@ export function DashboardContent({ stats, photoUrls }: DashboardContentProps) {
 
         {/* Quick Stats Sidebar */}
         <div className="space-y-6">
+          {/* Mini Calendar */}
+          <MiniCalendar basePath="/admin/calendar" />
+
           {/* User Stats */}
           <div className="bg-card rounded-2xl border border-border/50 p-6 shadow-sm">
             <div className="flex items-center gap-3 mb-5">

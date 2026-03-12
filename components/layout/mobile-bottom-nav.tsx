@@ -8,7 +8,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ClipboardCheck, ImagePlus, User } from 'lucide-react';
+import { ClipboardCheck, CalendarDays, ImagePlus, User } from 'lucide-react';
 
 
 interface NavItem {
@@ -27,6 +27,12 @@ export function MobileBottomNav() {
       label: 'Tasks',
       href: '/tasks',
       icon: <ClipboardCheck className="w-6 h-6" />,
+    },
+    {
+      key: 'calendar',
+      label: 'Calendar',
+      href: '/calendar',
+      icon: <CalendarDays className="w-6 h-6" />,
     },
     {
       key: 'upload',

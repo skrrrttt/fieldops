@@ -11,6 +11,7 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
   ClipboardList,
+  CalendarDays,
   ImageIcon,
   Settings,
   Users,
@@ -46,6 +47,11 @@ const navItems: NavItem[] = [
     label: 'Tasks',
     href: '/admin/tasks',
     icon: <ClipboardList className="w-5 h-5" />,
+  },
+  {
+    label: 'Calendar',
+    href: '/admin/calendar',
+    icon: <CalendarDays className="w-5 h-5" />,
   },
   {
     label: 'Customers',
