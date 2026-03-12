@@ -64,6 +64,7 @@ export interface StripingMap {
 export interface StripingSegment {
   id: string;
   map_id: string;
+  name: string | null;
   geometry: GeoJSONLineString;
   stripe_type: StripeType;
   attributes: SegmentAttributes | null;

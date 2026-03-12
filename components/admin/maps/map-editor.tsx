@@ -42,6 +42,7 @@ export function MapEditor({
       id: seg.id,
       properties: {
         id: seg.id,
+        name: seg.name || '',
         stripe_type: seg.stripe_type,
         color: STRIPE_TYPE_CONFIG[seg.stripe_type as StripeType]?.color ?? '#888',
         width: STRIPE_TYPE_CONFIG[seg.stripe_type as StripeType]?.width ?? 3,
@@ -221,6 +222,27 @@ export function MapEditor({
               'line-color': '#3B82F6',
               'line-width': ['+', ['get', 'width'], 10],
               'line-opacity': 0.4,
+            }}
+          />
+          {/* Segment name labels */}
+          <Layer
+            id="segments-label"
+            type="symbol"
+            filter={['!=', ['get', 'name'], '']}
+            minzoom={14}
+            layout={{
+              'symbol-placement': 'line-center',
+              'text-field': ['get', 'name'],
+              'text-size': ['interpolate', ['linear'], ['zoom'], 14, 11, 18, 14],
+              'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
+              'text-anchor': 'center',
+              'text-allow-overlap': false,
+              'text-ignore-placement': false,
+            }}
+            paint={{
+              'text-color': '#FFFFFF',
+              'text-halo-color': '#000000',
+              'text-halo-width': 2,
             }}
           />
         </Source>

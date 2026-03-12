@@ -7,6 +7,7 @@ import Link from 'next/link';
 import type { MapRef } from 'react-map-gl/mapbox';
 import type { StripingMapWithSegments, StripingSegment, StripeType, GeoJSONLineString, SegmentAttributes } from '@/lib/maps/types';
 import { updateStripingMap, upsertSegments } from '@/lib/maps/actions';
+import { reverseGeocodeRoadName } from '@/lib/maps/geocode';
 import { MapEditor } from './map-editor';
 import { SegmentPanel } from './segment-panel';
 import { TaskAssignmentDialog } from './task-assignment-dialog';
@@ -28,10 +29,12 @@ export function MapEditorWrapper({ map, tasks }: MapEditorWrapperProps) {
 
   const selectedSegment = segments.find(s => s.id === selectedSegmentId) ?? null;
 
-  const handleAddSegment = (geometry: GeoJSONLineString, stripeType: StripeType) => {
+  const handleAddSegment = async (geometry: GeoJSONLineString, stripeType: StripeType) => {
+    const tempId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const newSegment: StripingSegment = {
-      id: `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: tempId,
       map_id: map.id,
+      name: null,
       geometry,
       stripe_type: stripeType,
       attributes: null,
@@ -43,9 +46,21 @@ export function MapEditorWrapper({ map, tasks }: MapEditorWrapperProps) {
     setSegments(prev => [...prev, newSegment]);
     setSelectedSegmentId(newSegment.id);
     setHasChanges(true);
+
+    // Auto-generate name from road coordinates (non-blocking)
+    const coords = geometry.coordinates;
+    const start = coords[0];
+    const end = coords[coords.length - 1];
+    reverseGeocodeRoadName(start, end).then((autoName) => {
+      if (autoName) {
+        setSegments(prev => prev.map(s =>
+          s.id === tempId ? { ...s, name: autoName } : s
+        ));
+      }
+    });
   };
 
-  const handleUpdateSegment = (id: string, updates: Partial<Pick<StripingSegment, 'stripe_type' | 'attributes' | 'notes' | 'geometry'>>) => {
+  const handleUpdateSegment = (id: string, updates: Partial<Pick<StripingSegment, 'name' | 'stripe_type' | 'attributes' | 'notes' | 'geometry'>>) => {
     setSegments(prev => prev.map(s =>
       s.id === id ? { ...s, ...updates, updated_at: new Date().toISOString() } : s
     ));
@@ -81,6 +96,7 @@ export function MapEditorWrapper({ map, tasks }: MapEditorWrapperProps) {
     // Save segments
     const segmentData = segments.map((s, i) => ({
       id: s.id.startsWith('temp_') ? undefined : s.id,
+      name: s.name,
       geometry: s.geometry,
       stripe_type: s.stripe_type as StripeType,
       attributes: s.attributes as SegmentAttributes | null,

@@ -48,6 +48,7 @@ export function TaskMapView({ taskId, assignments, isOnline, onToggleComplete }:
       id: a.id,
       properties: {
         id: a.id,
+        name: a.segment.name || '',
         stripe_type: a.segment.stripe_type,
         color: STRIPE_TYPE_CONFIG[a.segment.stripe_type as StripeType]?.color ?? '#888',
         width: STRIPE_TYPE_CONFIG[a.segment.stripe_type as StripeType]?.width ?? 3,
@@ -176,6 +177,27 @@ export function TaskMapView({ taskId, assignments, isOnline, onToggleComplete }:
               'line-dasharray': [2, 4],
             }}
           />
+          {/* Road name labels — appear when zoomed in */}
+          <Layer
+            id="task-segments-label"
+            type="symbol"
+            filter={['!=', ['get', 'name'], '']}
+            minzoom={14}
+            layout={{
+              'symbol-placement': 'line-center',
+              'text-field': ['get', 'name'],
+              'text-size': ['interpolate', ['linear'], ['zoom'], 14, 12, 18, 16],
+              'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
+              'text-anchor': 'center',
+              'text-allow-overlap': false,
+              'text-ignore-placement': false,
+            }}
+            paint={{
+              'text-color': '#FFFFFF',
+              'text-halo-color': '#000000',
+              'text-halo-width': 2,
+            }}
+          />
         </Source>
 
         <GeolocateControl
@@ -201,7 +223,12 @@ export function TaskMapView({ taskId, assignments, isOnline, onToggleComplete }:
           <div className="p-4 border-b border-border">
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-foreground">
+                {selectedAssignment.segment.name && (
+                  <p className="font-medium text-foreground">
+                    {selectedAssignment.segment.name}
+                  </p>
+                )}
+                <p className={`${selectedAssignment.segment.name ? 'text-sm text-muted-foreground' : 'font-medium text-foreground'}`}>
                   {STRIPE_TYPE_CONFIG[selectedAssignment.segment.stripe_type as StripeType]?.label ?? selectedAssignment.segment.stripe_type}
                 </p>
                 {selectedAssignment.segment.notes && (

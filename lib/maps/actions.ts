@@ -229,6 +229,7 @@ export async function cloneStripingMap(
   if (segments && segments.length > 0) {
     const newSegments = (segments as StripingSegment[]).map((seg) => ({
       map_id: clonedMap.id,
+      name: seg.name,
       geometry: seg.geometry,
       stripe_type: seg.stripe_type,
       attributes: seg.attributes,
@@ -250,6 +251,7 @@ export async function upsertSegments(
   mapId: string,
   segments: Array<{
     id?: string;
+    name?: string | null;
     geometry: GeoJSONLineString;
     stripe_type: StripeType;
     attributes?: SegmentAttributes | null;
@@ -281,6 +283,7 @@ export async function upsertSegments(
   const existingRows = segments.filter(s => s.id).map(s => ({
     id: s.id!,
     map_id: mapId,
+    name: s.name || null,
     geometry: s.geometry,
     stripe_type: s.stripe_type,
     attributes: s.attributes || null,
@@ -291,6 +294,7 @@ export async function upsertSegments(
 
   const newRows = segments.filter(s => !s.id).map(s => ({
     map_id: mapId,
+    name: s.name || null,
     geometry: s.geometry,
     stripe_type: s.stripe_type,
     attributes: s.attributes || null,

@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Trash2, ChevronRight, Layers } from 'lucide-react';
+import { Trash2, ChevronRight, Layers, Sparkles } from 'lucide-react';
+import { reverseGeocodeRoadName } from '@/lib/maps/geocode';
 import type { StripingSegment, StripeType, SegmentAttributes } from '@/lib/maps/types';
 import { STRIPE_TYPE_CONFIG, STRIPE_TYPES } from '@/lib/maps/types';
 
@@ -9,7 +10,7 @@ interface SegmentPanelProps {
   segments: StripingSegment[];
   selectedSegmentId: string | null;
   onSelectSegment: (id: string | null) => void;
-  onUpdateSegment: (id: string, updates: Partial<Pick<StripingSegment, 'stripe_type' | 'attributes' | 'notes' | 'geometry'>>) => void;
+  onUpdateSegment: (id: string, updates: Partial<Pick<StripingSegment, 'name' | 'stripe_type' | 'attributes' | 'notes' | 'geometry'>>) => void;
   onDeleteSegment: (id: string) => void;
 }
 
@@ -80,10 +81,10 @@ function SegmentList({
           />
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-foreground truncate">
-              {STRIPE_TYPE_CONFIG[seg.stripe_type as StripeType]?.label ?? seg.stripe_type}
+              {seg.name || `Segment ${i + 1}`}
             </p>
-            <p className="text-xs text-muted-foreground">
-              Segment {i + 1}
+            <p className="text-xs text-muted-foreground truncate">
+              {STRIPE_TYPE_CONFIG[seg.stripe_type as StripeType]?.label ?? seg.stripe_type}
               {seg.notes && ` — ${seg.notes}`}
             </p>
           </div>
@@ -101,14 +102,35 @@ function SegmentEditor({
   onBack,
 }: {
   segment: StripingSegment;
-  onUpdate: (updates: Partial<Pick<StripingSegment, 'stripe_type' | 'attributes' | 'notes'>>) => void;
+  onUpdate: (updates: Partial<Pick<StripingSegment, 'name' | 'stripe_type' | 'attributes' | 'notes'>>) => void;
   onDelete: () => void;
   onBack: () => void;
 }) {
+  const [name, setName] = useState(segment.name ?? '');
+  const [isAutoNaming, setIsAutoNaming] = useState(false);
   const [notes, setNotes] = useState(segment.notes ?? '');
   const [attributes, setAttributes] = useState<SegmentAttributes>(
     (segment.attributes as SegmentAttributes) ?? {}
   );
+
+  const handleNameBlur = () => {
+    if (name !== (segment.name ?? '')) {
+      onUpdate({ name: name || null });
+    }
+  };
+
+  const handleAutoName = async () => {
+    setIsAutoNaming(true);
+    const coords = segment.geometry.coordinates;
+    const start = coords[0];
+    const end = coords[coords.length - 1];
+    const autoName = await reverseGeocodeRoadName(start, end);
+    if (autoName) {
+      setName(autoName);
+      onUpdate({ name: autoName });
+    }
+    setIsAutoNaming(false);
+  };
 
   const handleNotesBlur = () => {
     if (notes !== (segment.notes ?? '')) {
@@ -133,6 +155,34 @@ function SegmentEditor({
       </button>
 
       <div className="p-3 space-y-4">
+        {/* Segment Name */}
+        <div>
+          <label className="block text-xs font-medium text-muted-foreground mb-1">
+            Name
+          </label>
+          <div className="flex gap-1.5">
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onBlur={handleNameBlur}
+              placeholder="e.g. Main St"
+              className="flex-1 px-2 py-1.5 text-sm border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground"
+            />
+            <button
+              onClick={handleAutoName}
+              disabled={isAutoNaming}
+              title="Auto-detect road name"
+              className="px-2 py-1.5 text-sm border border-border rounded-lg hover:bg-muted transition-colors disabled:opacity-50 flex-shrink-0"
+            >
+              <Sparkles className={`w-4 h-4 ${isAutoNaming ? 'animate-spin' : ''}`} />
+            </button>
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-1">
+            Auto-generated from road. Tap to edit.
+          </p>
+        </div>
+
         {/* Stripe Type */}
         <div>
           <label className="block text-xs font-medium text-muted-foreground mb-1">
