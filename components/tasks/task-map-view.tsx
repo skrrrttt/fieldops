@@ -125,7 +125,7 @@ export function TaskMapView({ taskId, assignments, isOnline, onToggleComplete }:
           latitude: bounds ? (bounds[0][1] + bounds[1][1]) / 2 : 39.83,
           zoom: 15,
         }}
-        mapStyle="mapbox://styles/mapbox/satellite-v9"
+        mapStyle="mapbox://styles/mapbox/satellite-streets-v12"
         onClick={handleMapClick}
         onLoad={() => {
           // Auto-trigger geolocation after map loads

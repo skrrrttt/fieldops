@@ -294,7 +294,7 @@ export function MapEditor({
           latitude: center?.[1] ?? 39.8283,
           zoom: zoom,
         }}
-        mapStyle="mapbox://styles/mapbox/satellite-v9"
+        mapStyle="mapbox://styles/mapbox/satellite-streets-v12"
         cursor={cursorStyle}
         onClick={handleMapClick}
         interactiveLayerIds={drawMode === 'select' ? ['segments-hit', 'segments-line'] : undefined}
