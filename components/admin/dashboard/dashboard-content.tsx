@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * DashboardContent - Premium admin dashboard with refined visual hierarchy
  * Features: vibrant stat cards, clear data visualization, elegant spacing
