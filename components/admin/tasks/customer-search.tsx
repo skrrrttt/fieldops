@@ -36,6 +36,7 @@ export function CustomerSearch({ customers, selectedCustomer, onCustomerSelect, 
     return customers.filter(
       (c) =>
         c.name.toLowerCase().includes(query) ||
+        c.contact_name?.toLowerCase().includes(query) ||
         c.contact_email?.toLowerCase().includes(query) ||
         c.contact_phone?.toLowerCase().includes(query) ||
         c.address?.toLowerCase().includes(query)
@@ -61,8 +62,8 @@ export function CustomerSearch({ customers, selectedCustomer, onCustomerSelect, 
         </div>
         <div className="flex-1 min-w-0">
           <span className="font-medium text-foreground">{selectedCustomer.name}</span>
-          {selectedCustomer.contact_phone && (
-            <p className="text-sm text-muted-foreground">{selectedCustomer.contact_phone}</p>
+          {selectedCustomer.contact_name && (
+            <p className="text-sm text-muted-foreground">{selectedCustomer.contact_name}</p>
           )}
           {selectedCustomer.address && (
             <p className="text-sm text-muted-foreground truncate">{selectedCustomer.address}</p>
@@ -133,8 +134,8 @@ export function CustomerSearch({ customers, selectedCustomer, onCustomerSelect, 
                   <span className="text-sm font-medium text-foreground">
                     {customer.name}
                   </span>
-                  {customer.contact_phone && (
-                    <p className="text-xs text-muted-foreground">{customer.contact_phone}</p>
+                  {customer.contact_name && (
+                    <p className="text-xs text-muted-foreground">{customer.contact_name}</p>
                   )}
                   {customer.address && (
                     <p className="text-xs text-muted-foreground truncate">{customer.address}</p>

@@ -61,6 +61,7 @@ export function CustomerList({ customers }: CustomerListProps) {
   const [editingCustomer, setEditingCustomer] = useState<CustomerWithJobsAndTasks | null>(null);
   const [customerFormData, setCustomerFormData] = useState<CustomerFormData>({
     name: '',
+    contact_name: '',
     contact_phone: '',
     contact_email: '',
     address: '',
@@ -129,6 +130,7 @@ export function CustomerList({ customers }: CustomerListProps) {
     setEditingCustomer(customer);
     setCustomerFormData({
       name: customer.name,
+      contact_name: customer.contact_name || '',
       contact_phone: customer.contact_phone || '',
       contact_email: customer.contact_email || '',
       address: customer.address || '',
@@ -153,6 +155,7 @@ export function CustomerList({ customers }: CustomerListProps) {
     try {
       const result = await updateCustomer(editingCustomer.id, {
         name: customerFormData.name.trim(),
+        contact_name: customerFormData.contact_name.trim() || null,
         contact_phone: customerFormData.contact_phone.trim() || null,
         contact_email: customerFormData.contact_email.trim() || null,
         address: customerFormData.address.trim() || null,
@@ -369,6 +372,11 @@ export function CustomerList({ customers }: CustomerListProps) {
                     {customer.name}
                   </h3>
                   <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                    {customer.contact_name && (
+                      <span className="text-foreground font-medium">
+                        {customer.contact_name}
+                      </span>
+                    )}
                     {customer.contact_phone && (
                       <span className="flex items-center gap-1">
                         <Phone className="w-3 h-3" />
@@ -381,9 +389,6 @@ export function CustomerList({ customers }: CustomerListProps) {
                         {customer.contact_email}
                       </span>
                     )}
-                    <span className="text-muted-foreground">
-                      {customer.jobs.length} job{customer.jobs.length !== 1 ? 's' : ''}
-                    </span>
                     {customer.tasks && customer.tasks.length > 0 && (
                       <span className="text-muted-foreground flex items-center gap-1">
                         <ClipboardList className="w-3 h-3" />
@@ -394,14 +399,6 @@ export function CustomerList({ customers }: CustomerListProps) {
                 </div>
 
                 <div className="flex items-center gap-1">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => openAddJob(customer)}
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span className="hidden sm:inline ml-1">Add Job</span>
-                  </Button>
                   <Button
                     size="sm"
                     variant="ghost"

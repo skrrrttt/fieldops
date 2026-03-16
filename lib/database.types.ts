@@ -101,6 +101,7 @@ export interface Database {
         Row: {
           id: string;
           name: string;
+          contact_name: string | null;
           contact_phone: string | null;
           contact_email: string | null;
           address: string | null;
@@ -111,6 +112,7 @@ export interface Database {
         Insert: {
           id?: string;
           name: string;
+          contact_name?: string | null;
           contact_phone?: string | null;
           contact_email?: string | null;
           address?: string | null;
@@ -121,6 +123,7 @@ export interface Database {
         Update: {
           id?: string;
           name?: string;
+          contact_name?: string | null;
           contact_phone?: string | null;
           contact_email?: string | null;
           address?: string | null;

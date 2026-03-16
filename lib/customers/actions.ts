@@ -117,6 +117,7 @@ export async function getCustomer(id: string): Promise<CustomerWithJobs | null> 
 
 export interface CreateCustomerInput {
   name: string;
+  contact_name?: string | null;
   contact_phone?: string | null;
   contact_email?: string | null;
   address?: string | null;
@@ -134,6 +135,7 @@ export async function createCustomer(input: CreateCustomerInput): Promise<Action
     .from('customers')
     .insert({
       name: input.name,
+      contact_name: input.contact_name || null,
       contact_phone: input.contact_phone || null,
       contact_email: input.contact_email || null,
       address: input.address || null,
@@ -152,6 +154,7 @@ export async function createCustomer(input: CreateCustomerInput): Promise<Action
 
 export interface UpdateCustomerInput {
   name?: string;
+  contact_name?: string | null;
   contact_phone?: string | null;
   contact_email?: string | null;
   address?: string | null;
@@ -170,6 +173,7 @@ export async function updateCustomer(id: string, input: UpdateCustomerInput): Pr
   };
 
   if (input.name !== undefined) updateData.name = input.name;
+  if (input.contact_name !== undefined) updateData.contact_name = input.contact_name;
   if (input.contact_phone !== undefined) updateData.contact_phone = input.contact_phone;
   if (input.contact_email !== undefined) updateData.contact_email = input.contact_email;
   if (input.address !== undefined) updateData.address = input.address;

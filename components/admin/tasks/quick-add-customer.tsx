@@ -27,6 +27,7 @@ export function QuickAddCustomer({ isOpen, onClose, onCustomerCreated }: QuickAd
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [name, setName] = useState('');
+  const [contactName, setContactName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [address, setAddress] = useState('');
@@ -45,6 +46,7 @@ export function QuickAddCustomer({ isOpen, onClose, onCustomerCreated }: QuickAd
     try {
       const result = await createCustomer({
         name: name.trim(),
+        contact_name: contactName.trim() || null,
         contact_phone: phone.trim() || null,
         contact_email: email.trim() || null,
         address: address.trim() || null,
@@ -69,6 +71,7 @@ export function QuickAddCustomer({ isOpen, onClose, onCustomerCreated }: QuickAd
 
   const handleClose = () => {
     setName('');
+    setContactName('');
     setPhone('');
     setEmail('');
     setAddress('');
@@ -99,6 +102,16 @@ export function QuickAddCustomer({ isOpen, onClose, onCustomerCreated }: QuickAd
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Customer name"
+                disabled={isSubmitting}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="quick-customer-contact-name">Contact Name</Label>
+              <Input
+                id="quick-customer-contact-name"
+                value={contactName}
+                onChange={(e) => setContactName(e.target.value)}
+                placeholder="Primary contact person"
                 disabled={isSubmitting}
               />
             </div>

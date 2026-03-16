@@ -25,6 +25,7 @@ export function CreateCustomerForm() {
 
   const [formData, setFormData] = useState<CustomerFormData>({
     name: '',
+    contact_name: '',
     contact_phone: '',
     contact_email: '',
     address: '',
@@ -34,6 +35,7 @@ export function CreateCustomerForm() {
   const resetForm = () => {
     setFormData({
       name: '',
+      contact_name: '',
       contact_phone: '',
       contact_email: '',
       address: '',
@@ -63,6 +65,7 @@ export function CreateCustomerForm() {
     try {
       const result = await createCustomer({
         name: formData.name.trim(),
+        contact_name: formData.contact_name.trim() || null,
         contact_phone: formData.contact_phone.trim() || null,
         contact_email: formData.contact_email.trim() || null,
         address: formData.address.trim() || null,

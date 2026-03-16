@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 
 export interface CustomerFormData {
   name: string;
+  contact_name: string;
   contact_phone: string;
   contact_email: string;
   address: string;
@@ -38,6 +39,17 @@ export function CustomerForm({ data, onChange, disabled = false }: CustomerFormP
           placeholder="Enter customer name"
           disabled={disabled}
           required
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="customer-contact-name">Contact Name</Label>
+        <Input
+          id="customer-contact-name"
+          value={data.contact_name}
+          onChange={handleChange('contact_name')}
+          placeholder="Primary contact person"
+          disabled={disabled}
         />
       </div>
 
