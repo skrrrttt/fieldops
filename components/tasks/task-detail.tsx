@@ -191,12 +191,12 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
         <TaskChecklist taskChecklists={taskChecklists} />
       )}
 
-      {/* Customer/Job Section */}
-      {task.job && (
+      {/* Customer Section */}
+      {(task.customer || task.job) && (
         <section className="bg-card rounded-lg shadow-sm border border-border p-4">
           <h2 className="text-base font-semibold text-foreground flex items-center gap-2 mb-3">
             <Building2 className="w-4 h-4 text-muted-foreground" />
-            Customer & Job
+            Customer
           </h2>
           <div className="space-y-2">
             <div className="flex items-center gap-2">
@@ -205,18 +205,17 @@ export function TaskDetail({ task, photos, files, comments: initialComments, cus
               </div>
               <div>
                 <p className="font-medium text-foreground">
-                  {task.job.customer.name}
+                  {task.customer?.name || task.job?.customer.name}
                 </p>
-                <p className="text-sm text-muted-foreground">{task.job.name}</p>
               </div>
             </div>
-            {task.job.customer.contact_phone && (
+            {(task.customer?.contact_phone || task.job?.customer.contact_phone) && (
               <a
-                href={`tel:${task.job.customer.contact_phone}`}
+                href={`tel:${task.customer?.contact_phone || task.job?.customer.contact_phone}`}
                 className="flex items-center gap-2 text-sm text-primary hover:underline ml-10"
               >
                 <Phone className="w-3.5 h-3.5" />
-                {task.job.customer.contact_phone}
+                {task.customer?.contact_phone || task.job?.customer.contact_phone}
               </a>
             )}
           </div>

@@ -2,7 +2,7 @@ import { getTasks, getUsers, getDefaultStatus } from '@/lib/tasks/actions';
 import { getStatuses } from '@/lib/statuses/actions';
 import { getDivisions } from '@/lib/divisions/actions';
 import { getCustomFields } from '@/lib/custom-fields/actions';
-import { getActiveJobsWithCustomer, getCustomers } from '@/lib/customers/actions';
+import { getCustomers } from '@/lib/customers/actions';
 import { getChecklistsWithItems } from '@/lib/checklists/actions';
 import { getStripingMaps } from '@/lib/maps/actions';
 import { TaskTable } from '@/components/admin/tasks/task-table';
@@ -32,7 +32,7 @@ export default async function AdminTasksPage({ searchParams }: PageProps) {
   const search = params.search || '';
 
   // Fetch data in parallel
-  const [tasksResult, statuses, divisions, users, defaultStatusId, customFields, jobs, customers, checklists, stripingMaps] = await Promise.all([
+  const [tasksResult, statuses, divisions, users, defaultStatusId, customFields, customers, checklists, stripingMaps] = await Promise.all([
     getTasks({
       page,
       pageSize: 25,
@@ -48,7 +48,6 @@ export default async function AdminTasksPage({ searchParams }: PageProps) {
     getUsers(),
     getDefaultStatus(),
     getCustomFields(),
-    getActiveJobsWithCustomer(),
     getCustomers(),
     getChecklistsWithItems(),
     getStripingMaps(),
@@ -85,7 +84,6 @@ export default async function AdminTasksPage({ searchParams }: PageProps) {
           }}
           defaultStatusId={defaultStatusId}
           customFields={customFields}
-          jobs={jobs}
           customers={customers}
           checklists={checklists}
           stripingMaps={stripingMaps}

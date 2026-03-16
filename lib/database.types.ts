@@ -176,6 +176,7 @@ export interface Database {
           status_id: string;
           division_id: string | null;
           job_id: string | null;
+          customer_id: string | null;
           location_lat: number | null;
           location_lng: number | null;
           address: string | null;
@@ -196,6 +197,7 @@ export interface Database {
           status_id: string;
           division_id?: string | null;
           job_id?: string | null;
+          customer_id?: string | null;
           location_lat?: number | null;
           location_lng?: number | null;
           address?: string | null;
@@ -216,6 +218,7 @@ export interface Database {
           status_id?: string;
           division_id?: string | null;
           job_id?: string | null;
+          customer_id?: string | null;
           location_lat?: number | null;
           location_lng?: number | null;
           address?: string | null;
@@ -658,12 +661,15 @@ export interface CustomerWithJobs extends Customer {
   jobs: Job[];
 }
 
+export type TaskSummary = { id: string; title: string; status: Pick<Status, 'id' | 'name' | 'color' | 'is_complete'> | null };
+
 export interface JobWithTasks extends Job {
-  tasks: Array<{ id: string; title: string; status: Pick<Status, 'id' | 'name' | 'color' | 'is_complete'> | null }>;
+  tasks: TaskSummary[];
 }
 
 export interface CustomerWithJobsAndTasks extends Customer {
   jobs: JobWithTasks[];
+  tasks: TaskSummary[];
 }
 
 // Extended types with relations

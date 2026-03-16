@@ -3,7 +3,7 @@
 import { useState, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import type { TaskWithRelations } from '@/lib/tasks/actions';
-import type { Status, Division, User, CustomFieldDefinition, ChecklistWithItems, JobWithCustomer, Customer } from '@/lib/database.types';
+import type { Status, Division, User, CustomFieldDefinition, ChecklistWithItems, Customer } from '@/lib/database.types';
 import { createTask, updateTask, deleteTask } from '@/lib/tasks/actions';
 import { syncTaskChecklists } from '@/lib/checklists/actions';
 import { assignAllMapSegmentsToTask, removeSegmentsFromTask, getTaskStripingMapId } from '@/lib/maps/actions';
@@ -42,8 +42,8 @@ import { Separator } from '@/components/ui/separator';
 import { Loader2, Trash2, Map } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TaskMediaPanel } from './task-media-panel';
-import { JobSearch } from './job-search';
-import { QuickAddCustomerJob } from './quick-add-customer-job';
+import { CustomerSearch } from './customer-search';
+import { QuickAddCustomer } from './quick-add-customer';
 
 interface TaskModalProps {
   isOpen: boolean;
@@ -54,7 +54,6 @@ interface TaskModalProps {
   users: User[];
   defaultStatusId: string | null;
   customFields: CustomFieldDefinition[];
-  jobs?: JobWithCustomer[];
   customers?: Customer[];
   checklists?: ChecklistWithItems[];
   initialChecklistIds?: string[];
@@ -70,7 +69,6 @@ export function TaskModal({
   users,
   defaultStatusId,
   customFields,
-  jobs = [],
   customers = [],
   checklists = [],
   initialChecklistIds = [],
@@ -83,8 +81,8 @@ export function TaskModal({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [customFieldErrors, setCustomFieldErrors] = useState<Record<string, string>>({});
-  const [selectedJob, setSelectedJob] = useState<JobWithCustomer | null>(null);
-  const [showQuickAddJob, setShowQuickAddJob] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [showQuickAddCustomer, setShowQuickAddCustomer] = useState(false);
   const [selectedStripingMapId, setSelectedStripingMapId] = useState<string>('none');
   const [initialStripingMapId, setInitialStripingMapId] = useState<string>('none');
 
@@ -136,31 +134,27 @@ export function TaskModal({
     return defaults;
   };
 
-  // Handle job selection - auto-fill address from job
-  const handleJobSelect = (job: JobWithCustomer | null) => {
-    setSelectedJob(job);
+  // Handle customer selection
+  const handleCustomerSelect = (customer: Customer | null) => {
+    setSelectedCustomer(customer);
 
-    if (job) {
-      // Auto-fill address and location from job
+    if (customer?.address) {
       setFormData((prev) => ({
         ...prev,
-        address: job.address || '',
-        location_lat: job.location_lat?.toString() || '',
-        location_lng: job.location_lng?.toString() || '',
+        address: customer.address || prev.address,
       }));
     }
   };
 
-  // Handle job created from quick-add modal
-  const handleJobCreated = (job: JobWithCustomer) => {
-    setSelectedJob(job);
-    // Auto-fill address from the new job
-    setFormData((prev) => ({
-      ...prev,
-      address: job.address || '',
-      location_lat: job.location_lat?.toString() || '',
-      location_lng: job.location_lng?.toString() || '',
-    }));
+  // Handle customer created from quick-add modal
+  const handleCustomerCreated = (customer: Customer) => {
+    setSelectedCustomer(customer);
+    if (customer.address) {
+      setFormData((prev) => ({
+        ...prev,
+        address: customer.address || prev.address,
+      }));
+    }
   };
 
   // Reset form when task changes or modal opens
@@ -225,10 +219,10 @@ export function TaskModal({
     setShowDeleteConfirm(false);
     setCustomFieldErrors({});
     // Initialize selected job from task
-    if (task?.job) {
-      setSelectedJob(task.job);
+    if (task?.customer) {
+      setSelectedCustomer(task.customer);
     } else {
-      setSelectedJob(null);
+      setSelectedCustomer(null);
     }
     // Initialize selected checklists
     setSelectedChecklistIds(task ? initialChecklistIds : []);
@@ -320,7 +314,7 @@ export function TaskModal({
         specifications: formData.specifications || null,
         status_id: formData.status_id,
         division_id: formData.division_id || null,
-        job_id: selectedJob?.id || null,
+        customer_id: selectedCustomer?.id || null,
         assigned_user_id: formData.assigned_user_id || null,
         start_date: formData.start_date || null,
         end_date: formData.end_date || null,
@@ -418,17 +412,17 @@ export function TaskModal({
                 </Alert>
               )}
 
-              {/* Link to Job - auto-fills address */}
+              {/* Link to Customer */}
               <div className="pb-4">
-                <Label>Link to Customer Job</Label>
+                <Label>Customer</Label>
                 <p className="text-xs text-muted-foreground mb-2">
-                  Select a job to auto-fill address information, or add a new customer & job.
+                  Link this task to a customer.
                 </p>
-                <JobSearch
-                  jobs={jobs}
-                  selectedJob={selectedJob}
-                  onJobSelect={handleJobSelect}
-                  onQuickAddClick={() => setShowQuickAddJob(true)}
+                <CustomerSearch
+                  customers={customers}
+                  selectedCustomer={selectedCustomer}
+                  onCustomerSelect={handleCustomerSelect}
+                  onQuickAddClick={() => setShowQuickAddCustomer(true)}
                 />
                 <Separator className="mt-4" />
               </div>
@@ -890,12 +884,11 @@ export function TaskModal({
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Quick Add Customer/Job Modal */}
-      <QuickAddCustomerJob
-        isOpen={showQuickAddJob}
-        onClose={() => setShowQuickAddJob(false)}
-        onJobCreated={handleJobCreated}
-        existingCustomers={customers}
+      {/* Quick Add Customer Modal */}
+      <QuickAddCustomer
+        isOpen={showQuickAddCustomer}
+        onClose={() => setShowQuickAddCustomer(false)}
+        onCustomerCreated={handleCustomerCreated}
       />
     </>
   );

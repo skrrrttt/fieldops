@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/auth/actions';
-import type { Task, Division, Status, User, JobWithCustomer } from '@/lib/database.types';
+import type { Task, Division, Status, User, JobWithCustomer, Customer } from '@/lib/database.types';
 import type { ActionResult } from '@/lib/types';
 
 export interface TaskWithRelations extends Task {
@@ -11,6 +11,7 @@ export interface TaskWithRelations extends Task {
   division: Division | null;
   assigned_user: User | null;
   job: JobWithCustomer | null;
+  customer: Customer | null;
 }
 
 export interface TasksQueryParams {
@@ -62,7 +63,8 @@ export async function getTasks(
       status:statuses(*),
       division:divisions(*),
       assigned_user:users(*),
-      job:jobs(*, customer:customers(*))
+      job:jobs(*, customer:customers(*)),
+      customer:customers(*)
     `,
       { count: 'exact' }
     )
@@ -137,7 +139,8 @@ export async function getTask(id: string): Promise<TaskWithRelations | null> {
       status:statuses(*),
       division:divisions(*),
       assigned_user:users(*),
-      job:jobs(*, customer:customers(*))
+      job:jobs(*, customer:customers(*)),
+      customer:customers(*)
     `
     )
     .eq('id', id)
@@ -205,6 +208,7 @@ export interface CreateTaskData {
   status_id: string;
   division_id?: string | null;
   job_id?: string | null;
+  customer_id?: string | null;
   assigned_user_id?: string | null;
   start_date?: string | null;
   end_date?: string | null;
@@ -231,6 +235,7 @@ export async function createTask(data: CreateTaskData): Promise<ActionResult<Tas
       status_id: data.status_id,
       division_id: data.division_id || null,
       job_id: data.job_id || null,
+      customer_id: data.customer_id || null,
       assigned_user_id: data.assigned_user_id || null,
       start_date: data.start_date || null,
       end_date: data.end_date || null,
@@ -260,6 +265,7 @@ export interface UpdateTaskData {
   status_id?: string;
   division_id?: string | null;
   job_id?: string | null;
+  customer_id?: string | null;
   assigned_user_id?: string | null;
   start_date?: string | null;
   end_date?: string | null;
@@ -287,6 +293,7 @@ export async function updateTask(data: UpdateTaskData): Promise<ActionResult<Tas
   if (data.status_id !== undefined) updateData.status_id = data.status_id;
   if (data.division_id !== undefined) updateData.division_id = data.division_id;
   if (data.job_id !== undefined) updateData.job_id = data.job_id;
+  if (data.customer_id !== undefined) updateData.customer_id = data.customer_id;
   if (data.assigned_user_id !== undefined) updateData.assigned_user_id = data.assigned_user_id;
   if (data.start_date !== undefined) updateData.start_date = data.start_date;
   if (data.end_date !== undefined) updateData.end_date = data.end_date;

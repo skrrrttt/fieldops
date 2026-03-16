@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useCallback, useRef, useTransition } from 'react';
 import type { TaskWithRelations } from '@/lib/tasks/actions';
-import type { Status, Division, User, CustomFieldDefinition, ChecklistWithItems, JobWithCustomer, Customer } from '@/lib/database.types';
+import type { Status, Division, User, CustomFieldDefinition, ChecklistWithItems, Customer } from '@/lib/database.types';
 import type { StripingMap } from '@/lib/maps/types';
 import { TaskModal } from './task-modal';
 import { BulkActionBar } from './bulk-action-bar';
@@ -28,7 +28,6 @@ interface TaskTableProps {
   };
   defaultStatusId: string | null;
   customFields: CustomFieldDefinition[];
-  jobs: JobWithCustomer[];
   customers: Customer[];
   checklists: ChecklistWithItems[];
   stripingMaps: StripingMap[];
@@ -48,7 +47,6 @@ export function TaskTable({
   currentFilters,
   defaultStatusId,
   customFields,
-  jobs,
   customers,
   checklists,
   stripingMaps,
@@ -280,7 +278,6 @@ export function TaskTable({
         users={users}
         defaultStatusId={defaultStatusId}
         customFields={customFields}
-        jobs={jobs}
         customers={customers}
         checklists={checklists}
         initialChecklistIds={editingTaskChecklistIds}

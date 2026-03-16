@@ -65,7 +65,8 @@ export function TaskListOfflineWrapper({
     status: task.status ?? null,
     division: task.division ?? null,
     assigned_user: task.assigned_user ? task.assigned_user as User : null,
-    job: null, // Job data is not cached offline
+    job: null,
+    customer: null,
   }));
 
   // Handle refresh - refetch from server and update cache

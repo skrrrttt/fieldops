@@ -50,6 +50,7 @@ export async function getCustomersWithJobs(): Promise<CustomerWithJobs[]> {
 
 /**
  * Get all customers with their jobs and linked tasks (for customer management page)
+ * Fetches tasks linked via customer_id directly on the customer
  */
 export async function getCustomersWithJobsAndTasks(): Promise<CustomerWithJobsAndTasks[]> {
   const supabase = await createClient();
@@ -58,14 +59,12 @@ export async function getCustomersWithJobsAndTasks(): Promise<CustomerWithJobsAn
     .from('customers')
     .select(`
       *,
-      jobs (
-        *,
-        tasks (
-          id,
-          title,
-          status:statuses (*),
-          deleted_at
-        )
+      jobs (*),
+      tasks (
+        id,
+        title,
+        status:statuses (*),
+        deleted_at
       )
     `)
     .order('name');
@@ -77,21 +76,19 @@ export async function getCustomersWithJobsAndTasks(): Promise<CustomerWithJobsAn
 
   if (!data) return [];
 
-  // Filter out soft-deleted tasks and map to correct shape
+  // Filter out soft-deleted tasks
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (data as any[]).map((customer) => ({
     ...customer,
-    jobs: customer.jobs.map((job: Record<string, unknown>) => ({
-      ...job,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      tasks: ((job.tasks as any[]) || [])
-        .filter((t: { deleted_at: string | null }) => !t.deleted_at)
-        .map((t: { id: string; title: string; status: unknown }) => ({
-          id: t.id,
-          title: t.title,
-          status: t.status,
-        })),
-    })),
+    jobs: customer.jobs || [],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    tasks: ((customer.tasks as any[]) || [])
+      .filter((t: { deleted_at: string | null }) => !t.deleted_at)
+      .map((t: { id: string; title: string; status: unknown }) => ({
+        id: t.id,
+        title: t.title,
+        status: t.status,
+      })),
   })) as CustomerWithJobsAndTasks[];
 }
 
