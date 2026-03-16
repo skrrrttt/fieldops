@@ -658,6 +658,14 @@ export interface CustomerWithJobs extends Customer {
   jobs: Job[];
 }
 
+export interface JobWithTasks extends Job {
+  tasks: Array<{ id: string; title: string; status: Pick<Status, 'id' | 'name' | 'color' | 'is_complete'> | null }>;
+}
+
+export interface CustomerWithJobsAndTasks extends Customer {
+  jobs: JobWithTasks[];
+}
+
 // Extended types with relations
 export interface ChecklistWithItems extends Checklist {
   items: ChecklistItem[];

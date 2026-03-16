@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/auth/actions';
-import type { Customer, Job, CustomerWithJobs, JobWithCustomer } from '@/lib/database.types';
+import type { Customer, Job, CustomerWithJobs, CustomerWithJobsAndTasks, JobWithCustomer } from '@/lib/database.types';
 import type { ActionResult } from '@/lib/types';
 
 // ============ Customer Actions ============
@@ -46,6 +46,53 @@ export async function getCustomersWithJobs(): Promise<CustomerWithJobs[]> {
   }
 
   return (data as CustomerWithJobs[]) || [];
+}
+
+/**
+ * Get all customers with their jobs and linked tasks (for customer management page)
+ */
+export async function getCustomersWithJobsAndTasks(): Promise<CustomerWithJobsAndTasks[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('customers')
+    .select(`
+      *,
+      jobs (
+        *,
+        tasks (
+          id,
+          title,
+          status:statuses (*),
+          deleted_at
+        )
+      )
+    `)
+    .order('name');
+
+  if (error) {
+    console.error('Error fetching customers with jobs and tasks:', error);
+    return [];
+  }
+
+  if (!data) return [];
+
+  // Filter out soft-deleted tasks and map to correct shape
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data as any[]).map((customer) => ({
+    ...customer,
+    jobs: customer.jobs.map((job: Record<string, unknown>) => ({
+      ...job,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      tasks: ((job.tasks as any[]) || [])
+        .filter((t: { deleted_at: string | null }) => !t.deleted_at)
+        .map((t: { id: string; title: string; status: unknown }) => ({
+          id: t.id,
+          title: t.title,
+          status: t.status,
+        })),
+    })),
+  })) as CustomerWithJobsAndTasks[];
 }
 
 /**

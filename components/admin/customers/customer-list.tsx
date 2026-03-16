@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import type { CustomerWithJobs, Job } from '@/lib/database.types';
+import type { CustomerWithJobsAndTasks, JobWithTasks, Job } from '@/lib/database.types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -35,6 +35,7 @@ import {
   Plus,
   Loader2,
   Search,
+  ClipboardList,
 } from 'lucide-react';
 import { CustomerForm, type CustomerFormData } from './customer-form';
 import { JobForm, type JobFormData } from './job-form';
@@ -47,7 +48,7 @@ import {
 } from '@/lib/customers/actions';
 
 interface CustomerListProps {
-  customers: CustomerWithJobs[];
+  customers: CustomerWithJobsAndTasks[];
 }
 
 export function CustomerList({ customers }: CustomerListProps) {
@@ -57,7 +58,7 @@ export function CustomerList({ customers }: CustomerListProps) {
   const [expandedCustomers, setExpandedCustomers] = useState<Set<string>>(new Set());
 
   // Edit customer state
-  const [editingCustomer, setEditingCustomer] = useState<CustomerWithJobs | null>(null);
+  const [editingCustomer, setEditingCustomer] = useState<CustomerWithJobsAndTasks | null>(null);
   const [customerFormData, setCustomerFormData] = useState<CustomerFormData>({
     name: '',
     contact_phone: '',
@@ -69,11 +70,11 @@ export function CustomerList({ customers }: CustomerListProps) {
   const [customerError, setCustomerError] = useState<string | null>(null);
 
   // Delete customer state
-  const [deletingCustomer, setDeletingCustomer] = useState<CustomerWithJobs | null>(null);
+  const [deletingCustomer, setDeletingCustomer] = useState<CustomerWithJobsAndTasks | null>(null);
   const [isDeletingCustomer, setIsDeletingCustomer] = useState(false);
 
   // Add job state
-  const [addingJobToCustomer, setAddingJobToCustomer] = useState<CustomerWithJobs | null>(null);
+  const [addingJobToCustomer, setAddingJobToCustomer] = useState<CustomerWithJobsAndTasks | null>(null);
   const [jobFormData, setJobFormData] = useState<JobFormData>({
     name: '',
     address: '',
@@ -124,7 +125,7 @@ export function CustomerList({ customers }: CustomerListProps) {
   };
 
   // Customer handlers
-  const openEditCustomer = (customer: CustomerWithJobs) => {
+  const openEditCustomer = (customer: CustomerWithJobsAndTasks) => {
     setEditingCustomer(customer);
     setCustomerFormData({
       name: customer.name,
@@ -196,7 +197,7 @@ export function CustomerList({ customers }: CustomerListProps) {
   };
 
   // Job handlers
-  const openAddJob = (customer: CustomerWithJobs) => {
+  const openAddJob = (customer: CustomerWithJobsAndTasks) => {
     setAddingJobToCustomer(customer);
     setJobFormData({
       name: '',
@@ -383,6 +384,18 @@ export function CustomerList({ customers }: CustomerListProps) {
                     <span className="text-muted-foreground">
                       {customer.jobs.length} job{customer.jobs.length !== 1 ? 's' : ''}
                     </span>
+                    {(() => {
+                      const taskCount = customer.jobs.reduce(
+                        (sum, j) => sum + (('tasks' in j) ? (j as JobWithTasks).tasks.length : 0),
+                        0
+                      );
+                      return taskCount > 0 ? (
+                        <span className="text-muted-foreground flex items-center gap-1">
+                          <ClipboardList className="w-3 h-3" />
+                          {taskCount} task{taskCount !== 1 ? 's' : ''}
+                        </span>
+                      ) : null;
+                    })()}
                   </div>
                 </div>
 
@@ -423,50 +436,82 @@ export function CustomerList({ customers }: CustomerListProps) {
                   ) : (
                     <div className="divide-y divide-border">
                       {customer.jobs.map((job) => (
-                        <div
-                          key={job.id}
-                          className="flex items-center gap-3 px-4 py-3 pl-14"
-                        >
-                          <div className="flex-shrink-0 w-8 h-8 rounded bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                            <MapPin className="w-4 h-4 text-green-600 dark:text-green-400" />
-                          </div>
+                        <div key={job.id}>
+                          <div className="flex items-center gap-3 px-4 py-3 pl-14">
+                            <div className="flex-shrink-0 w-8 h-8 rounded bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                              <MapPin className="w-4 h-4 text-green-600 dark:text-green-400" />
+                            </div>
 
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium text-foreground">
-                                {job.name}
-                              </span>
-                              {!job.is_active && (
-                                <span className="text-xs px-1.5 py-0.5 bg-muted text-muted-foreground rounded">
-                                  Inactive
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium text-foreground">
+                                  {job.name}
                                 </span>
+                                {!job.is_active && (
+                                  <span className="text-xs px-1.5 py-0.5 bg-muted text-muted-foreground rounded">
+                                    Inactive
+                                  </span>
+                                )}
+                                {('tasks' in job) && (job as JobWithTasks).tasks.length > 0 && (
+                                  <span className="text-xs px-1.5 py-0.5 bg-primary/10 text-primary rounded">
+                                    {(job as JobWithTasks).tasks.length} task{(job as JobWithTasks).tasks.length !== 1 ? 's' : ''}
+                                  </span>
+                                )}
+                              </div>
+                              {job.address && (
+                                <p className="text-sm text-muted-foreground truncate">
+                                  {job.address}
+                                </p>
                               )}
                             </div>
-                            {job.address && (
-                              <p className="text-sm text-muted-foreground truncate">
-                                {job.address}
-                              </p>
-                            )}
+
+                            <div className="flex items-center gap-1">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-8 w-8 p-0"
+                                onClick={() => openEditJob(job)}
+                              >
+                                <Edit className="w-3.5 h-3.5" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                onClick={() => setDeletingJob(job)}
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </Button>
+                            </div>
                           </div>
 
-                          <div className="flex items-center gap-1">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="h-8 w-8 p-0"
-                              onClick={() => openEditJob(job)}
-                            >
-                              <Edit className="w-3.5 h-3.5" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-                              onClick={() => setDeletingJob(job)}
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </Button>
-                          </div>
+                          {/* Tasks linked to this job */}
+                          {('tasks' in job) && (job as JobWithTasks).tasks.length > 0 && (
+                            <div className="pl-[4.5rem] pr-4 pb-3 space-y-1.5">
+                              {(job as JobWithTasks).tasks.map((task) => (
+                                <div
+                                  key={task.id}
+                                  className="flex items-center gap-2 px-3 py-2 rounded-md bg-background border border-border"
+                                >
+                                  <ClipboardList className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                                  <span className="text-sm text-foreground truncate flex-1">
+                                    {task.title}
+                                  </span>
+                                  {task.status && (
+                                    <span
+                                      className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold whitespace-nowrap flex-shrink-0"
+                                      style={{
+                                        backgroundColor: `${task.status.color}20`,
+                                        color: task.status.color,
+                                      }}
+                                    >
+                                      {task.status.name}
+                                    </span>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>

@@ -419,21 +419,19 @@ export function TaskModal({
               )}
 
               {/* Link to Job - auto-fills address */}
-              {jobs.length > 0 && (
-                <div className="pb-4">
-                  <Label>Link to Customer Job</Label>
-                  <p className="text-xs text-muted-foreground mb-2">
-                    Select a job to auto-fill address information.
-                  </p>
-                  <JobSearch
-                    jobs={jobs}
-                    selectedJob={selectedJob}
-                    onJobSelect={handleJobSelect}
-                    onQuickAddClick={() => setShowQuickAddJob(true)}
-                  />
-                  <Separator className="mt-4" />
-                </div>
-              )}
+              <div className="pb-4">
+                <Label>Link to Customer Job</Label>
+                <p className="text-xs text-muted-foreground mb-2">
+                  Select a job to auto-fill address information, or add a new customer & job.
+                </p>
+                <JobSearch
+                  jobs={jobs}
+                  selectedJob={selectedJob}
+                  onJobSelect={handleJobSelect}
+                  onQuickAddClick={() => setShowQuickAddJob(true)}
+                />
+                <Separator className="mt-4" />
+              </div>
 
               {/* Title */}
               <div className="space-y-2">

@@ -1,9 +1,9 @@
-import { getCustomersWithJobs } from '@/lib/customers/actions';
+import { getCustomersWithJobsAndTasks } from '@/lib/customers/actions';
 import { CustomerList } from '@/components/admin/customers/customer-list';
 import { CreateCustomerForm } from '@/components/admin/customers/create-customer-form';
 
 export default async function AdminCustomersPage() {
-  const customers = await getCustomersWithJobs();
+  const customers = await getCustomersWithJobsAndTasks();
 
   return (
     <div className="space-y-6">
